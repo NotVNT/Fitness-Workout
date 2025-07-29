@@ -18,41 +18,61 @@ class WorkoutScheduleView extends StatefulWidget {
 class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
   DateTime _selectedDate = DateTime.now();
 
+  String _getLocalizedWorkoutName(BuildContext context, String workoutKey) {
+    final localizations = AppLocalizations.of(context);
+    switch (workoutKey) {
+      case 'fullBodyWorkout':
+        return localizations?.fullBodyWorkout ?? 'Full Body Workout';
+      case 'lowerBodyWorkout':
+        return localizations?.lowerBodyWorkout ?? 'Lower Body Workout';
+      case 'abWorkout':
+        return localizations?.abWorkout ?? 'Ab Workout';
+      case 'fullbodyWorkout':
+        return localizations?.fullbodyWorkout ?? 'Fullbody Workout';
+      case 'upperbodyWorkout':
+        return localizations?.upperbodyWorkout ?? 'Upperbody Workout';
+      case 'lowerbodyWorkout':
+        return localizations?.lowerbodyWorkout ?? 'Lowerbody Workout';
+      default:
+        return workoutKey;
+    }
+  }
+
   List eventArr = [
     {
-      "name": "Ab Workout",
+      "name": "abWorkout",
       "start_time": "25/05/2023 07:30 AM",
     },
     {
-      "name": "Upperbody Workout",
+      "name": "upperbodyWorkout",
       "start_time": "25/05/2023 09:00 AM",
     },
     {
-      "name": "Lowerbody Workout",
+      "name": "lowerbodyWorkout",
       "start_time": "25/05/2023 03:00 PM",
     },
     {
-      "name": "Ab Workout",
+      "name": "abWorkout",
       "start_time": "26/05/2023 07:30 AM",
     },
     {
-      "name": "Upperbody Workout",
+      "name": "upperbodyWorkout",
       "start_time": "26/05/2023 09:00 AM",
     },
     {
-      "name": "Lowerbody Workout",
+      "name": "lowerbodyWorkout",
       "start_time": "26/05/2023 03:00 PM",
     },
     {
-      "name": "Ab Workout",
+      "name": "abWorkout",
       "start_time": "27/05/2023 07:30 AM",
     },
     {
-      "name": "Upperbody Workout",
+      "name": "upperbodyWorkout",
       "start_time": "27/05/2023 09:00 AM",
     },
     {
-      "name": "Lowerbody Workout",
+      "name": "lowerbodyWorkout",
       "start_time": "27/05/2023 03:00 PM",
     }
   ];
@@ -370,7 +390,7 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
                                               BorderRadius.circular(17.5),
                                         ),
                                         child: Text(
-                                          "${sObj["name"].toString()}, ${getStringDateToOtherFormate(sObj["start_time"].toString(), outFormatStr: "h:mm aa")}",
+                                          "${_getLocalizedWorkoutName(context, sObj["name"].toString())}, ${getStringDateToOtherFormate(sObj["start_time"].toString(), outFormatStr: "h:mm aa")}",
                                           maxLines: 1,
                                           style: TextStyle(
                                             color: TColor.white,

@@ -1,6 +1,7 @@
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:fitness/common/colo_extension.dart';
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 
 class UpcomingWorkoutRow extends StatefulWidget {
   final Map wObj;
@@ -12,6 +13,26 @@ class UpcomingWorkoutRow extends StatefulWidget {
 
 class _UpcomingWorkoutRowState extends State<UpcomingWorkoutRow> {
   bool positive = false;
+
+  String _getLocalizedWorkoutName(BuildContext context, String workoutKey) {
+    final localizations = AppLocalizations.of(context);
+    switch (workoutKey) {
+      case 'fullBodyWorkout':
+        return localizations?.fullBodyWorkout ?? 'Full Body Workout';
+      case 'lowerBodyWorkout':
+        return localizations?.lowerBodyWorkout ?? 'Lower Body Workout';
+      case 'abWorkout':
+        return localizations?.abWorkout ?? 'Ab Workout';
+      case 'fullbodyWorkout':
+        return localizations?.fullbodyWorkout ?? 'Fullbody Workout';
+      case 'upperbodyWorkout':
+        return localizations?.upperbodyWorkout ?? 'Upperbody Workout';
+      case 'lowerbodyWorkout':
+        return localizations?.lowerbodyWorkout ?? 'Lowerbody Workout';
+      default:
+        return workoutKey;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +62,8 @@ class _UpcomingWorkoutRowState extends State<UpcomingWorkoutRow> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.wObj["title"].toString(),
+                  _getLocalizedWorkoutName(
+                      context, widget.wObj["title"].toString()),
                   style: TextStyle(
                       color: TColor.black,
                       fontSize: 12,

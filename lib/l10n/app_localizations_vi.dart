@@ -87,7 +87,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get fullBodyWorkout => 'Tập toàn thân';
 
   @override
-  String get lowerBodyWorkout => 'Tập phần dưới';
+  String get lowerBodyWorkout => 'Tập cơ dưới';
 
   @override
   String get abWorkout => 'Tập bụng';
@@ -153,7 +153,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get items => 'món';
 
   @override
-  String get calories => 'calo';
+  String get caloriesUnit => 'calo';
 
   @override
   String get sleepSchedule => 'Lịch ngủ';
@@ -166,4 +166,52 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get yourSchedule => 'Lịch trình của bạn';
+
+  @override
+  String get bmiBodyMassIndex => 'BMI (Chỉ số khối cơ thể)';
+
+  @override
+  String get waterIntake => 'Lượng nước uống';
+
+  @override
+  String get realTimeUpdates => 'Cập nhật thời gian thực';
+
+  @override
+  String get sleep => 'Giấc ngủ';
+
+  @override
+  String get calories => 'Calo';
+
+  @override
+  String get kCalLeft => 'kCal\ncòn lại';
+
+  @override
+  String get weekly => 'Hàng tuần';
+
+  @override
+  String get latestWorkout => 'Bài tập gần đây';
+
+  @override
+  String get seeMore => 'Xem thêm';
+
+  @override
+  String get caloriesBurn => 'Calo đốt cháy';
+
+  @override
+  String get minutes => 'phút';
+
+  @override
+  String get upcomingWorkout => 'Bài tập sắp tới';
+
+  @override
+  String get fullbodyWorkout => 'Tập toàn thân';
+
+  @override
+  String get upperbodyWorkout => 'Tập cơ trên';
+
+  @override
+  String get lowerbodyWorkout => 'Tập cơ dưới';
+
+  @override
+  String get exercises => 'Bài tập';
 }

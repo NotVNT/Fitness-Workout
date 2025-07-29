@@ -19,12 +19,12 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
   List latestArr = [
     {
       "image": "assets/img/Workout1.png",
-      "title": "Fullbody Workout",
+      "title": "fullbodyWorkout",
       "time": "Today, 03:00pm"
     },
     {
       "image": "assets/img/Workout2.png",
-      "title": "Upperbody Workout",
+      "title": "upperbodyWorkout",
       "time": "June 05, 02:00pm"
     },
   ];
@@ -225,8 +225,11 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                           time: "5/27, 09:00 AM",
                           color: TColor.primaryColor2.withOpacity(0.3),
                           onPressed: () {
-
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => const WorkoutScheduleView() )  );
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const WorkoutScheduleView()));
                           }),
                       SizedBox(
                         height: media.width * 0.02,
@@ -235,7 +238,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                           icon: "assets/img/difficulity.png",
                           title: "Difficulity",
                           time: "Beginner",
-                          color: TColor.secondaryColor2.withOpacity(0.3),
+                          color: TColor.secondaryColor2.withValues(alpha: 0.3),
                           onPressed: () {}),
                       SizedBox(
                         height: media.width * 0.05,

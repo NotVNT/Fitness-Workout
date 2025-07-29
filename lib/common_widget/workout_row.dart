@@ -1,10 +1,31 @@
 import 'package:fitness/common/colo_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import '../l10n/app_localizations.dart';
 
 class WorkoutRow extends StatelessWidget {
   final Map wObj;
   const WorkoutRow({super.key, required this.wObj});
+
+  String _getLocalizedWorkoutName(BuildContext context, String workoutKey) {
+    final localizations = AppLocalizations.of(context);
+    switch (workoutKey) {
+      case 'fullBodyWorkout':
+        return localizations?.fullBodyWorkout ?? 'Full Body Workout';
+      case 'lowerBodyWorkout':
+        return localizations?.lowerBodyWorkout ?? 'Lower Body Workout';
+      case 'abWorkout':
+        return localizations?.abWorkout ?? 'Ab Workout';
+      case 'fullbodyWorkout':
+        return localizations?.fullbodyWorkout ?? 'Fullbody Workout';
+      case 'upperbodyWorkout':
+        return localizations?.upperbodyWorkout ?? 'Upperbody Workout';
+      case 'lowerbodyWorkout':
+        return localizations?.lowerbodyWorkout ?? 'Lowerbody Workout';
+      default:
+        return workoutKey;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,11 +56,11 @@ class WorkoutRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  wObj["name"].toString(),
+                  _getLocalizedWorkoutName(context, wObj["name"].toString()),
                   style: TextStyle(color: TColor.black, fontSize: 12),
                 ),
                 Text(
-                  "${wObj["kcal"].toString()} Calories Burn | ${wObj["time"].toString()}minutes",
+                  "${wObj["kcal"].toString()} ${AppLocalizations.of(context)?.caloriesBurn ?? "Calories Burn"} | ${wObj["time"].toString()}${AppLocalizations.of(context)?.minutes ?? "minutes"}",
                   style: TextStyle(
                     color: TColor.gray,
                     fontSize: 10,

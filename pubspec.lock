@@ -25,13 +25,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.2"
-  calendar_agenda:
-    dependency: "direct main"
-    description:
-      path: "dev_lib/calendar_agenda"
-      relative: true
-    source: path
-    version: "0.0.2+2"
   carousel_slider:
     dependency: "direct main"
     description:
@@ -292,14 +285,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
-  scrollable_positioned_list:
-    dependency: transitive
-    description:
-      name: scrollable_positioned_list
-      sha256: "1b54d5f1329a1e263269abc9e2543d90806131aa14fe7c6062a8054d57249287"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.3.8"
   shared_preferences:
     dependency: "direct main"
     description:

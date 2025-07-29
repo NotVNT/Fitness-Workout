@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../common_widget/round_button.dart';
 import '../../common_widget/upcoming_workout_row.dart';
 import '../../common_widget/what_train_row.dart';
+import '../../l10n/app_localizations.dart';
 
 class WorkoutTrackerView extends StatefulWidget {
   const WorkoutTrackerView({super.key});
@@ -18,12 +19,12 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
   List latestArr = [
     {
       "image": "assets/img/Workout1.png",
-      "title": "Fullbody Workout",
+      "title": "fullbodyWorkout",
       "time": "Today, 03:00pm"
     },
     {
       "image": "assets/img/Workout2.png",
-      "title": "Upperbody Workout",
+      "title": "upperbodyWorkout",
       "time": "June 05, 02:00pm"
     },
   ];
@@ -31,20 +32,20 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
   List whatArr = [
     {
       "image": "assets/img/what_1.png",
-      "title": "Fullbody Workout",
-      "exercises": "11 Exercises",
+      "title": "fullbodyWorkout",
+      "exercises": "11 exercises",
       "time": "32mins"
     },
     {
       "image": "assets/img/what_2.png",
-      "title": "Lowebody Workout",
-      "exercises": "12 Exercises",
+      "title": "lowerbodyWorkout",
+      "exercises": "12 exercises",
       "time": "40mins"
     },
     {
       "image": "assets/img/what_3.png",
-      "title": "AB Workout",
-      "exercises": "14 Exercises",
+      "title": "abWorkout",
+      "exercises": "14 exercises",
       "time": "20mins"
     }
   ];
@@ -206,7 +207,7 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                       drawVerticalLine: false,
                       getDrawingHorizontalLine: (value) {
                         return FlLine(
-                          color: TColor.white.withOpacity(0.15),
+                          color: TColor.white.withValues(alpha: 0.15),
                           strokeWidth: 2,
                         );
                       },
@@ -241,7 +242,7 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                     width: 50,
                     height: 4,
                     decoration: BoxDecoration(
-                        color: TColor.gray.withOpacity(0.3),
+                        color: TColor.gray.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(3)),
                   ),
                   SizedBox(
@@ -251,7 +252,7 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                     padding: const EdgeInsets.symmetric(
                         vertical: 15, horizontal: 15),
                     decoration: BoxDecoration(
-                      color: TColor.primaryColor2.withOpacity(0.3),
+                      color: TColor.primaryColor2.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Row(
@@ -293,7 +294,8 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Upcoming Workout",
+                        AppLocalizations.of(context)?.upcomingWorkout ??
+                            "Upcoming Workout",
                         style: TextStyle(
                             color: TColor.black,
                             fontSize: 16,
@@ -302,7 +304,7 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                       TextButton(
                         onPressed: () {},
                         child: Text(
-                          "See More",
+                          AppLocalizations.of(context)?.seeMore ?? "See More",
                           style: TextStyle(
                               color: TColor.gray,
                               fontSize: 14,
@@ -398,7 +400,7 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
 
   LineChartBarData get lineChartBarData1_2 => LineChartBarData(
         isCurved: true,
-        color: TColor.white.withOpacity(0.5),
+        color: TColor.white.withValues(alpha: 0.5),
         barWidth: 2,
         isStrokeCapRound: true,
         dotData: FlDotData(show: false),

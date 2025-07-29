@@ -153,7 +153,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get items => 'Items';
 
   @override
-  String get calories => 'calories';
+  String get caloriesUnit => 'calories';
 
   @override
   String get sleepSchedule => 'Sleep Schedule';
@@ -166,4 +166,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get yourSchedule => 'Your Schedule';
+
+  @override
+  String get bmiBodyMassIndex => 'BMI (Body Mass Index)';
+
+  @override
+  String get waterIntake => 'Water Intake';
+
+  @override
+  String get realTimeUpdates => 'Real time updates';
+
+  @override
+  String get sleep => 'Sleep';
+
+  @override
+  String get calories => 'Calories';
+
+  @override
+  String get kCalLeft => 'kCal\nleft';
+
+  @override
+  String get weekly => 'Weekly';
+
+  @override
+  String get latestWorkout => 'Latest Workout';
+
+  @override
+  String get seeMore => 'See More';
+
+  @override
+  String get caloriesBurn => 'Calories Burn';
+
+  @override
+  String get minutes => 'minutes';
+
+  @override
+  String get upcomingWorkout => 'Upcoming Workout';
+
+  @override
+  String get fullbodyWorkout => 'Fullbody Workout';
+
+  @override
+  String get upperbodyWorkout => 'Upperbody Workout';
+
+  @override
+  String get lowerbodyWorkout => 'Lowerbody Workout';
+
+  @override
+  String get exercises => 'Exercises';
 }
