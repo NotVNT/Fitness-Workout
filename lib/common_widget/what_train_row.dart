@@ -2,10 +2,40 @@ import 'package:fitness/common_widget/round_button.dart';
 import 'package:flutter/material.dart';
 
 import '../common/colo_extension.dart';
+import '../l10n/app_localizations.dart';
 
 class WhatTrainRow extends StatelessWidget {
   final Map wObj;
   const WhatTrainRow({super.key, required this.wObj});
+
+  String _getLocalizedWorkoutName(BuildContext context, String workoutKey) {
+    final localizations = AppLocalizations.of(context);
+    switch (workoutKey) {
+      case 'fullBodyWorkout':
+        return localizations?.fullBodyWorkout ?? 'Full Body Workout';
+      case 'lowerBodyWorkout':
+        return localizations?.lowerBodyWorkout ?? 'Lower Body Workout';
+      case 'abWorkout':
+        return localizations?.abWorkout ?? 'Ab Workout';
+      case 'fullbodyWorkout':
+        return localizations?.fullbodyWorkout ?? 'Fullbody Workout';
+      case 'upperbodyWorkout':
+        return localizations?.upperbodyWorkout ?? 'Upperbody Workout';
+      case 'lowerbodyWorkout':
+        return localizations?.lowerbodyWorkout ?? 'Lowerbody Workout';
+      default:
+        return workoutKey;
+    }
+  }
+
+  String _getLocalizedExercises(BuildContext context, String exercisesText) {
+    final localizations = AppLocalizations.of(context);
+    if (exercisesText.contains('exercises')) {
+      final number = exercisesText.split(' ')[0];
+      return '$number ${localizations?.exercises ?? "Exercises"}';
+    }
+    return exercisesText;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +49,8 @@ class WhatTrainRow extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
           decoration: BoxDecoration(
             gradient: LinearGradient(colors: [
-              TColor.primaryColor2.withOpacity(0.3),
-              TColor.primaryColor1.withOpacity(0.3)
+              TColor.primaryColor2.withValues(alpha: 0.3),
+              TColor.primaryColor1.withValues(alpha: 0.3)
             ]),
             borderRadius: BorderRadius.circular(15),
           ),
@@ -31,7 +61,8 @@ class WhatTrainRow extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      wObj["title"].toString(),
+                      _getLocalizedWorkoutName(
+                          context, wObj["title"].toString()),
                       style: TextStyle(
                           color: TColor.black,
                           fontSize: 14,
@@ -41,7 +72,7 @@ class WhatTrainRow extends StatelessWidget {
                       height: 4,
                     ),
                     Text(
-                      "${wObj["exercises"].toString()} | ${ wObj["time"].toString() }" ,
+                      "${_getLocalizedExercises(context, wObj["exercises"].toString())} | ${wObj["time"].toString()}",
                       style: TextStyle(
                         color: TColor.gray,
                         fontSize: 12,
@@ -57,7 +88,7 @@ class WhatTrainRow extends StatelessWidget {
                           title: "View More",
                           fontSize: 10,
                           type: RoundButtonType.textGradient,
-                          elevation:0.05,
+                          elevation: 0.05,
                           fontWeight: FontWeight.w400,
                           onPressed: () {}),
                     )
@@ -74,7 +105,7 @@ class WhatTrainRow extends StatelessWidget {
                     width: 80,
                     height: 80,
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.54),
+                      color: Colors.white.withValues(alpha: 0.54),
                       borderRadius: BorderRadius.circular(40),
                     ),
                   ),

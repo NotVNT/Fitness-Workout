@@ -386,11 +386,11 @@ abstract class AppLocalizations {
   /// **'Items'**
   String get items;
 
-  /// No description provided for @calories.
+  /// No description provided for @caloriesUnit.
   ///
   /// In en, this message translates to:
   /// **'calories'**
-  String get calories;
+  String get caloriesUnit;
 
   /// No description provided for @sleepSchedule.
   ///
@@ -415,6 +415,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your Schedule'**
   String get yourSchedule;
+
+  /// No description provided for @bmiBodyMassIndex.
+  ///
+  /// In en, this message translates to:
+  /// **'BMI (Body Mass Index)'**
+  String get bmiBodyMassIndex;
+
+  /// No description provided for @waterIntake.
+  ///
+  /// In en, this message translates to:
+  /// **'Water Intake'**
+  String get waterIntake;
+
+  /// No description provided for @realTimeUpdates.
+  ///
+  /// In en, this message translates to:
+  /// **'Real time updates'**
+  String get realTimeUpdates;
+
+  /// No description provided for @sleep.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep'**
+  String get sleep;
+
+  /// No description provided for @calories.
+  ///
+  /// In en, this message translates to:
+  /// **'Calories'**
+  String get calories;
+
+  /// No description provided for @kCalLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'kCal\nleft'**
+  String get kCalLeft;
+
+  /// No description provided for @weekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get weekly;
+
+  /// No description provided for @latestWorkout.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest Workout'**
+  String get latestWorkout;
+
+  /// No description provided for @seeMore.
+  ///
+  /// In en, this message translates to:
+  /// **'See More'**
+  String get seeMore;
+
+  /// No description provided for @caloriesBurn.
+  ///
+  /// In en, this message translates to:
+  /// **'Calories Burn'**
+  String get caloriesBurn;
+
+  /// No description provided for @minutes.
+  ///
+  /// In en, this message translates to:
+  /// **'minutes'**
+  String get minutes;
+
+  /// No description provided for @upcomingWorkout.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming Workout'**
+  String get upcomingWorkout;
+
+  /// No description provided for @fullbodyWorkout.
+  ///
+  /// In en, this message translates to:
+  /// **'Fullbody Workout'**
+  String get fullbodyWorkout;
+
+  /// No description provided for @upperbodyWorkout.
+  ///
+  /// In en, this message translates to:
+  /// **'Upperbody Workout'**
+  String get upperbodyWorkout;
+
+  /// No description provided for @lowerbodyWorkout.
+  ///
+  /// In en, this message translates to:
+  /// **'Lowerbody Workout'**
+  String get lowerbodyWorkout;
+
+  /// No description provided for @exercises.
+  ///
+  /// In en, this message translates to:
+  /// **'Exercises'**
+  String get exercises;
 }
 
 class _AppLocalizationsDelegate

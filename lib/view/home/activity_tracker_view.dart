@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../common/colo_extension.dart';
 import '../../common_widget/latest_activity_row.dart';
 import '../../common_widget/today_target_cell.dart';
+import '../../l10n/app_localizations.dart';
 
 class ActivityTrackerView extends StatefulWidget {
   const ActivityTrackerView({super.key});
@@ -93,8 +94,8 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                     const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(colors: [
-                    TColor.primaryColor2.withOpacity(0.3),
-                    TColor.primaryColor1.withOpacity(0.3)
+                    TColor.primaryColor2.withValues(alpha: 0.3),
+                    TColor.primaryColor1.withValues(alpha: 0.3)
                   ]),
                   borderRadius: BorderRadius.circular(15),
                 ),
@@ -323,7 +324,8 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Latest Workout",
+                    AppLocalizations.of(context)?.latestWorkout ??
+                        "Latest Workout",
                     style: TextStyle(
                         color: TColor.black,
                         fontSize: 16,
@@ -332,7 +334,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                   TextButton(
                     onPressed: () {},
                     child: Text(
-                      "See More",
+                      AppLocalizations.of(context)?.seeMore ?? "See More",
                       style: TextStyle(
                           color: TColor.gray,
                           fontSize: 14,

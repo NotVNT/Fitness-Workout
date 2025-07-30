@@ -21,21 +21,21 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   List lastWorkoutArr = [
     {
-      "name": "Full Body Workout",
+      "name": "fullBodyWorkout",
       "image": "assets/img/Workout1.png",
       "kcal": "180",
       "time": "20",
       "progress": 0.3
     },
     {
-      "name": "Lower Body Workout",
+      "name": "lowerBodyWorkout",
       "image": "assets/img/Workout2.png",
       "kcal": "200",
       "time": "30",
       "progress": 0.4
     },
     {
-      "name": "Ab Workout",
+      "name": "abWorkout",
       "image": "assets/img/Workout3.png",
       "kcal": "300",
       "time": "40",
@@ -185,16 +185,20 @@ class _HomeViewState extends State<HomeView> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "BMI (Body Mass Index)",
+                                AppLocalizations.of(context)
+                                        ?.bmiBodyMassIndex ??
+                                    "BMI (Body Mass Index)",
                                 style: TextStyle(
                                     color: TColor.white,
                                     fontSize: 14,
                                     fontWeight: FontWeight.w700),
                               ),
                               Text(
-                                "You have a normal weight",
+                                AppLocalizations.of(context)
+                                        ?.youHaveNormalWeight ??
+                                    "You have a normal weight",
                                 style: TextStyle(
-                                    color: TColor.white.withOpacity(0.7),
+                                    color: TColor.white.withValues(alpha: 0.7),
                                     fontSize: 12),
                               ),
                               SizedBox(
@@ -204,7 +208,9 @@ class _HomeViewState extends State<HomeView> {
                                   width: 120,
                                   height: 35,
                                   child: RoundButton(
-                                      title: "View More",
+                                      title: AppLocalizations.of(context)
+                                              ?.viewMore ??
+                                          "View More",
                                       type: RoundButtonType.bgSGradient,
                                       fontSize: 12,
                                       fontWeight: FontWeight.w400,
@@ -241,7 +247,7 @@ class _HomeViewState extends State<HomeView> {
                   padding:
                       const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
                   decoration: BoxDecoration(
-                    color: TColor.primaryColor2.withOpacity(0.3),
+                    color: TColor.primaryColor2.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: Row(
@@ -281,7 +287,8 @@ class _HomeViewState extends State<HomeView> {
                   height: media.width * 0.05,
                 ),
                 Text(
-                  "Activity Status",
+                  AppLocalizations.of(context)?.activityStatus ??
+                      "Activity Status",
                   style: TextStyle(
                       color: TColor.black,
                       fontSize: 16,
@@ -296,7 +303,7 @@ class _HomeViewState extends State<HomeView> {
                     height: media.width * 0.4,
                     width: double.maxFinite,
                     decoration: BoxDecoration(
-                      color: TColor.primaryColor2.withOpacity(0.3),
+                      color: TColor.primaryColor2.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(25),
                     ),
                     child: Stack(
@@ -311,7 +318,8 @@ class _HomeViewState extends State<HomeView> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Heart Rate",
+                                AppLocalizations.of(context)?.heartRate ??
+                                    "Heart Rate",
                                 style: TextStyle(
                                     color: TColor.black,
                                     fontSize: 16,
@@ -330,7 +338,8 @@ class _HomeViewState extends State<HomeView> {
                                 child: Text(
                                   "78 BPM",
                                   style: TextStyle(
-                                      color: TColor.white.withOpacity(0.7),
+                                      color:
+                                          TColor.white.withValues(alpha: 0.7),
                                       fontWeight: FontWeight.w700,
                                       fontSize: 18),
                                 ),
@@ -406,7 +415,7 @@ class _HomeViewState extends State<HomeView> {
                                     (List<LineBarSpot> lineBarsSpot) {
                                   return lineBarsSpot.map((lineBarSpot) {
                                     return LineTooltipItem(
-                                      "${lineBarSpot.x.toInt()} mins ago",
+                                      "${lineBarSpot.x.toInt()} ${AppLocalizations.of(context)?.minsAgo ?? "mins ago"}",
                                       const TextStyle(
                                         color: Colors.white,
                                         fontSize: 10,
@@ -481,7 +490,9 @@ class _HomeViewState extends State<HomeView> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "Water Intake",
+                                      AppLocalizations.of(context)
+                                              ?.waterIntake ??
+                                          "Water Intake",
                                       style: TextStyle(
                                           color: TColor.black,
                                           fontSize: 12,
@@ -500,8 +511,8 @@ class _HomeViewState extends State<HomeView> {
                                       child: Text(
                                         "4 Liters",
                                         style: TextStyle(
-                                            color:
-                                                TColor.white.withOpacity(0.7),
+                                            color: TColor.white
+                                                .withValues(alpha: 0.7),
                                             fontWeight: FontWeight.w700,
                                             fontSize: 14),
                                       ),
@@ -510,7 +521,9 @@ class _HomeViewState extends State<HomeView> {
                                       height: 10,
                                     ),
                                     Text(
-                                      "Real time updates",
+                                      AppLocalizations.of(context)
+                                              ?.realTimeUpdates ??
+                                          "Real time updates",
                                       style: TextStyle(
                                         color: TColor.gray,
                                         fontSize: 12,
@@ -644,7 +657,8 @@ class _HomeViewState extends State<HomeView> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  "Sleep",
+                                  AppLocalizations.of(context)?.sleep ??
+                                      "Sleep",
                                   style: TextStyle(
                                       color: TColor.black,
                                       fontSize: 11,
@@ -700,7 +714,8 @@ class _HomeViewState extends State<HomeView> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  "Calories",
+                                  AppLocalizations.of(context)?.calories ??
+                                      "Calories",
                                   style: TextStyle(
                                       color: TColor.black,
                                       fontSize: 11,
@@ -748,7 +763,7 @@ class _HomeViewState extends State<HomeView> {
                                             ),
                                             child: FittedBox(
                                               child: Text(
-                                                "230kCal\nleft",
+                                                "230${AppLocalizations.of(context)?.kCalLeft ?? "kCal\nleft"}",
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
                                                     color: TColor.white,
@@ -783,7 +798,8 @@ class _HomeViewState extends State<HomeView> {
                   children: [
                     Flexible(
                       child: Text(
-                        "Workout Progress",
+                        AppLocalizations.of(context)?.workoutProgress ??
+                            "Workout Progress",
                         style: TextStyle(
                             color: TColor.black,
                             fontSize: 16,
@@ -894,7 +910,7 @@ class _HomeViewState extends State<HomeView> {
                             getTooltipItems: (List<LineBarSpot> lineBarsSpot) {
                               return lineBarsSpot.map((lineBarSpot) {
                                 return LineTooltipItem(
-                                  "${lineBarSpot.x.toInt()} mins ago",
+                                  "${lineBarSpot.x.toInt()} ${AppLocalizations.of(context)?.minsAgo ?? "mins ago"}",
                                   const TextStyle(
                                     color: Colors.white,
                                     fontSize: 10,
@@ -946,7 +962,8 @@ class _HomeViewState extends State<HomeView> {
                   children: [
                     Flexible(
                       child: Text(
-                        "Latest Workout",
+                        AppLocalizations.of(context)?.latestWorkout ??
+                            "Latest Workout",
                         style: TextStyle(
                             color: TColor.black,
                             fontSize: 16,
@@ -956,7 +973,7 @@ class _HomeViewState extends State<HomeView> {
                     TextButton(
                       onPressed: () {},
                       child: Text(
-                        "See More",
+                        AppLocalizations.of(context)?.seeMore ?? "See More",
                         style: TextStyle(
                             color: TColor.gray,
                             fontSize: 14,
