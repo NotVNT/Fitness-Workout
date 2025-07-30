@@ -7,6 +7,9 @@ import '../../common_widget/setting_row.dart';
 import '../../common_widget/title_subtitle_cell.dart';
 import '../../common_widget/language_selector.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/auth_service.dart';
+import '../../models/user_model.dart';
+import '../../test_user_data.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -37,7 +40,67 @@ class _ProfileViewState extends State<ProfileView> {
     {"image": "assets/img/p_contact.png", "name": "Contact Us", "tag": "5"},
     {"image": "assets/img/p_privacy.png", "name": "Privacy Policy", "tag": "6"},
     {"image": "assets/img/p_setting.png", "name": "Setting", "tag": "7"},
+    {"image": "assets/img/p_setting.png", "name": "Test User Data", "tag": "8"},
   ];
+
+  final AuthService _authService = AuthService();
+
+  int _calculateAge(String dateOfBirth) {
+    if (dateOfBirth.isEmpty) return 0;
+    try {
+      DateTime birthDate = DateTime.parse(dateOfBirth);
+      DateTime now = DateTime.now();
+      int age = now.year - birthDate.year;
+      if (now.month < birthDate.month ||
+          (now.month == birthDate.month && now.day < birthDate.day)) {
+        age--;
+      }
+      return age;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  Future<void> _logout() async {
+    // Hiển thị dialog xác nhận
+    bool? shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Đăng xuất'),
+          content: const Text('Bạn có chắc chắn muốn đăng xuất?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Hủy'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Đăng xuất'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldLogout == true) {
+      try {
+        await _authService.signOut();
+        // Navigation sẽ được xử lý bởi AuthWrapper
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content:
+                  Text('Lỗi đăng xuất: ${_authService.getErrorMessage(e)}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,48 +136,63 @@ class _ProfileViewState extends State<ProfileView> {
         ],
       ),
       backgroundColor: TColor.white,
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
+      body: StreamBuilder<Map<String, dynamic>?>(
+        stream: _authService.getCurrentUserDataStream(),
+        builder: (context, snapshot) {
+          Map<String, dynamic>? userData = snapshot.data;
+          String fullName = "User";
+          String goal = "Set your goal";
+
+          if (userData != null) {
+            String firstName = userData['firstName'] ?? '';
+            String lastName = userData['lastName'] ?? '';
+            fullName = '$firstName $lastName'.trim();
+            if (fullName.isEmpty) fullName = "User";
+            goal = userData['goal'] ?? "Set your goal";
+          }
+
+          return SingleChildScrollView(
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(30),
-                    child: Image.asset(
-                      "assets/img/u2.png",
-                      width: 50,
-                      height: 50,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 15,
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Stefani Wong",
-                          style: TextStyle(
-                            color: TColor.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
+                  Row(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(30),
+                        child: Image.asset(
+                          "assets/img/u2.png",
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
                         ),
-                        Text(
-                          "Lose a Fat Program",
-                          style: TextStyle(
-                            color: TColor.gray,
-                            fontSize: 12,
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
+                      ),
+                      const SizedBox(
+                        width: 15,
+                      ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              fullName,
+                              style: TextStyle(
+                                color: TColor.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Text(
+                              goal,
+                              style: TextStyle(
+                                color: TColor.gray,
+                                fontSize: 12,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
                   SizedBox(
                     width: 70,
                     height: 25,
@@ -138,29 +216,35 @@ class _ProfileViewState extends State<ProfileView> {
               const SizedBox(
                 height: 15,
               ),
-              const Row(
+              Row(
                 children: [
                   Expanded(
                     child: TitleSubtitleCell(
-                      title: "180cm",
+                      title: userData != null && userData['height'] != null
+                          ? "${userData['height'].toInt()}cm"
+                          : "0cm",
                       subtitle: "Height",
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 15,
                   ),
                   Expanded(
                     child: TitleSubtitleCell(
-                      title: "65kg",
+                      title: userData != null && userData['weight'] != null
+                          ? "${userData['weight'].toInt()}kg"
+                          : "0kg",
                       subtitle: "Weight",
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 15,
                   ),
                   Expanded(
                     child: TitleSubtitleCell(
-                      title: "22yo",
+                      title: userData != null && userData['dateOfBirth'] != null
+                          ? "${_calculateAge(userData['dateOfBirth'])}yo"
+                          : "0yo",
                       subtitle: "Age",
                     ),
                   ),
@@ -352,16 +436,29 @@ class _ProfileViewState extends State<ProfileView> {
                         return SettingRow(
                           icon: iObj["image"].toString(),
                           title: iObj["name"].toString(),
-                          onPressed: () {},
+                          onPressed: () {
+                            if (iObj["tag"] == "8") {}
+                          },
                         );
                       },
+                    ),
+                    const SizedBox(height: 25),
+                    // Nút đăng xuất
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: RoundButton(
+                        title: "Đăng xuất",
+                        type: RoundButtonType.bgGradient,
+                        onPressed: () => _logout(),
+                      ),
                     )
                   ],
                 ),
               )
             ],
-          ),
-        ),
+          ),)
+        );
+        },
       ),
     );
   }

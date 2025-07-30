@@ -1,8 +1,8 @@
 import 'package:fitness/common/colo_extension.dart';
 import 'package:fitness/common_widget/round_button.dart';
 import 'package:fitness/common_widget/round_textfield.dart';
-import 'package:fitness/view/login/complete_profile_view.dart';
 import 'package:flutter/material.dart';
+import 'package:fitness/services/auth_service.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -12,6 +12,56 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
+  final AuthService _authService = AuthService();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
+
+  Future<void> _signIn() async {
+    // Validation
+    if (_emailController.text.trim().isEmpty) {
+      _showErrorMessage('Vui lòng nhập email');
+      return;
+    }
+    if (_passwordController.text.trim().isEmpty) {
+      _showErrorMessage('Vui lòng nhập mật khẩu');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final result = await _authService.signInWithEmail(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+      );
+
+      if (result != null) {
+        // Navigation sẽ được xử lý bởi AuthWrapper
+        // Không cần Navigator.push ở đây
+      }
+    } catch (e) {
+      _showErrorMessage(_authService.getErrorMessage(e));
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _showErrorMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
   bool isCheck = false;
   @override
   Widget build(BuildContext context) {
@@ -43,9 +93,10 @@ class _LoginViewState extends State<LoginView> {
                 SizedBox(
                   height: media.width * 0.04,
                 ),
-                const RoundTextField(
+                RoundTextField(
                   hitText: "Email",
                   icon: "assets/img/email.png",
+                  controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                 ),
                 SizedBox(
@@ -55,6 +106,7 @@ class _LoginViewState extends State<LoginView> {
                   hitText: "Password",
                   icon: "assets/img/lock.png",
                   obscureText: true,
+                  controller: _passwordController,
                   rigtIcon: TextButton(
                       onPressed: () {},
                       child: Container(
@@ -73,7 +125,7 @@ class _LoginViewState extends State<LoginView> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Forgot your password?",
+                      "Quên mật khẩu?",
                       style: TextStyle(
                           color: TColor.gray,
                           fontSize: 10,
@@ -81,16 +133,10 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ],
                 ),
-               const Spacer(),
+                const Spacer(),
                 RoundButton(
-                    title: "Login",
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const CompleteProfileView()));
-                    }),
+                    title: _isLoading ? "Đang đăng nhập..." : "Login",
+                    onPressed: _isLoading ? () {} : () => _signIn()),
                 SizedBox(
                   height: media.width * 0.04,
                 ),
