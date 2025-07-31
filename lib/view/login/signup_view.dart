@@ -56,9 +56,24 @@ class _SignUpViewState extends State<SignUpView> {
       );
 
       if (result != null) {
-        // Navigation sẽ được xử lý bởi AuthWrapper
-        // Không cần Navigator.push ở đây
-        _showSuccessMessage('Đăng ký thành công!');
+        // Đăng ký thành công, đăng xuất và chuyển đến màn hình đăng nhập
+        _showSuccessMessage(
+            'Đăng ký thành công!');
+
+        // Đăng xuất user vừa tạo để họ phải đăng nhập lại
+        await _authService.signOut();
+
+        // Delay một chút để user đọc thông báo
+        await Future.delayed(const Duration(seconds: 2));
+
+        if (mounted) {
+          // Chuyển đến màn hình đăng nhập
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => const LoginView(),
+            ),
+          );
+        }
       }
     } catch (e) {
       _showErrorMessage(_authService.getErrorMessage(e));
@@ -74,8 +89,30 @@ class _SignUpViewState extends State<SignUpView> {
   void _showErrorMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Row(
+          children: [
+            const Icon(
+              Icons.error_outline,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
+        ),
         backgroundColor: Colors.red,
+        duration: const Duration(seconds: 4),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
       ),
     );
   }
@@ -83,8 +120,30 @@ class _SignUpViewState extends State<SignUpView> {
   void _showSuccessMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Row(
+          children: [
+            const Icon(
+              Icons.check_circle_outline,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
+        ),
         backgroundColor: Colors.green,
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
       ),
     );
   }

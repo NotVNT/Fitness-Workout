@@ -39,8 +39,13 @@ class _LoginViewState extends State<LoginView> {
       );
 
       if (result != null) {
-        // Navigation sẽ được xử lý bởi AuthWrapper
-        // Không cần Navigator.push ở đây
+        // Đăng nhập thành công, navigate trực tiếp đến MainTabView
+        if (mounted) {
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            '/main',
+            (route) => false,
+          );
+        }
       }
     } catch (e) {
       _showErrorMessage(_authService.getErrorMessage(e));
@@ -56,8 +61,30 @@ class _LoginViewState extends State<LoginView> {
   void _showErrorMessage(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Row(
+          children: [
+            const Icon(
+              Icons.error_outline,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
+        ),
         backgroundColor: Colors.red,
+        duration: const Duration(seconds: 4),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
       ),
     );
   }

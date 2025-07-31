@@ -1,5 +1,6 @@
 import 'package:fitness/database/firebase_options.dart';
 import 'package:fitness/widgets/auth_wrapper.dart';
+import 'package:fitness/view/main_tab/main_tab_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
@@ -50,6 +51,9 @@ class MyApp extends StatelessWidget {
               ),
               fontFamily: "Poppins"),
           home: const AuthWrapper(),
+          routes: {
+            '/main': (context) => const MainTabView(),
+          },
         );
       },
     );

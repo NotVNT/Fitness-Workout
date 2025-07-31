@@ -1,5 +1,6 @@
 import 'package:fitness/common/colo_extension.dart';
 import 'package:fitness/view/on_boarding/on_boarding_view.dart';
+import 'package:fitness/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
 import '../../common_widget/round_button.dart';
@@ -48,6 +49,19 @@ class _StartedViewState extends State<StartedView> {
                 ),
               ),
               const Spacer(),
+              // Test logout button
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final authService = AuthService();
+                    await authService.signOut();
+                    print('Force logout completed');
+                  },
+                  child: const Text('Force Logout (Test)'),
+                ),
+              ),
+              const SizedBox(height: 10),
               SafeArea(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15),
