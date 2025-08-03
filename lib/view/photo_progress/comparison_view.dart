@@ -4,6 +4,7 @@ import 'package:fitness/view/photo_progress/result_view.dart';
 import 'package:flutter/material.dart';
 
 import '../../common/colo_extension.dart';
+import '../../l10n/app_localizations.dart';
 
 class ComparisonView extends StatefulWidget {
   const ComparisonView({super.key});
@@ -41,7 +42,7 @@ class _ComparisonViewState extends State<ComparisonView> {
           ),
         ),
         title: Text(
-          "Comparison",
+          AppLocalizations.of(context)?.comparison ?? "Comparison",
           style: TextStyle(
               color: TColor.black, fontSize: 16, fontWeight: FontWeight.w700),
         ),
@@ -88,7 +89,8 @@ class _ComparisonViewState extends State<ComparisonView> {
                 color: TColor.lightGray),
             const Spacer(),
             RoundButton(
-                title: "Compare",
+                icon: Icons.compare_arrows,
+                iconSize: 20,
                 onPressed: () {
                   Navigator.push(
                     context,

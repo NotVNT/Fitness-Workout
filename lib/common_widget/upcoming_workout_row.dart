@@ -34,6 +34,14 @@ class _UpcomingWorkoutRowState extends State<UpcomingWorkoutRow> {
     }
   }
 
+  String _getLocalizedTime(BuildContext context, String timeText) {
+    final localizations = AppLocalizations.of(context);
+    if (timeText.startsWith('Today')) {
+      return timeText.replaceFirst('Today', localizations?.today ?? 'Today');
+    }
+    return timeText;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -70,7 +78,7 @@ class _UpcomingWorkoutRowState extends State<UpcomingWorkoutRow> {
                       fontWeight: FontWeight.w500),
                 ),
                 Text(
-                  widget.wObj["time"].toString(),
+                  _getLocalizedTime(context, widget.wObj["time"].toString()),
                   style: TextStyle(
                     color: TColor.gray,
                     fontSize: 10,

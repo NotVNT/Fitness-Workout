@@ -127,14 +127,27 @@ class LanguageSelector extends StatelessWidget {
       onTap: () {
         languageProvider.changeLanguage(locale);
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)?.languageChanged ??
-                "Language changed successfully"),
-            backgroundColor: TColor.primaryColor1,
-            duration: const Duration(seconds: 2),
-          ),
-        );
+
+        // Hiển thị thông báo theo ngôn ngữ mới được chọn với delay nhỏ
+        String message;
+        if (locale.languageCode == 'vi') {
+          message = "Đã thay đổi ngôn ngữ thành công";
+        } else {
+          message = "Language changed successfully";
+        }
+
+        // Delay nhỏ để đảm bảo UI đã được rebuild
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(message),
+                backgroundColor: TColor.primaryColor1,
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+        });
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),

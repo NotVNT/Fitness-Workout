@@ -18,26 +18,50 @@ class ProfileView extends StatefulWidget {
 class _ProfileViewState extends State<ProfileView> {
   bool positive = false;
 
-  List accountArr = [
-    {"image": "assets/img/p_personal.png", "name": "Personal Data", "tag": "1"},
-    {"image": "assets/img/p_achi.png", "name": "Achievement", "tag": "2"},
-    {
-      "image": "assets/img/p_activity.png",
-      "name": "Activity History",
-      "tag": "3"
-    },
-    {
-      "image": "assets/img/p_workout.png",
-      "name": "Workout Progress",
-      "tag": "4"
-    }
-  ];
+  // Sẽ được khởi tạo trong build method để có thể sử dụng localization
+  List<Map<String, String>> get accountArr => [
+        {
+          "image": "assets/img/p_personal.png",
+          "name": AppLocalizations.of(context)?.personalData ?? "Personal Data",
+          "tag": "1"
+        },
+        {
+          "image": "assets/img/p_achi.png",
+          "name": AppLocalizations.of(context)?.achievement ?? "Achievement",
+          "tag": "2"
+        },
+        {
+          "image": "assets/img/p_activity.png",
+          "name": AppLocalizations.of(context)?.activityHistory ??
+              "Activity History",
+          "tag": "3"
+        },
+        {
+          "image": "assets/img/p_workout.png",
+          "name": AppLocalizations.of(context)?.workoutProgress ??
+              "Workout Progress",
+          "tag": "4"
+        }
+      ];
 
-  List otherArr = [
-    {"image": "assets/img/p_contact.png", "name": "Contact Us", "tag": "5"},
-    {"image": "assets/img/p_privacy.png", "name": "Privacy Policy", "tag": "6"},
-    {"image": "assets/img/p_setting.png", "name": "Setting", "tag": "7"},
-  ];
+  List<Map<String, String>> get otherArr => [
+        {
+          "image": "assets/img/p_contact.png",
+          "name": AppLocalizations.of(context)?.contactUs ?? "Contact Us",
+          "tag": "5"
+        },
+        {
+          "image": "assets/img/p_privacy.png",
+          "name":
+              AppLocalizations.of(context)?.privacyPolicy ?? "Privacy Policy",
+          "tag": "6"
+        },
+        {
+          "image": "assets/img/p_setting.png",
+          "name": AppLocalizations.of(context)?.settings ?? "Settings",
+          "tag": "7"
+        },
+      ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,7 +122,8 @@ class _ProfileViewState extends State<ProfileView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Stefani Wong",
+                          AppLocalizations.of(context)?.stefaniWong ??
+                              "Stefani Wong",
                           style: TextStyle(
                             color: TColor.black,
                             fontSize: 14,
@@ -106,7 +131,8 @@ class _ProfileViewState extends State<ProfileView> {
                           ),
                         ),
                         Text(
-                          "Lose a Fat Program",
+                          AppLocalizations.of(context)?.loseAFatProgram ??
+                              "Lose a Fat Program",
                           style: TextStyle(
                             color: TColor.gray,
                             fontSize: 12,
@@ -119,7 +145,7 @@ class _ProfileViewState extends State<ProfileView> {
                     width: 70,
                     height: 25,
                     child: RoundButton(
-                      title: "Edit",
+                      title: AppLocalizations.of(context)?.edit ?? "Edit",
                       type: RoundButtonType.bgGradient,
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
@@ -138,30 +164,32 @@ class _ProfileViewState extends State<ProfileView> {
               const SizedBox(
                 height: 15,
               ),
-              const Row(
+              Row(
                 children: [
                   Expanded(
                     child: TitleSubtitleCell(
                       title: "180cm",
-                      subtitle: "Height",
+                      subtitle:
+                          AppLocalizations.of(context)?.height ?? "Height",
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 15,
                   ),
                   Expanded(
                     child: TitleSubtitleCell(
                       title: "65kg",
-                      subtitle: "Weight",
+                      subtitle:
+                          AppLocalizations.of(context)?.weight ?? "Weight",
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 15,
                   ),
                   Expanded(
                     child: TitleSubtitleCell(
                       title: "22yo",
-                      subtitle: "Age",
+                      subtitle: AppLocalizations.of(context)?.age ?? "Age",
                     ),
                   ),
                 ],
@@ -226,7 +254,8 @@ class _ProfileViewState extends State<ProfileView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Notification",
+                      AppLocalizations.of(context)?.notification ??
+                          "Notification",
                       style: TextStyle(
                         color: TColor.black,
                         fontSize: 16,
@@ -248,7 +277,9 @@ class _ProfileViewState extends State<ProfileView> {
                             ),
                             Expanded(
                               child: Text(
-                                "Pop-up Notification",
+                                AppLocalizations.of(context)
+                                        ?.popUpNotification ??
+                                    "Pop-up Notification",
                                 style: TextStyle(
                                   color: TColor.black,
                                   fontSize: 12,
@@ -332,7 +363,7 @@ class _ProfileViewState extends State<ProfileView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Other",
+                      AppLocalizations.of(context)?.other ?? "Other",
                       style: TextStyle(
                         color: TColor.black,
                         fontSize: 16,

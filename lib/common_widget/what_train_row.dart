@@ -85,11 +85,10 @@ class WhatTrainRow extends StatelessWidget {
                       width: 100,
                       height: 30,
                       child: RoundButton(
-                          title: "View More",
-                          fontSize: 10,
+                          icon: Icons.arrow_forward,
+                          iconSize: 16,
                           type: RoundButtonType.textGradient,
                           elevation: 0.05,
-                          fontWeight: FontWeight.w400,
                           onPressed: () {}),
                     )
                   ],

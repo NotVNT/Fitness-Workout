@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../common_widget/round_button.dart';
 import '../../common_widget/upcoming_workout_row.dart';
 import '../../common_widget/what_train_row.dart';
+import '../../common_widget/icon_text_button.dart';
 import '../../l10n/app_localizations.dart';
 
 class WorkoutTrackerView extends StatefulWidget {
@@ -85,7 +86,8 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                 ),
               ),
               title: Text(
-                "Workout Tracker",
+                AppLocalizations.of(context)?.workoutTracker ??
+                    "Workout Tracker",
                 style: TextStyle(
                     color: TColor.white,
                     fontSize: 16,
@@ -259,7 +261,8 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Daily Workout Schedule",
+                          AppLocalizations.of(context)?.dailyWorkoutSchedule ??
+                              "Daily Workout Schedule",
                           style: TextStyle(
                               color: TColor.black,
                               fontSize: 14,
@@ -269,10 +272,9 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                           width: 70,
                           height: 25,
                           child: RoundButton(
-                            title: "Check",
+                            icon: Icons.check,
+                            iconSize: 16,
                             type: RoundButtonType.bgGradient,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
                             onPressed: () {
                               // Navigator.push(
                               //   context,
@@ -301,15 +303,10 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                             fontSize: 16,
                             fontWeight: FontWeight.w700),
                       ),
-                      TextButton(
+                      IconTextButton(
+                        icon: Icons.arrow_forward,
+                        iconSize: 20,
                         onPressed: () {},
-                        child: Text(
-                          AppLocalizations.of(context)?.seeMore ?? "See More",
-                          style: TextStyle(
-                              color: TColor.gray,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700),
-                        ),
                       )
                     ],
                   ),
@@ -329,7 +326,8 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "What Do You Want to Train",
+                        AppLocalizations.of(context)?.whatDoYouWantToTrain ??
+                            "What Do You Want to Train",
                         style: TextStyle(
                             color: TColor.black,
                             fontSize: 16,
@@ -462,10 +460,12 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
         showTitles: true,
         reservedSize: 32,
         interval: 1,
-        getTitlesWidget: bottomTitleWidgets,
+        getTitlesWidget: (value, meta) =>
+            bottomTitleWidgets(value, meta, context),
       );
 
-  Widget bottomTitleWidgets(double value, TitleMeta meta) {
+  Widget bottomTitleWidgets(
+      double value, TitleMeta meta, BuildContext context) {
     var style = TextStyle(
       color: TColor.white,
       fontSize: 12,
@@ -473,25 +473,25 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
     Widget text;
     switch (value.toInt()) {
       case 1:
-        text = Text('Sun', style: style);
+        text = Text(AppLocalizations.of(context)?.sun ?? 'Sun', style: style);
         break;
       case 2:
-        text = Text('Mon', style: style);
+        text = Text(AppLocalizations.of(context)?.mon ?? 'Mon', style: style);
         break;
       case 3:
-        text = Text('Tue', style: style);
+        text = Text(AppLocalizations.of(context)?.tue ?? 'Tue', style: style);
         break;
       case 4:
-        text = Text('Wed', style: style);
+        text = Text(AppLocalizations.of(context)?.wed ?? 'Wed', style: style);
         break;
       case 5:
-        text = Text('Thu', style: style);
+        text = Text(AppLocalizations.of(context)?.thu ?? 'Thu', style: style);
         break;
       case 6:
-        text = Text('Fri', style: style);
+        text = Text(AppLocalizations.of(context)?.fri ?? 'Fri', style: style);
         break;
       case 7:
-        text = Text('Sat', style: style);
+        text = Text(AppLocalizations.of(context)?.sat ?? 'Sat', style: style);
         break;
       default:
         text = const Text('');

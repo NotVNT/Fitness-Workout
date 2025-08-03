@@ -145,10 +145,8 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
                                 width: 110,
                                 height: 35,
                                 child: RoundButton(
-                                    title: AppLocalizations.of(context)
-                                            ?.learnMore ??
-                                        "Learn More",
-                                    fontSize: 12,
+                                    icon: Icons.info_outline,
+                                    iconSize: 16,
                                     onPressed: () {}),
                               )
                             ]),

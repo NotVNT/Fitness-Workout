@@ -5,6 +5,7 @@ import '../../common/colo_extension.dart';
 import '../../common_widget/find_eat_cell.dart';
 import '../../common_widget/round_button.dart';
 import '../../common_widget/today_meal_row.dart';
+import '../../l10n/app_localizations.dart';
 import 'meal_food_details_view.dart';
 import 'meal_schedule_view.dart';
 
@@ -29,14 +30,18 @@ class _MealPlannerViewState extends State<MealPlannerView> {
     },
   ];
 
-  List findEatArr = [
-    {
-      "name": "Breakfast",
-      "image": "assets/img/m_3.png",
-      "number": "120+ Foods"
-    },
-    {"name": "Lunch", "image": "assets/img/m_4.png", "number": "130+ Foods"},
-  ];
+  List<Map<String, String>> _getFindEatArr(BuildContext context) => [
+        {
+          "name": AppLocalizations.of(context)?.breakfast ?? "Breakfast",
+          "image": "assets/img/m_3.png",
+          "number": "120+ ${AppLocalizations.of(context)?.foods ?? "Foods"}"
+        },
+        {
+          "name": AppLocalizations.of(context)?.lunch ?? "Lunch",
+          "image": "assets/img/m_4.png",
+          "number": "130+ ${AppLocalizations.of(context)?.foods ?? "Foods"}"
+        },
+      ];
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +73,7 @@ class _MealPlannerViewState extends State<MealPlannerView> {
           ),
         ),
         title: Text(
-          "Meal Planner",
+          AppLocalizations.of(context)?.mealPlanner ?? "Meal Planner",
           style: TextStyle(
               color: TColor.black, fontSize: 16, fontWeight: FontWeight.w700),
         ),
@@ -108,7 +113,8 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                     children: [
                       Flexible(
                         child: Text(
-                          "Meal Nutritions",
+                          AppLocalizations.of(context)?.mealNutritions ??
+                              "Meal Nutritions",
                           style: TextStyle(
                               color: TColor.black,
                               fontSize: 16,
@@ -124,7 +130,12 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                           ),
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton(
-                              items: ["Weekly", "Monthly"]
+                              items: [
+                                AppLocalizations.of(context)?.weekly ??
+                                    "Weekly",
+                                AppLocalizations.of(context)?.monthly ??
+                                    "Monthly"
+                              ]
                                   .map((name) => DropdownMenuItem(
                                         value: name,
                                         child: Text(
@@ -138,7 +149,8 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                               icon:
                                   Icon(Icons.expand_more, color: TColor.white),
                               hint: Text(
-                                "Weekly",
+                                AppLocalizations.of(context)?.weekly ??
+                                    "Weekly",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     color: TColor.white, fontSize: 12),
@@ -279,7 +291,8 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                       children: [
                         Flexible(
                           child: Text(
-                            "Daily Meal Schedule",
+                            AppLocalizations.of(context)?.dailyMealSchedule ??
+                                "Daily Meal Schedule",
                             style: TextStyle(
                                 color: TColor.black,
                                 fontSize: 14,
@@ -290,10 +303,9 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                           width: 70,
                           height: 25,
                           child: RoundButton(
-                            title: "Check",
+                            icon: Icons.check,
+                            iconSize: 16,
                             type: RoundButtonType.bgGradient,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
                             onPressed: () {
                               Navigator.push(
                                 context,
@@ -316,7 +328,8 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                     children: [
                       Flexible(
                         child: Text(
-                          "Today Meals",
+                          AppLocalizations.of(context)?.todayMeals ??
+                              "Today Meals",
                           style: TextStyle(
                               color: TColor.black,
                               fontSize: 16,
@@ -333,11 +346,14 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton(
                               items: [
-                                "Breakfast",
-                                "Lunch",
-                                "Dinner",
-                                "Snack",
-                                "Dessert"
+                                AppLocalizations.of(context)?.breakfast ??
+                                    "Breakfast",
+                                AppLocalizations.of(context)?.lunch ?? "Lunch",
+                                AppLocalizations.of(context)?.dinner ??
+                                    "Dinner",
+                                AppLocalizations.of(context)?.snack ?? "Snack",
+                                AppLocalizations.of(context)?.dessert ??
+                                    "Dessert"
                               ]
                                   .map((name) => DropdownMenuItem(
                                         value: name,
@@ -352,7 +368,8 @@ class _MealPlannerViewState extends State<MealPlannerView> {
                               icon:
                                   Icon(Icons.expand_more, color: TColor.white),
                               hint: Text(
-                                "Breakfast",
+                                AppLocalizations.of(context)?.breakfast ??
+                                    "Breakfast",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     color: TColor.white, fontSize: 12),
@@ -381,7 +398,8 @@ class _MealPlannerViewState extends State<MealPlannerView> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
-                "Find Something to Eat",
+                AppLocalizations.of(context)?.findSomethingToEat ??
+                    "Find Something to Eat",
                 style: TextStyle(
                     color: TColor.black,
                     fontSize: 16,
@@ -393,9 +411,9 @@ class _MealPlannerViewState extends State<MealPlannerView> {
               child: ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 15.0),
                   scrollDirection: Axis.horizontal,
-                  itemCount: findEatArr.length,
+                  itemCount: _getFindEatArr(context).length,
                   itemBuilder: (context, index) {
-                    var fObj = findEatArr[index] as Map? ?? {};
+                    var fObj = _getFindEatArr(context)[index] as Map? ?? {};
                     return InkWell(
                       onTap: () {
                         Navigator.push(
