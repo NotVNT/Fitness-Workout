@@ -286,10 +286,9 @@ class _SleepTrackerViewState extends State<SleepTrackerView> {
                           width: 70,
                           height: 25,
                           child: RoundButton(
-                            title: "Check",
+                            icon: Icons.check,
+                            iconSize: 16,
                             type: RoundButtonType.bgGradient,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
                             onPressed: () {
                               Navigator.push(
                                 context,

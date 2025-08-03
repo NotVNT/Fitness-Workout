@@ -1,6 +1,7 @@
 import 'package:dotted_dashed_line/dotted_dashed_line.dart';
 import 'package:fitness/common_widget/round_button.dart';
 import 'package:fitness/common_widget/workout_row.dart';
+import 'package:fitness/common_widget/icon_text_button.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
@@ -185,8 +186,7 @@ class _HomeViewState extends State<HomeView> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                AppLocalizations.of(context)
-                                        ?.bmiBodyMassIndex ??
+                                AppLocalizations.of(context)?.bmi ??
                                     "BMI (Body Mass Index)",
                                 style: TextStyle(
                                     color: TColor.white,
@@ -208,12 +208,9 @@ class _HomeViewState extends State<HomeView> {
                                   width: 120,
                                   height: 35,
                                   child: RoundButton(
-                                      title: AppLocalizations.of(context)
-                                              ?.viewMore ??
-                                          "View More",
+                                      icon: Icons.arrow_forward,
+                                      iconSize: 16,
                                       type: RoundButtonType.bgSGradient,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
                                       onPressed: () {}))
                             ],
                           ),
@@ -265,10 +262,9 @@ class _HomeViewState extends State<HomeView> {
                         width: 70,
                         height: 25,
                         child: RoundButton(
-                          title: AppLocalizations.of(context)?.check ?? "Check",
+                          icon: Icons.check,
+                          iconSize: 16,
                           type: RoundButtonType.bgGradient,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -970,15 +966,10 @@ class _HomeViewState extends State<HomeView> {
                             fontWeight: FontWeight.w700),
                       ),
                     ),
-                    TextButton(
+                    IconTextButton(
+                      icon: Icons.arrow_forward,
+                      iconSize: 20,
                       onPressed: () {},
-                      child: Text(
-                        AppLocalizations.of(context)?.seeMore ?? "See More",
-                        style: TextStyle(
-                            color: TColor.gray,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700),
-                      ),
                     )
                   ],
                 ),
@@ -1161,25 +1152,25 @@ class _HomeViewState extends State<HomeView> {
     Widget text;
     switch (value.toInt()) {
       case 1:
-        text = Text('Sun', style: style);
+        text = Text(AppLocalizations.of(context)?.sun ?? 'Sun', style: style);
         break;
       case 2:
-        text = Text('Mon', style: style);
+        text = Text(AppLocalizations.of(context)?.mon ?? 'Mon', style: style);
         break;
       case 3:
-        text = Text('Tue', style: style);
+        text = Text(AppLocalizations.of(context)?.tue ?? 'Tue', style: style);
         break;
       case 4:
-        text = Text('Wed', style: style);
+        text = Text(AppLocalizations.of(context)?.wed ?? 'Wed', style: style);
         break;
       case 5:
-        text = Text('Thu', style: style);
+        text = Text(AppLocalizations.of(context)?.thu ?? 'Thu', style: style);
         break;
       case 6:
-        text = Text('Fri', style: style);
+        text = Text(AppLocalizations.of(context)?.fri ?? 'Fri', style: style);
         break;
       case 7:
-        text = Text('Sat', style: style);
+        text = Text(AppLocalizations.of(context)?.sat ?? 'Sat', style: style);
         break;
       default:
         text = const Text('');
