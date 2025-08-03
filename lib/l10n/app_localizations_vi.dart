@@ -337,4 +337,22 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get reminderReset => 'Đã khôi phục nhắc nhở!';
+
+  @override
+  String get testUserData => 'Dữ liệu người dùng thử nghiệm';
+
+  @override
+  String get logout => 'Đăng xuất';
+
+  @override
+  String get confirmLogout => 'Bạn có chắc chắn muốn đăng xuất?';
+
+  @override
+  String get cancel => 'Hủy';
+
+  @override
+  String get logoutError => 'Lỗi đăng xuất';
+
+  @override
+  String get setYourGoal => 'Đặt mục tiêu của bạn';
 }

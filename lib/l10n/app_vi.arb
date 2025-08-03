@@ -108,5 +108,11 @@
   "compareMyPhoto": "So sánh ảnh của tôi",
   "gallery": "Thư viện",
   "comparison": "So sánh",
-  "reminderReset": "Đã khôi phục nhắc nhở!"
+  "reminderReset": "Đã khôi phục nhắc nhở!",
+  "testUserData": "Dữ liệu người dùng thử nghiệm",
+  "logout": "Đăng xuất",
+  "confirmLogout": "Bạn có chắc chắn muốn đăng xuất?",
+  "cancel": "Hủy",
+  "logoutError": "Lỗi đăng xuất",
+  "setYourGoal": "Đặt mục tiêu của bạn"
 }

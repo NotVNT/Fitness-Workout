@@ -108,5 +108,11 @@
   "compareMyPhoto": "Compare my Photo",
   "gallery": "Gallery",
   "comparison": "Comparison",
-  "reminderReset": "Reminder reset!"
+  "reminderReset": "Reminder reset!",
+  "testUserData": "Test User Data",
+  "logout": "Logout",
+  "confirmLogout": "Are you sure you want to logout?",
+  "cancel": "Cancel",
+  "logoutError": "Logout error",
+  "setYourGoal": "Set your goal"
 }

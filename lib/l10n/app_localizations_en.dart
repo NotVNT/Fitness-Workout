@@ -336,4 +336,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reminderReset => 'Reminder reset!';
+
+  @override
+  String get testUserData => 'Test User Data';
+
+  @override
+  String get logout => 'Logout';
+
+  @override
+  String get confirmLogout => 'Are you sure you want to logout?';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get logoutError => 'Logout error';
+
+  @override
+  String get setYourGoal => 'Set your goal';
 }

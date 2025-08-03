@@ -34,12 +34,14 @@ class _ProfileViewState extends State<ProfileView> {
         },
         {
           "image": "assets/img/p_activity.png",
-          "name": AppLocalizations.of(context)?.activityHistory ?? "Activity History",
+          "name": AppLocalizations.of(context)?.activityHistory ??
+              "Activity History",
           "tag": "3"
         },
         {
           "image": "assets/img/p_workout.png",
-          "name": AppLocalizations.of(context)?.workoutProgress ?? "Workout Progress",
+          "name": AppLocalizations.of(context)?.workoutProgress ??
+              "Workout Progress",
           "tag": "4"
         }
       ];
@@ -53,7 +55,8 @@ class _ProfileViewState extends State<ProfileView> {
         },
         {
           "image": "assets/img/p_privacy.png",
-          "name": AppLocalizations.of(context)?.privacyPolicy ?? "Privacy Policy",
+          "name":
+              AppLocalizations.of(context)?.privacyPolicy ?? "Privacy Policy",
           "tag": "6"
         },
         {
@@ -63,27 +66,11 @@ class _ProfileViewState extends State<ProfileView> {
         },
         {
           "image": "assets/img/p_setting.png",
-          "name": AppLocalizations.of(context)?.testUserData ?? "Test User Data",
+          "name":
+              AppLocalizations.of(context)?.testUserData ?? "Test User Data",
           "tag": "8"
         },
       ];
-
-  // Tính tuổi từ ngày sinh
-  int _calculateAge(String dateOfBirth) {
-    if (dateOfBirth.isEmpty) return 0;
-    try {
-      DateTime birthDate = DateTime.parse(dateOfBirth);
-      DateTime now = DateTime.now();
-      int age = now.year - birthDate.year;
-      if (now.month < birthDate.month ||
-          (now.month == birthDate.month && now.day < birthDate.day)) {
-        age--;
-      }
-      return age;
-    } catch (e) {
-      return 0;
-    }
-  }
 
   // Hàm đăng xuất
   Future<void> _logout() async {
@@ -94,7 +81,8 @@ class _ProfileViewState extends State<ProfileView> {
         print('ProfileView: Showing logout dialog');
         return AlertDialog(
           title: Text(AppLocalizations.of(context)?.logout ?? 'Đăng xuất'),
-          content: Text(AppLocalizations.of(context)?.confirmLogout ?? 'Bạn có chắc chắn muốn đăng xuất?'),
+          content: Text(AppLocalizations.of(context)?.confirmLogout ??
+              'Bạn có chắc chắn muốn đăng xuất?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -133,9 +121,8 @@ class _ProfileViewState extends State<ProfileView> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                  AppLocalizations.of(context)?.logoutError ??
-                      'Lỗi đăng xuất: ${_authService.getErrorMessage(e)}'),
+              content: Text(AppLocalizations.of(context)?.logoutError ??
+                  'Lỗi đăng xuất: ${_authService.getErrorMessage(e)}'),
               backgroundColor: Colors.red,
             ),
           );
@@ -182,28 +169,43 @@ class _ProfileViewState extends State<ProfileView> {
       body: StreamBuilder<Map<String, dynamic>?>(
         stream: _authService.getCurrentUserDataStream(),
         builder: (context, snapshot) {
-          print('ProfileView - StreamBuilder state: ${snapshot.connectionState}');
+          print(
+              'ProfileView - StreamBuilder state: ${snapshot.connectionState}');
           print('ProfileView - Has data: ${snapshot.hasData}');
           print('ProfileView - Data: ${snapshot.data}');
           print('ProfileView - Error: ${snapshot.error}');
 
           Map<String, dynamic>? userData = snapshot.data;
-          String fullName = "User";
-          String goal = AppLocalizations.of(context)?.setYourGoal ?? "Set your goal";
-          String height = "0cm";
-          String weight = "0kg";
-          String age = "0yo";
+          UserModel? user;
 
+          // Chuyển đổi Map thành UserModel nếu có dữ liệu
           if (userData != null) {
-            String firstName = userData['firstName'] ?? '';
-            String lastName = userData['lastName'] ?? '';
-            fullName = '$firstName $lastName'.trim();
-            if (fullName.isEmpty) fullName = "User";
-            goal = userData['goal'] ?? AppLocalizations.of(context)?.setYourGoal ?? "Set your goal";
-            height = userData['height'] != null ? "${userData['height'].toInt()}cm" : "0cm";
-            weight = userData['weight'] != null ? "${userData['weight'].toInt()}kg" : "0kg";
-            age = userData['dateOfBirth'] != null ? "${_calculateAge(userData['dateOfBirth'])}yo" : "0yo";
+            user = UserModel(
+              id: userData['id'] ?? '',
+              email: userData['email'] ?? '',
+              firstName: userData['firstName'] ?? '',
+              lastName: userData['lastName'] ?? '',
+              dateOfBirth: userData['dateOfBirth'] ?? '',
+              gender: userData['gender'] ?? '',
+              weight: (userData['weight'] ?? 0.0).toDouble(),
+              height: (userData['height'] ?? 0.0).toDouble(),
+              goal: userData['goal'] ?? '',
+            );
           }
+
+          // Sử dụng UserModel để lấy thông tin
+          String fullName = user?.fullName ?? "User";
+          String goal = user?.goal.isNotEmpty == true
+              ? user!.goal
+              : AppLocalizations.of(context)?.setYourGoal ?? "Set your goal";
+          String height = user?.height != null && user!.height > 0
+              ? "${user.height.toInt()}cm"
+              : "0cm";
+          String weight = user?.weight != null && user!.weight > 0
+              ? "${user.weight.toInt()}kg"
+              : "0kg";
+          String age =
+              user?.age != null && user!.age > 0 ? "${user.age}yo" : "0yo";
 
           return SingleChildScrollView(
             child: Container(
@@ -264,14 +266,16 @@ class _ProfileViewState extends State<ProfileView> {
                       Expanded(
                         child: TitleSubtitleCell(
                           title: height,
-                          subtitle: AppLocalizations.of(context)?.height ?? "Height",
+                          subtitle:
+                              AppLocalizations.of(context)?.height ?? "Height",
                         ),
                       ),
                       const SizedBox(width: 15),
                       Expanded(
                         child: TitleSubtitleCell(
                           title: weight,
-                          subtitle: AppLocalizations.of(context)?.weight ?? "Weight",
+                          subtitle:
+                              AppLocalizations.of(context)?.weight ?? "Weight",
                         ),
                       ),
                       const SizedBox(width: 15),
@@ -285,7 +289,8 @@ class _ProfileViewState extends State<ProfileView> {
                   ),
                   const SizedBox(height: 25),
                   Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 15),
                     decoration: BoxDecoration(
                       color: TColor.white,
                       borderRadius: BorderRadius.circular(15),
@@ -325,7 +330,8 @@ class _ProfileViewState extends State<ProfileView> {
                   ),
                   const SizedBox(height: 25),
                   Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 15),
                     decoration: BoxDecoration(
                       color: TColor.white,
                       borderRadius: BorderRadius.circular(15),
@@ -337,7 +343,8 @@ class _ProfileViewState extends State<ProfileView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          AppLocalizations.of(context)?.notification ?? "Notification",
+                          AppLocalizations.of(context)?.notification ??
+                              "Notification",
                           style: TextStyle(
                             color: TColor.black,
                             fontSize: 16,
@@ -359,7 +366,8 @@ class _ProfileViewState extends State<ProfileView> {
                               const SizedBox(width: 15),
                               Expanded(
                                 child: Text(
-                                  AppLocalizations.of(context)?.popUpNotification ??
+                                  AppLocalizations.of(context)
+                                          ?.popUpNotification ??
                                       "Pop-up Notification",
                                   style: TextStyle(
                                     color: TColor.black,
@@ -371,14 +379,16 @@ class _ProfileViewState extends State<ProfileView> {
                                 current: positive,
                                 values: [false, true],
                                 indicatorSize: const Size.square(30.0),
-                                animationDuration: const Duration(milliseconds: 200),
+                                animationDuration:
+                                    const Duration(milliseconds: 200),
                                 animationCurve: Curves.linear,
                                 onChanged: (b) => setState(() => positive = b),
                                 iconBuilder: (context, local, global) {
                                   return const SizedBox();
                                 },
-                                onTap: (tapProperties) => setState(
-                                    () => positive = tapProperties.tapped?.value ?? !positive),
+                                onTap: (tapProperties) => setState(() =>
+                                    positive = tapProperties.tapped?.value ??
+                                        !positive),
                                 iconsTappable: false,
                                 wrapperBuilder: (context, global, child) {
                                   return Stack(
@@ -390,8 +400,10 @@ class _ProfileViewState extends State<ProfileView> {
                                         height: 30.0,
                                         child: DecoratedBox(
                                           decoration: BoxDecoration(
-                                            gradient: LinearGradient(colors: TColor.secondaryG),
-                                            borderRadius: const BorderRadius.all(
+                                            gradient: LinearGradient(
+                                                colors: TColor.secondaryG),
+                                            borderRadius:
+                                                const BorderRadius.all(
                                               Radius.circular(50.0),
                                             ),
                                           ),
@@ -431,7 +443,8 @@ class _ProfileViewState extends State<ProfileView> {
                   ),
                   const SizedBox(height: 25),
                   Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 15),
                     decoration: BoxDecoration(
                       color: TColor.white,
                       borderRadius: BorderRadius.circular(15),
@@ -473,7 +486,8 @@ class _ProfileViewState extends State<ProfileView> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: RoundButton(
-                            title: AppLocalizations.of(context)?.logout ?? "Đăng xuất",
+                            title: AppLocalizations.of(context)?.logout ??
+                                "Đăng xuất",
                             type: RoundButtonType.bgGradient,
                             onPressed: () => _logout(),
                           ),

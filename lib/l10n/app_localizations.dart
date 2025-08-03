@@ -751,6 +751,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reminder reset!'**
   String get reminderReset;
+
+  /// No description provided for @testUserData.
+  ///
+  /// In en, this message translates to:
+  /// **'Test User Data'**
+  String get testUserData;
+
+  /// No description provided for @logout.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get logout;
+
+  /// No description provided for @confirmLogout.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to logout?'**
+  String get confirmLogout;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @logoutError.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout error'**
+  String get logoutError;
+
+  /// No description provided for @setYourGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'Set your goal'**
+  String get setYourGoal;
 }
 
 class _AppLocalizationsDelegate
