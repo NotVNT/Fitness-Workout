@@ -206,11 +206,11 @@ class _LoginViewState extends State<LoginView> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  "Hey there,",
+                  "Xin chào,",
                   style: TextStyle(color: TColor.gray, fontSize: 16),
                 ),
                 Text(
-                  "Welcome Back",
+                  "Chào mừng trở lại",
                   style: TextStyle(
                       color: TColor.black,
                       fontSize: 20,
@@ -232,7 +232,7 @@ class _LoginViewState extends State<LoginView> {
                   height: media.width * 0.04,
                 ),
                 RoundTextField(
-                  hitText: "Password",
+                  hitText: "Mật khẩu",
                   icon: "assets/img/lock.png",
                   obscureText: true,
                   controller: _passwordController,
@@ -267,7 +267,7 @@ class _LoginViewState extends State<LoginView> {
                 ),
                 const Spacer(),
                 RoundButton(
-                    title: _isLoading ? "Đang đăng nhập..." : "Login",
+                    title: _isLoading ? "Đang đăng nhập..." : "Đăng nhập",
                     onPressed: _isLoading ? () {} : () => _signIn()),
                 SizedBox(
                   height: media.width * 0.04,
@@ -281,7 +281,7 @@ class _LoginViewState extends State<LoginView> {
                       color: TColor.gray.withOpacity(0.5),
                     )),
                     Text(
-                      "  Or  ",
+                      "  Hoặc  ",
                       style: TextStyle(color: TColor.black, fontSize: 12),
                     ),
                     Expanded(
@@ -355,14 +355,14 @@ class _LoginViewState extends State<LoginView> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        "Don’t have an account yet? ",
+                        "Chưa có tài khoản ? ",
                         style: TextStyle(
                           color: TColor.black,
                           fontSize: 14,
                         ),
                       ),
                       Text(
-                        "Register",
+                        "Đăng ký",
                         style: TextStyle(
                             color: TColor.black,
                             fontSize: 14,

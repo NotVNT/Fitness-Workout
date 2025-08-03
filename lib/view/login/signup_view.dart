@@ -161,11 +161,11 @@ class _SignUpViewState extends State<SignUpView> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  "Hey there,",
+                  "Xin chào,",
                   style: TextStyle(color: TColor.gray, fontSize: 16),
                 ),
                 Text(
-                  "Create an Account",
+                  "Tạo tài khoản",
                   style: TextStyle(
                       color: TColor.black,
                       fontSize: 20,
@@ -175,7 +175,7 @@ class _SignUpViewState extends State<SignUpView> {
                   height: media.width * 0.05,
                 ),
                 RoundTextField(
-                  hitText: "First Name",
+                  hitText: "Tên",
                   icon: "assets/img/user_text.png",
                   controller: _firstNameController,
                 ),
@@ -183,7 +183,7 @@ class _SignUpViewState extends State<SignUpView> {
                   height: media.width * 0.04,
                 ),
                 RoundTextField(
-                  hitText: "Last Name",
+                  hitText: "Họ",
                   icon: "assets/img/user_text.png",
                   controller: _lastNameController,
                 ),
@@ -200,7 +200,7 @@ class _SignUpViewState extends State<SignUpView> {
                   height: media.width * 0.04,
                 ),
                 RoundTextField(
-                  hitText: "Password",
+                  hitText: "Mật khẩu",
                   icon: "assets/img/lock.png",
                   obscureText: true,
                   controller: _passwordController,
@@ -238,7 +238,7 @@ class _SignUpViewState extends State<SignUpView> {
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
                       child: Text(
-                        "By continuing you accept our Privacy Policy and\nTerm of Use",
+                        "Bằng cách tiếp tục, bạn đồng ý với Chính sách bảo mật\nvà Điều khoản sử dụng của chúng tôi",
                         style: TextStyle(color: TColor.gray, fontSize: 10),
                       ),
                     )
@@ -248,7 +248,7 @@ class _SignUpViewState extends State<SignUpView> {
                   height: media.width * 0.4,
                 ),
                 RoundButton(
-                    title: _isLoading ? "Đang đăng ký..." : "Register",
+                    title: _isLoading ? "Đang đăng ký..." : "Đăng ký",
                     onPressed: _isLoading ? () {} : () => _signUp()),
                 SizedBox(
                   height: media.width * 0.04,
@@ -262,7 +262,7 @@ class _SignUpViewState extends State<SignUpView> {
                       color: TColor.gray.withOpacity(0.5),
                     )),
                     Text(
-                      "  Or  ",
+                      "  Hoặc  ",
                       style: TextStyle(color: TColor.black, fontSize: 12),
                     ),
                     Expanded(
@@ -339,14 +339,14 @@ class _SignUpViewState extends State<SignUpView> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        "Already have an account? ",
+                        "Đã có tài khoản? ",
                         style: TextStyle(
                           color: TColor.black,
                           fontSize: 14,
                         ),
                       ),
                       Text(
-                        "Login",
+                        "Đăng nhập",
                         style: TextStyle(
                             color: TColor.black,
                             fontSize: 14,
