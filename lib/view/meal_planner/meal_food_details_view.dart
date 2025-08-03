@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../common/colo_extension.dart';
 import '../../common_widget/meal_category_cell.dart';
 import '../../common_widget/popular_meal_row.dart';
+import '../../l10n/app_localizations.dart';
 import 'food_info_details_view.dart';
 
 class MealFoodDetailsView extends StatefulWidget {
@@ -173,7 +174,8 @@ class _MealFoodDetailsViewState extends State<MealFoodDetailsView> {
                           width: 25,
                           height: 25,
                         ),
-                        hintText: "Search Pancake"),
+                        hintText: AppLocalizations.of(context)?.searchPancake ??
+                            "Search Pancake"),
                   )),
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 8),
@@ -201,7 +203,7 @@ class _MealFoodDetailsViewState extends State<MealFoodDetailsView> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Category",
+                    AppLocalizations.of(context)?.category ?? "Category",
                     style: TextStyle(
                         color: TColor.black,
                         fontSize: 16,
@@ -230,7 +232,8 @@ class _MealFoodDetailsViewState extends State<MealFoodDetailsView> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
-                "Recommendation\nfor Diet",
+                AppLocalizations.of(context)?.recommendationForDiet ??
+                    "Recommendation\nfor Diet",
                 style: TextStyle(
                     color: TColor.black,
                     fontSize: 16,
@@ -257,7 +260,7 @@ class _MealFoodDetailsViewState extends State<MealFoodDetailsView> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Text(
-                "Popular",
+                AppLocalizations.of(context)?.popular ?? "Popular",
                 style: TextStyle(
                     color: TColor.black,
                     fontSize: 16,

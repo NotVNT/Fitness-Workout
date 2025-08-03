@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../common/colo_extension.dart';
 import '../../common_widget/round_button.dart';
+import '../../common_widget/icon_text_button.dart';
+import '../../l10n/app_localizations.dart';
 import 'comparison_view.dart';
 
 class PhotoProgressView extends StatefulWidget {
@@ -12,6 +15,37 @@ class PhotoProgressView extends StatefulWidget {
 }
 
 class _PhotoProgressViewState extends State<PhotoProgressView> {
+  bool _showReminder = true; // State để quản lý việc hiển thị reminder
+
+  @override
+  void initState() {
+    super.initState();
+    _loadReminderState();
+  }
+
+  // Load trạng thái reminder từ SharedPreferences
+  _loadReminderState() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _showReminder = prefs.getBool('show_photo_reminder') ?? true;
+    });
+  }
+
+  // Save trạng thái reminder vào SharedPreferences
+  _saveReminderState(bool value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('show_photo_reminder', value);
+  }
+
+  // Reset reminder (có thể dùng cho testing hoặc settings)
+  _resetReminder() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('show_photo_reminder', true);
+    setState(() {
+      _showReminder = true;
+    });
+  }
+
   List photoArr = [
     {
       "time": "2 June",
@@ -44,13 +78,26 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
         leadingWidth: 0,
         leading: const SizedBox(),
         title: Text(
-          "Progress Photo",
+          AppLocalizations.of(context)?.progressPhoto ?? "Progress Photo",
           style: TextStyle(
               color: TColor.black, fontSize: 16, fontWeight: FontWeight.w700),
         ),
         actions: [
           InkWell(
             onTap: () {},
+            onLongPress: () {
+              // Long press để reset reminder
+              _resetReminder();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    AppLocalizations.of(context)?.reminderReset ??
+                        "Reminder reset!",
+                  ),
+                  duration: const Duration(seconds: 2),
+                ),
+              );
+            },
             child: Container(
               margin: const EdgeInsets.all(8),
               height: 40,
@@ -77,67 +124,77 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  child: Container(
-                    width: double.maxFinite,
-                    padding: const EdgeInsets.all(15),
-                    decoration: BoxDecoration(
-                        color: const Color(0xffFFE5E5),
-                        borderRadius: BorderRadius.circular(20)),
-                    child: Row(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                              color: TColor.white,
-                              borderRadius: BorderRadius.circular(30)),
-                          width: 50,
-                          height: 50,
-                          alignment: Alignment.center,
-                          child: Image.asset(
-                            "assets/img/date_notifi.png",
-                            width: 30,
-                            height: 30,
+                // Hiển thị reminder chỉ khi _showReminder = true
+                if (_showReminder)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 20),
+                    child: Container(
+                      width: double.maxFinite,
+                      padding: const EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                          color: const Color(0xffFFE5E5),
+                          borderRadius: BorderRadius.circular(20)),
+                      child: Row(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                                color: TColor.white,
+                                borderRadius: BorderRadius.circular(30)),
+                            width: 50,
+                            height: 50,
+                            alignment: Alignment.center,
+                            child: Image.asset(
+                              "assets/img/date_notifi.png",
+                              width: 30,
+                              height: 30,
+                            ),
                           ),
-                        ),
-                        const SizedBox(
-                          width: 8,
-                        ),
-                        Expanded(
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  "Reminder!",
-                                  style: TextStyle(
-                                      color: Colors.red,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                                Text(
-                                  "Next Photos Fall On July 08",
-                                  style: TextStyle(
-                                      color: TColor.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700),
-                                ),
-                              ]),
-                        ),
-                        Container(
-                            height: 60,
-                            alignment: Alignment.topRight,
-                            child: IconButton(
-                                onPressed: () {},
-                                icon: Icon(
-                                  Icons.close,
-                                  color: TColor.gray,
-                                  size: 15,
-                                )))
-                      ],
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          Expanded(
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    AppLocalizations.of(context)?.reminder ??
+                                        "Reminder!",
+                                    style: const TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                  Text(
+                                    AppLocalizations.of(context)
+                                            ?.nextPhotosFallOn ??
+                                        "Next Photos Fall On July 08",
+                                    style: TextStyle(
+                                        color: TColor.black,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700),
+                                  ),
+                                ]),
+                          ),
+                          Container(
+                              height: 60,
+                              alignment: Alignment.topRight,
+                              child: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _showReminder = false;
+                                    });
+                                    _saveReminderState(false);
+                                  },
+                                  icon: Icon(
+                                    Icons.close,
+                                    color: TColor.gray,
+                                    size: 15,
+                                  )))
+                        ],
+                      ),
                     ),
                   ),
-                ),
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
@@ -162,7 +219,9 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
                                   height: 15,
                                 ),
                                 Text(
-                                  "Track Your Progress Each\nMonth With Photo",
+                                  AppLocalizations.of(context)
+                                          ?.trackYourProgress ??
+                                      "Track Your Progress Each\nMonth With Photo",
                                   style: TextStyle(
                                     color: TColor.black,
                                     fontSize: 12,
@@ -173,8 +232,8 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
                                   width: 110,
                                   height: 35,
                                   child: RoundButton(
-                                      title: "Learn More",
-                                      fontSize: 12,
+                                      icon: Icons.info_outline,
+                                      iconSize: 16,
                                       onPressed: () {}),
                                 )
                               ]),
@@ -205,7 +264,8 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
                     children: [
                       Flexible(
                         child: Text(
-                          "Compare my Photo",
+                          AppLocalizations.of(context)?.compareMyPhoto ??
+                              "Compare my Photo",
                           style: TextStyle(
                               color: TColor.black,
                               fontSize: 14,
@@ -216,10 +276,9 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
                         width: 100,
                         height: 25,
                         child: RoundButton(
-                          title: "Compare",
+                          icon: Icons.compare_arrows,
+                          iconSize: 16,
                           type: RoundButtonType.bgGradient,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -240,18 +299,17 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Gallery",
+                        AppLocalizations.of(context)?.gallery ?? "Gallery",
                         style: TextStyle(
                             color: TColor.black,
                             fontSize: 16,
                             fontWeight: FontWeight.w700),
                       ),
-                      TextButton(
-                          onPressed: () {},
-                          child: Text(
-                            "See more",
-                            style: TextStyle(color: TColor.gray, fontSize: 12),
-                          ))
+                      IconTextButton(
+                        icon: Icons.arrow_forward,
+                        iconSize: 18,
+                        onPressed: () {},
+                      )
                     ],
                   ),
                 ),
