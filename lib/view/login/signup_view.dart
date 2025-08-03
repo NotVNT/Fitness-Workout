@@ -1,9 +1,9 @@
 import 'package:fitness/common/colo_extension.dart';
 import 'package:fitness/common_widget/round_button.dart';
 import 'package:fitness/common_widget/round_textfield.dart';
-import 'package:fitness/view/login/complete_profile_view.dart';
 import 'package:fitness/view/login/login_view.dart';
 import 'package:flutter/material.dart';
+import 'package:fitness/services/auth_service.dart';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});
@@ -13,6 +13,140 @@ class SignUpView extends StatefulWidget {
 }
 
 class _SignUpViewState extends State<SignUpView> {
+  final AuthService _authService = AuthService();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  bool _isLoading = false;
+
+  Future<void> _signUp() async {
+    // Validation
+    if (_firstNameController.text.trim().isEmpty) {
+      _showErrorMessage('Vui lòng nhập họ');
+      return;
+    }
+    if (_lastNameController.text.trim().isEmpty) {
+      _showErrorMessage('Vui lòng nhập tên');
+      return;
+    }
+    if (_emailController.text.trim().isEmpty) {
+      _showErrorMessage('Vui lòng nhập email');
+      return;
+    }
+    if (_passwordController.text.trim().isEmpty) {
+      _showErrorMessage('Vui lòng nhập mật khẩu');
+      return;
+    }
+    if (_passwordController.text.length < 6) {
+      _showErrorMessage('Mật khẩu phải có ít nhất 6 ký tự');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final result = await _authService.signUpWithEmail(
+        _emailController.text.trim(),
+        _passwordController.text.trim(),
+        firstName: _firstNameController.text.trim(),
+        lastName: _lastNameController.text.trim(),
+      );
+
+      if (result != null) {
+        // Đăng ký thành công, đăng xuất và chuyển đến màn hình đăng nhập
+        _showSuccessMessage('Đăng ký thành công!');
+
+        // Đăng xuất user vừa tạo để họ phải đăng nhập lại
+        await _authService.signOut();
+
+        // Delay một chút để user đọc thông báo
+        await Future.delayed(const Duration(seconds: 2));
+
+        if (mounted) {
+          // Chuyển đến màn hình đăng nhập
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => const LoginView(),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      _showErrorMessage(_authService.getErrorMessage(e));
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _showErrorMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(
+              Icons.error_outline,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 4),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+  }
+
+  void _showSuccessMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(
+              Icons.check_circle_outline,
+              color: Colors.white,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+  }
+
   bool isCheck = false;
   @override
   Widget build(BuildContext context) {
@@ -27,11 +161,11 @@ class _SignUpViewState extends State<SignUpView> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Text(
-                  "Hey there,",
+                  "Xin chào,",
                   style: TextStyle(color: TColor.gray, fontSize: 16),
                 ),
                 Text(
-                  "Create an Account",
+                  "Tạo tài khoản",
                   style: TextStyle(
                       color: TColor.black,
                       fontSize: 20,
@@ -40,32 +174,36 @@ class _SignUpViewState extends State<SignUpView> {
                 SizedBox(
                   height: media.width * 0.05,
                 ),
-                const RoundTextField(
-                  hitText: "First Name",
+                RoundTextField(
+                  hitText: "Tên",
                   icon: "assets/img/user_text.png",
-                ),
-                SizedBox(
-                  height: media.width * 0.04,
-                ),
-                const RoundTextField(
-                  hitText: "Last Name",
-                  icon: "assets/img/user_text.png",
-                ),
-                SizedBox(
-                  height: media.width * 0.04,
-                ),
-                const RoundTextField(
-                  hitText: "Email",
-                  icon: "assets/img/email.png",
-                  keyboardType: TextInputType.emailAddress,
+                  controller: _firstNameController,
                 ),
                 SizedBox(
                   height: media.width * 0.04,
                 ),
                 RoundTextField(
-                  hitText: "Password",
+                  hitText: "Họ",
+                  icon: "assets/img/user_text.png",
+                  controller: _lastNameController,
+                ),
+                SizedBox(
+                  height: media.width * 0.04,
+                ),
+                RoundTextField(
+                  hitText: "Email",
+                  icon: "assets/img/email.png",
+                  keyboardType: TextInputType.emailAddress,
+                  controller: _emailController,
+                ),
+                SizedBox(
+                  height: media.width * 0.04,
+                ),
+                RoundTextField(
+                  hitText: "Mật khẩu",
                   icon: "assets/img/lock.png",
                   obscureText: true,
+                  controller: _passwordController,
                   rigtIcon: TextButton(
                       onPressed: () {},
                       child: Container(
@@ -99,20 +237,19 @@ class _SignUpViewState extends State<SignUpView> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
-                      child:  Text(
-                          "By continuing you accept our Privacy Policy and\nTerm of Use",
-                          style: TextStyle(color: TColor.gray, fontSize: 10),
-                        ),
-                     
+                      child: Text(
+                        "Bằng cách tiếp tục, bạn đồng ý với Chính sách bảo mật\nvà Điều khoản sử dụng của chúng tôi",
+                        style: TextStyle(color: TColor.gray, fontSize: 10),
+                      ),
                     )
                   ],
                 ),
                 SizedBox(
                   height: media.width * 0.4,
                 ),
-                RoundButton(title: "Register", onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const CompleteProfileView()  ));
-                }),
+                RoundButton(
+                    title: _isLoading ? "Đang đăng ký..." : "Đăng ký",
+                    onPressed: _isLoading ? () {} : () => _signUp()),
                 SizedBox(
                   height: media.width * 0.04,
                 ),
@@ -125,7 +262,7 @@ class _SignUpViewState extends State<SignUpView> {
                       color: TColor.gray.withOpacity(0.5),
                     )),
                     Text(
-                      "  Or  ",
+                      "  Hoặc  ",
                       style: TextStyle(color: TColor.black, fontSize: 12),
                     ),
                     Expanded(
@@ -162,11 +299,9 @@ class _SignUpViewState extends State<SignUpView> {
                         ),
                       ),
                     ),
-
-                     SizedBox(
+                    SizedBox(
                       width: media.width * 0.04,
                     ),
-
                     GestureDetector(
                       onTap: () {},
                       child: Container(
@@ -195,7 +330,7 @@ class _SignUpViewState extends State<SignUpView> {
                 ),
                 TextButton(
                   onPressed: () {
-                     Navigator.push(
+                    Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => const LoginView()));
@@ -204,14 +339,14 @@ class _SignUpViewState extends State<SignUpView> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        "Already have an account? ",
+                        "Đã có tài khoản? ",
                         style: TextStyle(
                           color: TColor.black,
                           fontSize: 14,
                         ),
                       ),
                       Text(
-                        "Login",
+                        "Đăng nhập",
                         style: TextStyle(
                             color: TColor.black,
                             fontSize: 14,
