@@ -153,6 +153,16 @@ class AuthService {
     }
   }
 
+  // Reset mật khẩu qua email
+  Future<void> resetPassword(String email) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email.trim());
+    } catch (e) {
+      print('Lỗi reset mật khẩu: $e');
+      rethrow;
+    }
+  }
+
   // Xóa tài khoản và tất cả dữ liệu
   Future<void> deleteAccount(String password) async {
     try {
@@ -233,10 +243,12 @@ class AuthService {
           return 'Lỗi kết nối mạng. Vui lòng kiểm tra internet';
         case 'user-disabled':
           return 'Tài khoản đã bị vô hiệu hóa';
+        case 'missing-email':
+          return 'Vui lòng nhập email';
         default:
-          return 'Đăng nhập thất bại. Vui lòng thử lại';
+          return 'Có lỗi xảy ra. Vui lòng thử lại';
       }
     }
-    return 'Đăng nhập thất bại. Vui lòng thử lại';
+    return 'Có lỗi xảy ra. Vui lòng thử lại';
   }
 }

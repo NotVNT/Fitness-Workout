@@ -49,7 +49,7 @@ class _StartedViewState extends State<StartedView> {
                 ),
               ),
               const Spacer(),
-              // Test logout button
+              // Debug logout button (có thể xóa sau)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: ElevatedButton(
@@ -58,7 +58,7 @@ class _StartedViewState extends State<StartedView> {
                     await authService.signOut();
                     print('Force logout completed');
                   },
-                  child: const Text('Force Logout (Test)'),
+                  child: const Text('Force Logout (Debug)'),
                 ),
               ),
               const SizedBox(height: 10),

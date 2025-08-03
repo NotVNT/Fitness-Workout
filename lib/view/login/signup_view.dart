@@ -57,8 +57,7 @@ class _SignUpViewState extends State<SignUpView> {
 
       if (result != null) {
         // Đăng ký thành công, đăng xuất và chuyển đến màn hình đăng nhập
-        _showSuccessMessage(
-            'Đăng ký thành công!');
+        _showSuccessMessage('Đăng ký thành công!');
 
         // Đăng xuất user vừa tạo để họ phải đăng nhập lại
         await _authService.signOut();
