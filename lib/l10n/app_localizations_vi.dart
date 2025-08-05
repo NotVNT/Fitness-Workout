@@ -355,4 +355,70 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get setYourGoal => 'Đặt mục tiêu của bạn';
+
+  @override
+  String get editBMI => 'Chỉnh sửa BMI';
+
+  @override
+  String get editBMIInfo => 'Chỉnh sửa thông tin BMI';
+
+  @override
+  String get weightKg => 'Cân nặng (kg)';
+
+  @override
+  String get heightCm => 'Chiều cao (cm)';
+
+  @override
+  String get currentBMI => 'BMI hiện tại';
+
+  @override
+  String get pleaseEnterWeight => 'Vui lòng nhập cân nặng';
+
+  @override
+  String get pleaseEnterHeight => 'Vui lòng nhập chiều cao';
+
+  @override
+  String get invalidWeight => 'Cân nặng không hợp lệ (1-500 kg)';
+
+  @override
+  String get invalidHeight => 'Chiều cao không hợp lệ (1-300 cm)';
+
+  @override
+  String get saving => 'Đang lưu...';
+
+  @override
+  String get save => 'Lưu';
+
+  @override
+  String get bmiUpdateSuccess => 'Cập nhật thông tin BMI thành công!';
+
+  @override
+  String get bmiUpdateError => 'Có lỗi xảy ra khi cập nhật thông tin!';
+
+  @override
+  String get noDataAvailable => 'Chưa có thông tin';
+
+  @override
+  String get underweight => 'Thiếu cân';
+
+  @override
+  String get normal => 'Bình thường';
+
+  @override
+  String get overweight => 'Thừa cân';
+
+  @override
+  String get obese => 'Béo phì';
+
+  @override
+  String get youAreUnderweight => 'Bạn đang thiếu cân';
+
+  @override
+  String get youAreOverweight => 'Bạn đang thừa cân';
+
+  @override
+  String get youAreObese => 'Bạn đang béo phì';
+
+  @override
+  String get noBMIData => 'Chưa có thông tin BMI';
 }

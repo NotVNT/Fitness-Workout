@@ -9,6 +9,7 @@ class UserModel {
   final String gender;
   final double weight;
   final double height;
+  final double targetWeight;
   final String goal;
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -22,6 +23,7 @@ class UserModel {
     this.gender = '',
     this.weight = 0.0,
     this.height = 0.0,
+    this.targetWeight = 0.0,
     this.goal = '',
     this.createdAt,
     this.updatedAt,
@@ -30,7 +32,7 @@ class UserModel {
   // Factory constructor to create UserModel from Firestore document
   factory UserModel.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-    
+
     return UserModel(
       id: doc.id,
       email: data['email'] ?? '',
@@ -40,12 +42,13 @@ class UserModel {
       gender: data['gender'] ?? '',
       weight: (data['weight'] ?? 0.0).toDouble(),
       height: (data['height'] ?? 0.0).toDouble(),
+      targetWeight: (data['targetWeight'] ?? 0.0).toDouble(),
       goal: data['goal'] ?? '',
-      createdAt: data['createdAt'] != null 
-          ? (data['createdAt'] as Timestamp).toDate() 
+      createdAt: data['createdAt'] != null
+          ? (data['createdAt'] as Timestamp).toDate()
           : null,
-      updatedAt: data['updatedAt'] != null 
-          ? (data['updatedAt'] as Timestamp).toDate() 
+      updatedAt: data['updatedAt'] != null
+          ? (data['updatedAt'] as Timestamp).toDate()
           : null,
     );
   }
@@ -60,6 +63,7 @@ class UserModel {
       'gender': gender,
       'weight': weight,
       'height': height,
+      'targetWeight': targetWeight,
       'goal': goal,
       'updatedAt': FieldValue.serverTimestamp(),
     };
@@ -95,7 +99,7 @@ class UserModel {
       DateTime birthDate = DateTime.parse(dateOfBirth);
       DateTime now = DateTime.now();
       int age = now.year - birthDate.year;
-      if (now.month < birthDate.month || 
+      if (now.month < birthDate.month ||
           (now.month == birthDate.month && now.day < birthDate.day)) {
         age--;
       }
@@ -114,6 +118,7 @@ class UserModel {
     String? gender,
     double? weight,
     double? height,
+    double? targetWeight,
     String? goal,
     DateTime? updatedAt,
   }) {
@@ -126,6 +131,7 @@ class UserModel {
       gender: gender ?? this.gender,
       weight: weight ?? this.weight,
       height: height ?? this.height,
+      targetWeight: targetWeight ?? this.targetWeight,
       goal: goal ?? this.goal,
       createdAt: createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
