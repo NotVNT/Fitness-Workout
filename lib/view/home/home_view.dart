@@ -6,11 +6,14 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
+import 'package:provider/provider.dart';
 import '../../common/colo_extension.dart';
 import '../../l10n/app_localizations.dart';
+import '../../providers/user_provider.dart';
 import 'activity_tracker_view.dart';
 import 'finished_workout_view.dart';
 import 'notification_view.dart';
+import '../bmi_edit/height_input_view.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -44,6 +47,31 @@ class _HomeViewState extends State<HomeView> {
     },
   ];
   List<int> showingTooltipOnSpots = [21];
+
+  @override
+  void initState() {
+    super.initState();
+    // Load user data when the home view initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.loadUserData();
+    });
+  }
+
+  Future<void> _showBMIEditDialog() async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HeightInputView(),
+      ),
+    ).then((_) {
+      // Refresh user data when returning from the flow
+      if (mounted) {
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        userProvider.loadUserData();
+      }
+    });
+  }
 
   List<FlSpot> get allSpots => const [
         FlSpot(0, 20),
@@ -178,61 +206,64 @@ class _HomeViewState extends State<HomeView> {
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 25, horizontal: 25),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Consumer<UserProvider>(
+                        builder: (context, userProvider, child) {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                AppLocalizations.of(context)?.bmi ??
-                                    "BMI (Body Mass Index)",
-                                style: TextStyle(
-                                    color: TColor.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    AppLocalizations.of(context)?.bmi ??
+                                        "BMI (Body Mass Index)",
+                                    style: TextStyle(
+                                        color: TColor.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700),
+                                  ),
+                                  Text(
+                                    userProvider.getBMIStatusMessage(),
+                                    style: TextStyle(
+                                        color:
+                                            TColor.white.withValues(alpha: 0.7),
+                                        fontSize: 12),
+                                  ),
+                                  SizedBox(
+                                    height: media.width * 0.05,
+                                  ),
+                                  SizedBox(
+                                      width: 120,
+                                      height: 35,
+                                      child: RoundButton(
+                                          icon: Icons.edit,
+                                          iconSize: 16,
+                                          type: RoundButtonType.bgSGradient,
+                                          onPressed: _showBMIEditDialog))
+                                ],
                               ),
-                              Text(
-                                AppLocalizations.of(context)
-                                        ?.youHaveNormalWeight ??
-                                    "You have a normal weight",
-                                style: TextStyle(
-                                    color: TColor.white.withValues(alpha: 0.7),
-                                    fontSize: 12),
+                              AspectRatio(
+                                aspectRatio: 1,
+                                child: PieChart(
+                                  PieChartData(
+                                    pieTouchData: PieTouchData(
+                                      touchCallback: (FlTouchEvent event,
+                                          pieTouchResponse) {},
+                                    ),
+                                    startDegreeOffset: 250,
+                                    borderData: FlBorderData(
+                                      show: false,
+                                    ),
+                                    sectionsSpace: 1,
+                                    centerSpaceRadius: 0,
+                                    sections: showingSections(),
+                                  ),
+                                ),
                               ),
-                              SizedBox(
-                                height: media.width * 0.05,
-                              ),
-                              SizedBox(
-                                  width: 120,
-                                  height: 35,
-                                  child: RoundButton(
-                                      icon: Icons.arrow_forward,
-                                      iconSize: 16,
-                                      type: RoundButtonType.bgSGradient,
-                                      onPressed: () {}))
                             ],
-                          ),
-                          AspectRatio(
-                            aspectRatio: 1,
-                            child: PieChart(
-                              PieChartData(
-                                pieTouchData: PieTouchData(
-                                  touchCallback:
-                                      (FlTouchEvent event, pieTouchResponse) {},
-                                ),
-                                startDegreeOffset: 250,
-                                borderData: FlBorderData(
-                                  show: false,
-                                ),
-                                sectionsSpace: 1,
-                                centerSpaceRadius: 0,
-                                sections: showingSections(),
-                              ),
-                            ),
-                          ),
-                        ],
+                          );
+                        },
                       ),
                     )
                   ]),
@@ -1004,10 +1035,14 @@ class _HomeViewState extends State<HomeView> {
   }
 
   List<PieChartSectionData> showingSections() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final bmi = userProvider.bmi;
+    final bmiText = bmi > 0 ? bmi.toStringAsFixed(1) : "--";
+
     return List.generate(
       2,
       (i) {
-        var color0 = TColor.secondaryColor1;
+        var color0 = userProvider.getBMIColor();
 
         switch (i) {
           case 0:
@@ -1017,9 +1052,9 @@ class _HomeViewState extends State<HomeView> {
                 title: '',
                 radius: 55,
                 titlePositionPercentageOffset: 0.55,
-                badgeWidget: const Text(
-                  "20,1",
-                  style: TextStyle(
+                badgeWidget: Text(
+                  bmiText,
+                  style: const TextStyle(
                       color: Colors.white,
                       fontSize: 12,
                       fontWeight: FontWeight.w700),

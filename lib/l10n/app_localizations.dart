@@ -787,6 +787,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Set your goal'**
   String get setYourGoal;
+
+  /// No description provided for @editBMI.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit BMI'**
+  String get editBMI;
+
+  /// No description provided for @editBMIInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit BMI Information'**
+  String get editBMIInfo;
+
+  /// No description provided for @weightKg.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight (kg)'**
+  String get weightKg;
+
+  /// No description provided for @heightCm.
+  ///
+  /// In en, this message translates to:
+  /// **'Height (cm)'**
+  String get heightCm;
+
+  /// No description provided for @currentBMI.
+  ///
+  /// In en, this message translates to:
+  /// **'Current BMI'**
+  String get currentBMI;
+
+  /// No description provided for @pleaseEnterWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter weight'**
+  String get pleaseEnterWeight;
+
+  /// No description provided for @pleaseEnterHeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter height'**
+  String get pleaseEnterHeight;
+
+  /// No description provided for @invalidWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid weight (1-500 kg)'**
+  String get invalidWeight;
+
+  /// No description provided for @invalidHeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid height (1-300 cm)'**
+  String get invalidHeight;
+
+  /// No description provided for @saving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving...'**
+  String get saving;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @bmiUpdateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'BMI information updated successfully!'**
+  String get bmiUpdateSuccess;
+
+  /// No description provided for @bmiUpdateError.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred while updating information!'**
+  String get bmiUpdateError;
+
+  /// No description provided for @noDataAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No data available'**
+  String get noDataAvailable;
+
+  /// No description provided for @underweight.
+  ///
+  /// In en, this message translates to:
+  /// **'Underweight'**
+  String get underweight;
+
+  /// No description provided for @normal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get normal;
+
+  /// No description provided for @overweight.
+  ///
+  /// In en, this message translates to:
+  /// **'Overweight'**
+  String get overweight;
+
+  /// No description provided for @obese.
+  ///
+  /// In en, this message translates to:
+  /// **'Obese'**
+  String get obese;
+
+  /// No description provided for @youAreUnderweight.
+  ///
+  /// In en, this message translates to:
+  /// **'You are underweight'**
+  String get youAreUnderweight;
+
+  /// No description provided for @youAreOverweight.
+  ///
+  /// In en, this message translates to:
+  /// **'You are overweight'**
+  String get youAreOverweight;
+
+  /// No description provided for @youAreObese.
+  ///
+  /// In en, this message translates to:
+  /// **'You are obese'**
+  String get youAreObese;
+
+  /// No description provided for @noBMIData.
+  ///
+  /// In en, this message translates to:
+  /// **'No BMI data available'**
+  String get noBMIData;
 }
 
 class _AppLocalizationsDelegate

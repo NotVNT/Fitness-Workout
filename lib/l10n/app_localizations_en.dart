@@ -354,4 +354,70 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get setYourGoal => 'Set your goal';
+
+  @override
+  String get editBMI => 'Edit BMI';
+
+  @override
+  String get editBMIInfo => 'Edit BMI Information';
+
+  @override
+  String get weightKg => 'Weight (kg)';
+
+  @override
+  String get heightCm => 'Height (cm)';
+
+  @override
+  String get currentBMI => 'Current BMI';
+
+  @override
+  String get pleaseEnterWeight => 'Please enter weight';
+
+  @override
+  String get pleaseEnterHeight => 'Please enter height';
+
+  @override
+  String get invalidWeight => 'Invalid weight (1-500 kg)';
+
+  @override
+  String get invalidHeight => 'Invalid height (1-300 cm)';
+
+  @override
+  String get saving => 'Saving...';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get bmiUpdateSuccess => 'BMI information updated successfully!';
+
+  @override
+  String get bmiUpdateError => 'An error occurred while updating information!';
+
+  @override
+  String get noDataAvailable => 'No data available';
+
+  @override
+  String get underweight => 'Underweight';
+
+  @override
+  String get normal => 'Normal';
+
+  @override
+  String get overweight => 'Overweight';
+
+  @override
+  String get obese => 'Obese';
+
+  @override
+  String get youAreUnderweight => 'You are underweight';
+
+  @override
+  String get youAreOverweight => 'You are overweight';
+
+  @override
+  String get youAreObese => 'You are obese';
+
+  @override
+  String get noBMIData => 'No BMI data available';
 }

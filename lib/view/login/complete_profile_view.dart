@@ -51,6 +51,7 @@ class _CompleteProfileViewState extends State<CompleteProfileView> {
           gender: _selectedGender,
           weight: double.tryParse(txtWeight.text) ?? 0.0,
           height: double.tryParse(txtHeight.text) ?? 0.0,
+          targetWeight: 0.0, // Default target weight
         );
 
         // Navigate to next screen

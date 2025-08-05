@@ -29,6 +29,7 @@ class AuthService {
           email: email,
           firstName: firstName,
           lastName: lastName,
+          targetWeight: 0.0,
         );
       }
 
@@ -97,6 +98,7 @@ class AuthService {
           await _firestoreService.createUserProfile(
             userId: currentUser!.uid,
             email: currentUser!.email ?? '',
+            targetWeight: 0.0,
           );
           // Lấy lại data sau khi tạo
           final newUserDoc =
@@ -203,6 +205,7 @@ class AuthService {
             await _firestoreService.createUserProfile(
               userId: currentUser!.uid,
               email: currentUser!.email ?? '',
+              targetWeight: 0.0,
             );
             // Trả về data mặc định
             return {
