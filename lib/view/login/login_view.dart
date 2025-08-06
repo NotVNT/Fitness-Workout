@@ -16,6 +16,7 @@ class _LoginViewState extends State<LoginView> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
 
   Future<void> _signIn() async {
     // Validation
@@ -205,51 +206,38 @@ class _LoginViewState extends State<LoginView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  "Xin chào,",
-                  style: TextStyle(color: TColor.gray, fontSize: 16),
-                ),
-                Text(
-                  "Chào mừng trở lại",
-                  style: TextStyle(
-                      color: TColor.black,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700),
-                ),
-                SizedBox(
-                  height: media.width * 0.05,
-                ),
-                SizedBox(
-                  height: media.width * 0.04,
-                ),
+                SizedBox(height: media.height * 0.1),
                 RoundTextField(
                   hitText: "Email",
                   icon: "assets/img/email.png",
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                 ),
-                SizedBox(
-                  height: media.width * 0.04,
-                ),
+                SizedBox(height: 20),
                 RoundTextField(
                   hitText: "Mật khẩu",
                   icon: "assets/img/lock.png",
-                  obscureText: true,
+                  obscureText: !_isPasswordVisible,
                   controller: _passwordController,
                   rigtIcon: TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
                       child: Container(
                           alignment: Alignment.center,
                           width: 20,
                           height: 20,
-                          child: Image.asset(
-                            "assets/img/show_password.png",
-                            width: 20,
-                            height: 20,
-                            fit: BoxFit.contain,
+                          child: Icon(
+                            _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
                             color: TColor.gray,
+                            size: 20,
                           ))),
                 ),
+                SizedBox(height: 15),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -258,20 +246,19 @@ class _LoginViewState extends State<LoginView> {
                       child: Text(
                         "Quên mật khẩu?",
                         style: TextStyle(
-                            color: TColor.gray,
-                            fontSize: 10,
+                            color: TColor.primaryColor1,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
                             decoration: TextDecoration.underline),
                       ),
                     ),
                   ],
                 ),
-                const Spacer(),
+                SizedBox(height: media.height * 0.05),
                 RoundButton(
                     title: _isLoading ? "Đang đăng nhập..." : "Đăng nhập",
                     onPressed: _isLoading ? () {} : () => _signIn()),
-                SizedBox(
-                  height: media.width * 0.04,
-                ),
+                SizedBox(height: 30),
                 Row(
                   // crossAxisAlignment: CrossAxisAlignment.,
                   children: [
@@ -364,16 +351,14 @@ class _LoginViewState extends State<LoginView> {
                       Text(
                         "Đăng ký",
                         style: TextStyle(
-                            color: TColor.black,
+                            color: TColor.primaryColor1,
                             fontSize: 14,
                             fontWeight: FontWeight.w700),
                       )
                     ],
                   ),
                 ),
-                SizedBox(
-                  height: media.width * 0.04,
-                ),
+                SizedBox(height: 20),
               ],
             ),
           ),
