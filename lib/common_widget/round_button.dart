@@ -5,7 +5,9 @@ import '../common/colo_extension.dart';
 enum RoundButtonType { bgGradient, bgSGradient, textGradient }
 
 class RoundButton extends StatelessWidget {
-  final String title;
+  final String? title;
+  final IconData? icon;
+  final double? iconSize;
   final RoundButtonType type;
   final VoidCallback onPressed;
   final double fontSize;
@@ -14,7 +16,9 @@ class RoundButton extends StatelessWidget {
 
   const RoundButton(
       {super.key,
-      required this.title,
+      this.title,
+      this.icon,
+      this.iconSize = 16,
       this.type = RoundButtonType.bgGradient,
       this.fontSize = 16,
       this.elevation = 1,
@@ -60,11 +64,7 @@ class RoundButton extends StatelessWidget {
           ),
           child: type == RoundButtonType.bgGradient ||
                   type == RoundButtonType.bgSGradient
-              ? Text(title,
-                  style: TextStyle(
-                      color: TColor.white,
-                      fontSize: fontSize,
-                      fontWeight: fontWeight))
+              ? _buildContent(TColor.white)
               : ShaderMask(
                   blendMode: BlendMode.srcIn,
                   shaderCallback: (bounds) {
@@ -75,14 +75,31 @@ class RoundButton extends StatelessWidget {
                         .createShader(
                             Rect.fromLTRB(0, 0, bounds.width, bounds.height));
                   },
-                  child: Text(title,
-                      style: TextStyle(
-                          color: TColor.primaryColor1,
-                          fontSize: fontSize,
-                          fontWeight: fontWeight)),
+                  child: _buildContent(TColor.primaryColor1),
                 ),
         ),
       ),
     );
+  }
+
+  Widget _buildContent(Color color) {
+    if (icon != null) {
+      return Icon(
+        icon,
+        color: color,
+        size: iconSize,
+      );
+    } else if (title != null) {
+      return Text(
+        title!,
+        style: TextStyle(
+          color: color,
+          fontSize: fontSize,
+          fontWeight: fontWeight,
+        ),
+      );
+    } else {
+      return const SizedBox.shrink();
+    }
   }
 }

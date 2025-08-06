@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../common/colo_extension.dart';
 import '../../common_widget/latest_activity_row.dart';
 import '../../common_widget/today_target_cell.dart';
+import '../../common_widget/icon_text_button.dart';
 import '../../l10n/app_localizations.dart';
 
 class ActivityTrackerView extends StatefulWidget {
@@ -331,15 +332,10 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                         fontSize: 16,
                         fontWeight: FontWeight.w700),
                   ),
-                  TextButton(
+                  IconTextButton(
+                    icon: Icons.arrow_forward,
+                    iconSize: 20,
                     onPressed: () {},
-                    child: Text(
-                      AppLocalizations.of(context)?.seeMore ?? "See More",
-                      style: TextStyle(
-                          color: TColor.gray,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700),
-                    ),
                   )
                 ],
               ),
@@ -371,25 +367,25 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
     Widget text;
     switch (value.toInt()) {
       case 0:
-        text = Text('Sun', style: style);
+        text = Text(AppLocalizations.of(context)?.sun ?? 'Sun', style: style);
         break;
       case 1:
-        text = Text('Mon', style: style);
+        text = Text(AppLocalizations.of(context)?.mon ?? 'Mon', style: style);
         break;
       case 2:
-        text = Text('Tue', style: style);
+        text = Text(AppLocalizations.of(context)?.tue ?? 'Tue', style: style);
         break;
       case 3:
-        text = Text('Wed', style: style);
+        text = Text(AppLocalizations.of(context)?.wed ?? 'Wed', style: style);
         break;
       case 4:
-        text = Text('Thu', style: style);
+        text = Text(AppLocalizations.of(context)?.thu ?? 'Thu', style: style);
         break;
       case 5:
-        text = Text('Fri', style: style);
+        text = Text(AppLocalizations.of(context)?.fri ?? 'Fri', style: style);
         break;
       case 6:
-        text = Text('Sat', style: style);
+        text = Text(AppLocalizations.of(context)?.sat ?? 'Sat', style: style);
         break;
       default:
         text = Text('', style: style);

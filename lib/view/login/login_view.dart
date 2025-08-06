@@ -206,7 +206,23 @@ class _LoginViewState extends State<LoginView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(height: media.height * 0.1),
+                Text(
+                  "Xin chào,",
+                  style: TextStyle(color: TColor.gray, fontSize: 16),
+                ),
+                Text(
+                  "Chào mừng trở lại",
+                  style: TextStyle(
+                      color: TColor.black,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700),
+                ),
+                SizedBox(
+                  height: media.width * 0.05,
+                ),
+                SizedBox(
+                  height: media.width * 0.04,
+                ),
                 RoundTextField(
                   hitText: "Email",
                   icon: "assets/img/email.png",
@@ -246,19 +262,20 @@ class _LoginViewState extends State<LoginView> {
                       child: Text(
                         "Quên mật khẩu?",
                         style: TextStyle(
-                            color: TColor.primaryColor1,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
+                            color: TColor.gray,
+                            fontSize: 10,
                             decoration: TextDecoration.underline),
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: media.height * 0.05),
+                const Spacer(),
                 RoundButton(
                     title: _isLoading ? "Đang đăng nhập..." : "Đăng nhập",
                     onPressed: _isLoading ? () {} : () => _signIn()),
-                SizedBox(height: 30),
+                SizedBox(
+                  height: media.width * 0.04,
+                ),
                 Row(
                   // crossAxisAlignment: CrossAxisAlignment.,
                   children: [

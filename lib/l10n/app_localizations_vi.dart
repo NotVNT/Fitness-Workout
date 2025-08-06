@@ -69,16 +69,70 @@ class AppLocalizationsVi extends AppLocalizations {
   String get contact => 'Liên hệ';
 
   @override
+  String get contactUs => 'Liên hệ với chúng tôi';
+
+  @override
   String get privacyPolicy => 'Chính sách bảo mật';
 
   @override
   String get settings => 'Cài đặt';
 
   @override
+  String get edit => 'Chỉnh sửa';
+
+  @override
+  String get height => 'Chiều cao';
+
+  @override
+  String get weight => 'Cân nặng';
+
+  @override
+  String get age => 'Tuổi';
+
+  @override
+  String get notification => 'Thông báo';
+
+  @override
+  String get popUpNotification => 'Thông báo bật lên';
+
+  @override
   String get workoutTracker => 'Theo dõi tập luyện';
 
   @override
-  String get mealPlanner => 'Kế hoạch ăn uống';
+  String get dailyWorkoutSchedule => 'Lịch tập hàng ngày';
+
+  @override
+  String get upcomingWorkout => 'Bài tập sắp tới';
+
+  @override
+  String get whatDoYouWantToTrain => 'Bạn muốn tập gì';
+
+  @override
+  String get sun => 'CN';
+
+  @override
+  String get mon => 'T2';
+
+  @override
+  String get tue => 'T3';
+
+  @override
+  String get wed => 'T4';
+
+  @override
+  String get thu => 'T5';
+
+  @override
+  String get fri => 'T6';
+
+  @override
+  String get sat => 'T7';
+
+  @override
+  String get today => 'Hôm nay';
+
+  @override
+  String get mealPlanner => 'Kế hoạch bữa ăn';
 
   @override
   String get sleepTracker => 'Theo dõi giấc ngủ';
@@ -132,7 +186,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get markDone => 'Đánh dấu hoàn thành';
 
   @override
-  String get mealSchedule => 'Lịch ăn uống';
+  String get mealSchedule => 'Lịch bữa ăn';
 
   @override
   String get breakfast => 'Bữa sáng';
@@ -150,10 +204,49 @@ class AppLocalizationsVi extends AppLocalizations {
   String get todayMealNutritions => 'Dinh dưỡng bữa ăn hôm nay';
 
   @override
-  String get items => 'món';
+  String get items => 'Món';
 
   @override
   String get caloriesUnit => 'calo';
+
+  @override
+  String get mealNutritions => 'Dinh dưỡng bữa ăn';
+
+  @override
+  String get monthly => 'Hàng tháng';
+
+  @override
+  String get dailyMealSchedule => 'Lịch ăn hàng ngày';
+
+  @override
+  String get todayMeals => 'Bữa ăn hôm nay';
+
+  @override
+  String get snack => 'Đồ ăn vặt';
+
+  @override
+  String get dessert => 'Tráng miệng';
+
+  @override
+  String get findSomethingToEat => 'Tìm món ăn';
+
+  @override
+  String get foods => 'Món ăn';
+
+  @override
+  String get searchPancake => 'Tìm bánh pancake';
+
+  @override
+  String get category => 'Danh mục';
+
+  @override
+  String get recommendationForDiet => 'Gợi ý\ncho chế độ ăn';
+
+  @override
+  String get popular => 'Phổ biến';
+
+  @override
+  String get weekly => 'Hàng tuần';
 
   @override
   String get sleepSchedule => 'Lịch ngủ';
@@ -166,9 +259,6 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get yourSchedule => 'Lịch trình của bạn';
-
-  @override
-  String get bmiBodyMassIndex => 'BMI (Chỉ số khối cơ thể)';
 
   @override
   String get waterIntake => 'Lượng nước uống';
@@ -186,9 +276,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get kCalLeft => 'kCal\ncòn lại';
 
   @override
-  String get weekly => 'Hàng tuần';
-
-  @override
   String get latestWorkout => 'Bài tập gần đây';
 
   @override
@@ -201,9 +288,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get minutes => 'phút';
 
   @override
-  String get upcomingWorkout => 'Bài tập sắp tới';
-
-  @override
   String get fullbodyWorkout => 'Tập toàn thân';
 
   @override
@@ -214,4 +298,127 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get exercises => 'Bài tập';
+
+  @override
+  String get congratulationsFinishedWorkout =>
+      'Chúc mừng, Bạn đã hoàn thành bài tập';
+
+  @override
+  String get exercisesKingNutritionQueen =>
+      'Tập luyện là vua và dinh dưỡng là hoàng hậu. Kết hợp cả hai và bạn sẽ có một vương quốc';
+
+  @override
+  String get jackLalanne => '-Jack Lalanne';
+
+  @override
+  String get backToHome => 'Về trang chủ';
+
+  @override
+  String get progressPhoto => 'Ảnh Tiến Độ';
+
+  @override
+  String get reminder => 'Nhắc nhở!';
+
+  @override
+  String get nextPhotosFallOn => 'Ảnh tiếp theo vào ngày 08 tháng 7';
+
+  @override
+  String get trackYourProgress =>
+      'Theo dõi tiến độ của bạn\nmỗi tháng bằng ảnh';
+
+  @override
+  String get compareMyPhoto => 'So sánh ảnh của tôi';
+
+  @override
+  String get gallery => 'Thư viện';
+
+  @override
+  String get comparison => 'So sánh';
+
+  @override
+  String get reminderReset => 'Đã khôi phục nhắc nhở!';
+
+  @override
+  String get testUserData => 'Dữ liệu người dùng thử nghiệm';
+
+  @override
+  String get logout => 'Đăng xuất';
+
+  @override
+  String get confirmLogout => 'Bạn có chắc chắn muốn đăng xuất?';
+
+  @override
+  String get cancel => 'Hủy';
+
+  @override
+  String get logoutError => 'Lỗi đăng xuất';
+
+  @override
+  String get setYourGoal => 'Đặt mục tiêu của bạn';
+
+  @override
+  String get editBMI => 'Chỉnh sửa BMI';
+
+  @override
+  String get editBMIInfo => 'Chỉnh sửa thông tin BMI';
+
+  @override
+  String get weightKg => 'Cân nặng (kg)';
+
+  @override
+  String get heightCm => 'Chiều cao (cm)';
+
+  @override
+  String get currentBMI => 'BMI hiện tại';
+
+  @override
+  String get pleaseEnterWeight => 'Vui lòng nhập cân nặng';
+
+  @override
+  String get pleaseEnterHeight => 'Vui lòng nhập chiều cao';
+
+  @override
+  String get invalidWeight => 'Cân nặng không hợp lệ (1-500 kg)';
+
+  @override
+  String get invalidHeight => 'Chiều cao không hợp lệ (1-300 cm)';
+
+  @override
+  String get saving => 'Đang lưu...';
+
+  @override
+  String get save => 'Lưu';
+
+  @override
+  String get bmiUpdateSuccess => 'Cập nhật thông tin BMI thành công!';
+
+  @override
+  String get bmiUpdateError => 'Có lỗi xảy ra khi cập nhật thông tin!';
+
+  @override
+  String get noDataAvailable => 'Chưa có thông tin';
+
+  @override
+  String get underweight => 'Thiếu cân';
+
+  @override
+  String get normal => 'Bình thường';
+
+  @override
+  String get overweight => 'Thừa cân';
+
+  @override
+  String get obese => 'Béo phì';
+
+  @override
+  String get youAreUnderweight => 'Bạn đang thiếu cân';
+
+  @override
+  String get youAreOverweight => 'Bạn đang thừa cân';
+
+  @override
+  String get youAreObese => 'Bạn đang béo phì';
+
+  @override
+  String get noBMIData => 'Chưa có thông tin BMI';
 }

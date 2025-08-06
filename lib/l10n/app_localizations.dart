@@ -218,6 +218,12 @@ abstract class AppLocalizations {
   /// **'Contact'**
   String get contact;
 
+  /// No description provided for @contactUs.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Us'**
+  String get contactUs;
+
   /// No description provided for @privacyPolicy.
   ///
   /// In en, this message translates to:
@@ -230,11 +236,113 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settings;
 
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// No description provided for @height.
+  ///
+  /// In en, this message translates to:
+  /// **'Height'**
+  String get height;
+
+  /// No description provided for @weight.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight'**
+  String get weight;
+
+  /// No description provided for @age.
+  ///
+  /// In en, this message translates to:
+  /// **'Age'**
+  String get age;
+
+  /// No description provided for @notification.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification'**
+  String get notification;
+
+  /// No description provided for @popUpNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Pop-up Notification'**
+  String get popUpNotification;
+
   /// No description provided for @workoutTracker.
   ///
   /// In en, this message translates to:
   /// **'Workout Tracker'**
   String get workoutTracker;
+
+  /// No description provided for @dailyWorkoutSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Workout Schedule'**
+  String get dailyWorkoutSchedule;
+
+  /// No description provided for @upcomingWorkout.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming Workout'**
+  String get upcomingWorkout;
+
+  /// No description provided for @whatDoYouWantToTrain.
+  ///
+  /// In en, this message translates to:
+  /// **'What Do You Want to Train'**
+  String get whatDoYouWantToTrain;
+
+  /// No description provided for @sun.
+  ///
+  /// In en, this message translates to:
+  /// **'Sun'**
+  String get sun;
+
+  /// No description provided for @mon.
+  ///
+  /// In en, this message translates to:
+  /// **'Mon'**
+  String get mon;
+
+  /// No description provided for @tue.
+  ///
+  /// In en, this message translates to:
+  /// **'Tue'**
+  String get tue;
+
+  /// No description provided for @wed.
+  ///
+  /// In en, this message translates to:
+  /// **'Wed'**
+  String get wed;
+
+  /// No description provided for @thu.
+  ///
+  /// In en, this message translates to:
+  /// **'Thu'**
+  String get thu;
+
+  /// No description provided for @fri.
+  ///
+  /// In en, this message translates to:
+  /// **'Fri'**
+  String get fri;
+
+  /// No description provided for @sat.
+  ///
+  /// In en, this message translates to:
+  /// **'Sat'**
+  String get sat;
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
 
   /// No description provided for @mealPlanner.
   ///
@@ -392,6 +500,84 @@ abstract class AppLocalizations {
   /// **'calories'**
   String get caloriesUnit;
 
+  /// No description provided for @mealNutritions.
+  ///
+  /// In en, this message translates to:
+  /// **'Meal Nutritions'**
+  String get mealNutritions;
+
+  /// No description provided for @monthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get monthly;
+
+  /// No description provided for @dailyMealSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Meal Schedule'**
+  String get dailyMealSchedule;
+
+  /// No description provided for @todayMeals.
+  ///
+  /// In en, this message translates to:
+  /// **'Today Meals'**
+  String get todayMeals;
+
+  /// No description provided for @snack.
+  ///
+  /// In en, this message translates to:
+  /// **'Snack'**
+  String get snack;
+
+  /// No description provided for @dessert.
+  ///
+  /// In en, this message translates to:
+  /// **'Dessert'**
+  String get dessert;
+
+  /// No description provided for @findSomethingToEat.
+  ///
+  /// In en, this message translates to:
+  /// **'Find Something to Eat'**
+  String get findSomethingToEat;
+
+  /// No description provided for @foods.
+  ///
+  /// In en, this message translates to:
+  /// **'Foods'**
+  String get foods;
+
+  /// No description provided for @searchPancake.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Pancake'**
+  String get searchPancake;
+
+  /// No description provided for @category.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get category;
+
+  /// No description provided for @recommendationForDiet.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommendation\nfor Diet'**
+  String get recommendationForDiet;
+
+  /// No description provided for @popular.
+  ///
+  /// In en, this message translates to:
+  /// **'Popular'**
+  String get popular;
+
+  /// No description provided for @weekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get weekly;
+
   /// No description provided for @sleepSchedule.
   ///
   /// In en, this message translates to:
@@ -415,12 +601,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your Schedule'**
   String get yourSchedule;
-
-  /// No description provided for @bmiBodyMassIndex.
-  ///
-  /// In en, this message translates to:
-  /// **'BMI (Body Mass Index)'**
-  String get bmiBodyMassIndex;
 
   /// No description provided for @waterIntake.
   ///
@@ -452,12 +632,6 @@ abstract class AppLocalizations {
   /// **'kCal\nleft'**
   String get kCalLeft;
 
-  /// No description provided for @weekly.
-  ///
-  /// In en, this message translates to:
-  /// **'Weekly'**
-  String get weekly;
-
   /// No description provided for @latestWorkout.
   ///
   /// In en, this message translates to:
@@ -482,12 +656,6 @@ abstract class AppLocalizations {
   /// **'minutes'**
   String get minutes;
 
-  /// No description provided for @upcomingWorkout.
-  ///
-  /// In en, this message translates to:
-  /// **'Upcoming Workout'**
-  String get upcomingWorkout;
-
   /// No description provided for @fullbodyWorkout.
   ///
   /// In en, this message translates to:
@@ -511,6 +679,246 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Exercises'**
   String get exercises;
+
+  /// No description provided for @congratulationsFinishedWorkout.
+  ///
+  /// In en, this message translates to:
+  /// **'Congratulations, You Have Finished Your Workout'**
+  String get congratulationsFinishedWorkout;
+
+  /// No description provided for @exercisesKingNutritionQueen.
+  ///
+  /// In en, this message translates to:
+  /// **'Exercises is king and nutrition is queen. Combine the two and you will have a kingdom'**
+  String get exercisesKingNutritionQueen;
+
+  /// No description provided for @jackLalanne.
+  ///
+  /// In en, this message translates to:
+  /// **'-Jack Lalanne'**
+  String get jackLalanne;
+
+  /// No description provided for @backToHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Back To Home'**
+  String get backToHome;
+
+  /// No description provided for @progressPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress Photo'**
+  String get progressPhoto;
+
+  /// No description provided for @reminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder!'**
+  String get reminder;
+
+  /// No description provided for @nextPhotosFallOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Next Photos Fall On July 08'**
+  String get nextPhotosFallOn;
+
+  /// No description provided for @trackYourProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Track Your Progress Each\nMonth With Photo'**
+  String get trackYourProgress;
+
+  /// No description provided for @compareMyPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Compare my Photo'**
+  String get compareMyPhoto;
+
+  /// No description provided for @gallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get gallery;
+
+  /// No description provided for @comparison.
+  ///
+  /// In en, this message translates to:
+  /// **'Comparison'**
+  String get comparison;
+
+  /// No description provided for @reminderReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder reset!'**
+  String get reminderReset;
+
+  /// No description provided for @testUserData.
+  ///
+  /// In en, this message translates to:
+  /// **'Test User Data'**
+  String get testUserData;
+
+  /// No description provided for @logout.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get logout;
+
+  /// No description provided for @confirmLogout.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to logout?'**
+  String get confirmLogout;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @logoutError.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout error'**
+  String get logoutError;
+
+  /// No description provided for @setYourGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'Set your goal'**
+  String get setYourGoal;
+
+  /// No description provided for @editBMI.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit BMI'**
+  String get editBMI;
+
+  /// No description provided for @editBMIInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit BMI Information'**
+  String get editBMIInfo;
+
+  /// No description provided for @weightKg.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight (kg)'**
+  String get weightKg;
+
+  /// No description provided for @heightCm.
+  ///
+  /// In en, this message translates to:
+  /// **'Height (cm)'**
+  String get heightCm;
+
+  /// No description provided for @currentBMI.
+  ///
+  /// In en, this message translates to:
+  /// **'Current BMI'**
+  String get currentBMI;
+
+  /// No description provided for @pleaseEnterWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter weight'**
+  String get pleaseEnterWeight;
+
+  /// No description provided for @pleaseEnterHeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter height'**
+  String get pleaseEnterHeight;
+
+  /// No description provided for @invalidWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid weight (1-500 kg)'**
+  String get invalidWeight;
+
+  /// No description provided for @invalidHeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid height (1-300 cm)'**
+  String get invalidHeight;
+
+  /// No description provided for @saving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving...'**
+  String get saving;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @bmiUpdateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'BMI information updated successfully!'**
+  String get bmiUpdateSuccess;
+
+  /// No description provided for @bmiUpdateError.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred while updating information!'**
+  String get bmiUpdateError;
+
+  /// No description provided for @noDataAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No data available'**
+  String get noDataAvailable;
+
+  /// No description provided for @underweight.
+  ///
+  /// In en, this message translates to:
+  /// **'Underweight'**
+  String get underweight;
+
+  /// No description provided for @normal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get normal;
+
+  /// No description provided for @overweight.
+  ///
+  /// In en, this message translates to:
+  /// **'Overweight'**
+  String get overweight;
+
+  /// No description provided for @obese.
+  ///
+  /// In en, this message translates to:
+  /// **'Obese'**
+  String get obese;
+
+  /// No description provided for @youAreUnderweight.
+  ///
+  /// In en, this message translates to:
+  /// **'You are underweight'**
+  String get youAreUnderweight;
+
+  /// No description provided for @youAreOverweight.
+  ///
+  /// In en, this message translates to:
+  /// **'You are overweight'**
+  String get youAreOverweight;
+
+  /// No description provided for @youAreObese.
+  ///
+  /// In en, this message translates to:
+  /// **'You are obese'**
+  String get youAreObese;
+
+  /// No description provided for @noBMIData.
+  ///
+  /// In en, this message translates to:
+  /// **'No BMI data available'**
+  String get noBMIData;
 }
 
 class _AppLocalizationsDelegate
