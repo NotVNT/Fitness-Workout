@@ -8,50 +8,46 @@ import '../../common_widget/food_step_detail_row.dart';
 class FoodInfoDetailsView extends StatefulWidget {
   final Map mObj;
   final Map dObj;
+  final Function(Map)? onMealSelected;
   const FoodInfoDetailsView(
-      {super.key, required this.dObj, required this.mObj});
+      {super.key, required this.dObj, required this.mObj, this.onMealSelected});
 
   @override
   State<FoodInfoDetailsView> createState() => _FoodInfoDetailsViewState();
 }
 
 class _FoodInfoDetailsViewState extends State<FoodInfoDetailsView> {
-  List nutritionArr = [
-    {"image": "assets/img/burn.png", "title": "180kCal"},
-    {"image": "assets/img/egg.png", "title": "30g fats"},
-    {"image": "assets/img/proteins.png", "title": "20g proteins"},
-    {"image": "assets/img/carbo.png", "title": "50g carbo"},
-  ];
-
-  List ingredientsArr = [
-    {
-      "image": "assets/img/flour.png",
-      "title": "Wheat Flour",
-      "value": "100grm"
-    },
-    {"image": "assets/img/sugar.png", "title": "Sugar", "value": "3 tbsp"},
-    {
-      "image": "assets/img/baking_soda.png",
-      "title": "Baking Soda",
-      "value": "2tsp"
-    },
-    {"image": "assets/img/eggs.png", "title": "Eggs", "value": "2 items"},
-  ];
+  List<Map<String, dynamic>> getNutritionArr() {
+    return [
+      {
+        "icon": Icons.local_fire_department,
+        "title": widget.dObj["kcal"] ?? "180kCal"
+      },
+      {"icon": Icons.opacity, "title": widget.dObj["fat"] ?? "4g chất béo"},
+      {
+        "icon": Icons.fitness_center,
+        "title": widget.dObj["protein"] ?? "8g protein"
+      },
+      {"icon": Icons.grain, "title": widget.dObj["carbs"] ?? "25g carb"},
+    ];
+  }
 
   List stepArr = [
-    {"no": "1", "detail": "Prepare all of the ingredients that needed"},
-    {"no": "2", "detail": "Mix flour, sugar, salt, and baking powder"},
+    {"no": "1", "detail": "Chuẩn bị tất cả nguyên liệu cần thiết"},
+    {"no": "2", "detail": "Trộn bột mì, đường, muối và bột nở"},
     {
       "no": "3",
-      "detail":
-          "In a seperate place, mix the eggs and liquid milk until blended"
+      "detail": "Ở một nơi riêng, trộn trứng và sữa tươi cho đến khi quyện đều"
     },
     {
       "no": "4",
       "detail":
-          "Put the egg and milk mixture into the dry ingredients, Stir untul smooth and smooth"
+          "Đổ hỗn hợp trứng và sữa vào nguyên liệu khô, khuấy đều cho đến khi mịn"
     },
-    {"no": "5", "detail": "Prepare all of the ingredients that needed"},
+    {
+      "no": "5",
+      "detail": "Nướng bánh trên chảo với lửa vừa cho đến khi vàng đều"
+    },
   ];
 
   @override
@@ -98,11 +94,10 @@ class _FoodInfoDetailsViewState extends State<FoodInfoDetailsView> {
                     decoration: BoxDecoration(
                         color: TColor.lightGray,
                         borderRadius: BorderRadius.circular(10)),
-                    child: Image.asset(
-                      "assets/img/more_btn.png",
-                      width: 15,
-                      height: 15,
-                      fit: BoxFit.contain,
+                    child: Icon(
+                      Icons.more_horiz,
+                      color: TColor.black,
+                      size: 20,
                     ),
                   ),
                 )
@@ -135,11 +130,19 @@ class _FoodInfoDetailsViewState extends State<FoodInfoDetailsView> {
                       scale: 1.25,
                       child: Align(
                         alignment: Alignment.bottomCenter,
-                        child: Image.asset(
-                          widget.dObj["b_image"].toString(),
+                        child: Container(
                           width: media.width * 0.50,
                           height: media.width * 0.50,
-                          fit: BoxFit.contain,
+                          decoration: BoxDecoration(
+                            color: TColor.primaryColor1.withOpacity(0.1),
+                            borderRadius:
+                                BorderRadius.circular(media.width * 0.25),
+                          ),
+                          child: Icon(
+                            Icons.restaurant_menu,
+                            color: TColor.primaryColor1,
+                            size: media.width * 0.2,
+                          ),
                         ),
                       ),
                     ),
@@ -197,7 +200,7 @@ class _FoodInfoDetailsViewState extends State<FoodInfoDetailsView> {
                                         fontWeight: FontWeight.w700),
                                   ),
                                   Text(
-                                    "by James Ruth",
+                                    "bởi Chuyên gia dinh dưỡng",
                                     style: TextStyle(
                                         color: TColor.gray, fontSize: 12),
                                   ),
@@ -206,11 +209,10 @@ class _FoodInfoDetailsViewState extends State<FoodInfoDetailsView> {
                             ),
                             TextButton(
                               onPressed: () {},
-                              child: Image.asset(
-                                "assets/img/fav.png",
-                                width: 15,
-                                height: 15,
-                                fit: BoxFit.contain,
+                              child: Icon(
+                                Icons.favorite_border,
+                                color: TColor.primaryColor1,
+                                size: 24,
                               ),
                             )
                           ],
@@ -235,9 +237,9 @@ class _FoodInfoDetailsViewState extends State<FoodInfoDetailsView> {
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             scrollDirection: Axis.horizontal,
                             shrinkWrap: true,
-                            itemCount: nutritionArr.length,
+                            itemCount: getNutritionArr().length,
                             itemBuilder: (context, index) {
-                              var nObj = nutritionArr[index] as Map? ?? {};
+                              var nObj = getNutritionArr()[index] as Map? ?? {};
                               return Container(
                                   margin: const EdgeInsets.symmetric(
                                       vertical: 8, horizontal: 4),
@@ -256,11 +258,11 @@ class _FoodInfoDetailsViewState extends State<FoodInfoDetailsView> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
-                                      Image.asset(
-                                        nObj["image"].toString(),
-                                        width: 15,
-                                        height: 15,
-                                        fit: BoxFit.contain,
+                                      Icon(
+                                        nObj["icon"] ??
+                                            Icons.local_fire_department,
+                                        color: TColor.primaryColor1,
+                                        size: 16,
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.all(8.0),
@@ -281,7 +283,7 @@ class _FoodInfoDetailsViewState extends State<FoodInfoDetailsView> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: Text(
-                          "Descriptions",
+                          "Mô tả",
                           style: TextStyle(
                               color: TColor.black,
                               fontSize: 16,
@@ -294,12 +296,12 @@ class _FoodInfoDetailsViewState extends State<FoodInfoDetailsView> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: ReadMoreText(
-                          'Pancakes are some people\'s favorite breakfast, who doesn\'t like pancakes? Especially with the real honey splash on top of the pancakes, of course everyone loves that! besides being Pancakes are some people\'s favorite breakfast, who doesn\'t like pancakes? Especially with the real honey splash on top of the pancakes, of course everyone loves that! besides being',
+                          'Bánh pancake là món ăn sáng yêu thích của nhiều người, ai mà không thích bánh pancake? Đặc biệt khi được rưới mật ong thật lên trên bánh, chắc chắn ai cũng thích! Ngoài việc ngon miệng, bánh pancake còn dễ làm và bổ dưỡng. Món ăn này phù hợp cho cả gia đình và có thể tùy biến với nhiều loại topping khác nhau.',
                           trimLines: 4,
                           colorClickableText: TColor.black,
                           trimMode: TrimMode.Line,
-                          trimCollapsedText: ' Read More ...',
-                          trimExpandedText: ' Read Less',
+                          trimCollapsedText: ' Xem thêm ...',
+                          trimExpandedText: ' Thu gọn',
                           style: TextStyle(
                             color: TColor.gray,
                             fontSize: 12,
@@ -317,7 +319,7 @@ class _FoodInfoDetailsViewState extends State<FoodInfoDetailsView> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Ingredients That You\nWill Need",
+                              "Hướng dẫn từng bước",
                               style: TextStyle(
                                   color: TColor.black,
                                   fontSize: 16,
@@ -326,80 +328,7 @@ class _FoodInfoDetailsViewState extends State<FoodInfoDetailsView> {
                             TextButton(
                               onPressed: () {},
                               child: Text(
-                                "${stepArr.length} Items",
-                                style:
-                                    TextStyle(color: TColor.gray, fontSize: 12),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      SizedBox(
-                        height: (media.width * 0.25) + 40,
-                        child: ListView.builder(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            scrollDirection: Axis.horizontal,
-                            shrinkWrap: true,
-                            itemCount: ingredientsArr.length,
-                            itemBuilder: (context, index) {
-                              var nObj = ingredientsArr[index] as Map? ?? {};
-                              return Container(
-                                  margin:
-                                      const EdgeInsets.symmetric(horizontal: 4),
-                                  width: media.width * 0.23,
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        width: media.width * 0.23,
-                                        height: media.width * 0.23,
-                                        decoration: BoxDecoration(
-                                            color: TColor.lightGray,
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                        alignment: Alignment.center,
-                                        child: Image.asset(
-                                          nObj["image"].toString(),
-                                          width: 45,
-                                          height: 45,
-                                          fit: BoxFit.contain,
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: 4,
-                                      ),
-                                      Text(
-                                        nObj["title"].toString(),
-                                        style: TextStyle(
-                                            color: TColor.black, fontSize: 12),
-                                      ),
-                                      Text(
-                                        nObj["value"].toString(),
-                                        style: TextStyle(
-                                            color: TColor.gray, fontSize: 10),
-                                      ),
-                                    ],
-                                  ));
-                            }),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Step by Step",
-                              style: TextStyle(
-                                  color: TColor.black,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700),
-                            ),
-                            TextButton(
-                              onPressed: () {},
-                              child: Text(
-                                "${stepArr.length} Steps",
+                                "${stepArr.length} Bước",
                                 style:
                                     TextStyle(color: TColor.gray, fontSize: 12),
                               ),
@@ -436,7 +365,16 @@ class _FoodInfoDetailsViewState extends State<FoodInfoDetailsView> {
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: RoundButton(
                             title: "Add to ${widget.mObj["name"]} Meal",
-                            onPressed: () {}),
+                            onPressed: () {
+                              // Add meal to selected meals
+                              if (widget.onMealSelected != null) {
+                                widget.onMealSelected!(widget.dObj);
+                              }
+
+                              // Navigate back to meal planner
+                              Navigator.of(context).popUntil((route) =>
+                                  route.settings.name == null || route.isFirst);
+                            }),
                       ),
                     ],
                   ),

@@ -243,6 +243,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get recommendationForDiet => 'Gợi ý\ncho chế độ ăn';
 
   @override
+  String get dinnerRecommendations => 'Gợi ý\ncho bữa tối';
+
+  @override
   String get popular => 'Phổ biến';
 
   @override
@@ -421,4 +424,73 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get noBMIData => 'Chưa có thông tin BMI';
+
+  @override
+  String get lastNightSleep => 'Giấc ngủ đêm qua';
+
+  @override
+  String get dailySleepSchedule => 'Lịch ngủ hàng ngày';
+
+  @override
+  String get todaySchedule => 'Lịch trình hôm nay';
+
+  @override
+  String get alarm => 'Báo thức';
+
+  @override
+  String inHoursMinutes(Object hours, Object minutes) {
+    return 'trong $hours giờ $minutes phút';
+  }
+
+  @override
+  String hoursMinutes(Object hours, Object minutes) {
+    return '$hours giờ $minutes phút';
+  }
+
+  @override
+  String sleepDuration(Object hours, Object minutes) {
+    return '${hours}g ${minutes}p';
+  }
+
+  @override
+  String get phoGaKhongDauMo => 'Phở gà không dầu mỡ';
+
+  @override
+  String get chaoYenMachChuoi => 'Cháo yến mạch chuối';
+
+  @override
+  String get comGaoLutCaThuNuong => 'Cơm gạo lứt + Cá thu nướng';
+
+  @override
+  String get canhChuaCaChua => 'Canh chua cà chua';
+
+  @override
+  String get cheDauXanhKhongDuong => 'Chè đậu xanh không đường';
+
+  @override
+  String get sinhToBo => 'Sinh tố bơ sữa chua';
+
+  @override
+  String get canhChuaCaBasa => 'Canh chua cá basa';
+
+  @override
+  String get goiGaBapCai => 'Gỏi gà bắp cải';
+
+  @override
+  String get goiCuonTomThit => 'Gỏi cuốn tôm thịt';
+
+  @override
+  String get banhMiNguyenCamChaBong => 'Bánh mì nguyên cám chà bông';
+
+  @override
+  String get waterAdvice => 'Hãy uống đủ nước';
+
+  @override
+  String get litersPerDay => 'lít 1 ngày';
+
+  @override
+  String get sleepAdvice => 'Hãy ngủ đủ 8 tiếng 1 ngày';
+
+  @override
+  String get shouldDo => 'Nên làm';
 }

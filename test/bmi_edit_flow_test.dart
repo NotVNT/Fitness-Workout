@@ -6,7 +6,6 @@ import 'package:fitness/view/bmi_edit/current_weight_input_view.dart';
 import 'package:fitness/view/bmi_edit/target_weight_input_view.dart';
 import 'package:fitness/view/bmi_edit/creating_schedule_view.dart';
 import 'package:fitness/providers/user_provider.dart';
-import 'package:fitness/models/user_model.dart';
 
 void main() {
   group('BMI Edit Flow Tests', () {

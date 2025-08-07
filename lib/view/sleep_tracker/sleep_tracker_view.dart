@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../common/colo_extension.dart';
 import '../../common_widget/round_button.dart';
 import '../../common_widget/today_sleep_schedule_row.dart';
+import '../../l10n/app_localizations.dart';
 
 class SleepTrackerView extends StatefulWidget {
   const SleepTrackerView({super.key});
@@ -14,20 +15,23 @@ class SleepTrackerView extends StatefulWidget {
 }
 
 class _SleepTrackerViewState extends State<SleepTrackerView> {
-  List todaySleepArr = [
-    {
-      "name": "Bedtime",
-      "image": "assets/img/bed.png",
-      "time": "01/06/2023 09:00 PM",
-      "duration": "in 6hours 22minutes"
-    },
-    {
-      "name": "Alarm",
-      "image": "assets/img/alaarm.png",
-      "time": "02/06/2023 05:10 AM",
-      "duration": "in 14hours 30minutes"
-    },
-  ];
+  List<Map<String, String>> get todaySleepArr => [
+        {
+          "name": AppLocalizations.of(context)?.bedtime ?? "Bedtime",
+          "image": "assets/img/bed.png",
+          "time": "01/06/2023 09:00 PM",
+          "duration": AppLocalizations.of(context)?.inHoursMinutes('6', '22') ??
+              "in 6hours 22minutes"
+        },
+        {
+          "name": AppLocalizations.of(context)?.alarm ?? "Alarm",
+          "image": "assets/img/alaarm.png",
+          "time": "02/06/2023 05:10 AM",
+          "duration":
+              AppLocalizations.of(context)?.inHoursMinutes('14', '30') ??
+                  "in 14hours 30minutes"
+        },
+      ];
 
   List findEatArr = [
     {
@@ -70,7 +74,7 @@ class _SleepTrackerViewState extends State<SleepTrackerView> {
           ),
         ),
         title: Text(
-          "Sleep Tracker",
+          AppLocalizations.of(context)?.sleepTracker ?? "Sleep Tracker",
           style: TextStyle(
               color: TColor.black, fontSize: 16, fontWeight: FontWeight.w700),
         ),
@@ -238,7 +242,8 @@ class _SleepTrackerViewState extends State<SleepTrackerView> {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 15),
                             child: Text(
-                              "Last Night Sleep",
+                              AppLocalizations.of(context)?.lastNightSleep ??
+                                  "Last Night Sleep",
                               style: TextStyle(
                                 color: TColor.white,
                                 fontSize: 14,
@@ -248,7 +253,9 @@ class _SleepTrackerViewState extends State<SleepTrackerView> {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 15),
                             child: Text(
-                              "8h 20m",
+                              AppLocalizations.of(context)
+                                      ?.sleepDuration('8', '20') ??
+                                  "8h 20m",
                               style: TextStyle(
                                   color: TColor.white,
                                   fontSize: 16,
@@ -276,7 +283,8 @@ class _SleepTrackerViewState extends State<SleepTrackerView> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Daily Sleep Schedule",
+                          AppLocalizations.of(context)?.dailySleepSchedule ??
+                              "Daily Sleep Schedule",
                           style: TextStyle(
                               color: TColor.black,
                               fontSize: 14,
@@ -307,7 +315,8 @@ class _SleepTrackerViewState extends State<SleepTrackerView> {
                     height: media.width * 0.05,
                   ),
                   Text(
-                    "Today Schedule",
+                    AppLocalizations.of(context)?.todaySchedule ??
+                        "Today Schedule",
                     style: TextStyle(
                         color: TColor.black,
                         fontSize: 16,
@@ -425,25 +434,25 @@ class _SleepTrackerViewState extends State<SleepTrackerView> {
     Widget text;
     switch (value.toInt()) {
       case 1:
-        text = Text('Sun', style: style);
+        text = Text(AppLocalizations.of(context)?.sun ?? 'Sun', style: style);
         break;
       case 2:
-        text = Text('Mon', style: style);
+        text = Text(AppLocalizations.of(context)?.mon ?? 'Mon', style: style);
         break;
       case 3:
-        text = Text('Tue', style: style);
+        text = Text(AppLocalizations.of(context)?.tue ?? 'Tue', style: style);
         break;
       case 4:
-        text = Text('Wed', style: style);
+        text = Text(AppLocalizations.of(context)?.wed ?? 'Wed', style: style);
         break;
       case 5:
-        text = Text('Thu', style: style);
+        text = Text(AppLocalizations.of(context)?.thu ?? 'Thu', style: style);
         break;
       case 6:
-        text = Text('Fri', style: style);
+        text = Text(AppLocalizations.of(context)?.fri ?? 'Fri', style: style);
         break;
       case 7:
-        text = Text('Sat', style: style);
+        text = Text(AppLocalizations.of(context)?.sat ?? 'Sat', style: style);
         break;
       default:
         text = const Text('');
