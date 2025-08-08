@@ -3,6 +3,8 @@ import 'package:fitness/common_widget/round_button.dart';
 import 'package:fitness/common_widget/round_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness/services/auth_service.dart';
+import '../bmi_edit/height_input_view.dart';
+import 'package:fitness/view/login/signup_view.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -16,6 +18,7 @@ class _LoginViewState extends State<LoginView> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
 
   Future<void> _signIn() async {
     // Validation
@@ -39,11 +42,14 @@ class _LoginViewState extends State<LoginView> {
       );
 
       if (result != null) {
-        // Đăng nhập thành công, navigate trực tiếp đến MainTabView
+        // Đăng nhập thành công -> đi vào flow BMI trước khi vào Home
         if (mounted) {
-          Navigator.of(context).pushNamedAndRemoveUntil(
-            '/main',
-            (route) => false,
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => const HeightInputView(
+                navigateToMainOnComplete: true,
+              ),
+            ),
           );
         }
       }
@@ -228,28 +234,31 @@ class _LoginViewState extends State<LoginView> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                 ),
-                SizedBox(
-                  height: media.width * 0.04,
-                ),
+                SizedBox(height: 20),
                 RoundTextField(
                   hitText: "Mật khẩu",
                   icon: "assets/img/lock.png",
-                  obscureText: true,
+                  obscureText: !_isPasswordVisible,
                   controller: _passwordController,
                   rigtIcon: TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
                       child: Container(
                           alignment: Alignment.center,
                           width: 20,
                           height: 20,
-                          child: Image.asset(
-                            "assets/img/show_password.png",
-                            width: 20,
-                            height: 20,
-                            fit: BoxFit.contain,
+                          child: Icon(
+                            _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
                             color: TColor.gray,
+                            size: 20,
                           ))),
                 ),
+                SizedBox(height: 15),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -349,7 +358,12 @@ class _LoginViewState extends State<LoginView> {
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SignUpView(),
+                      ),
+                    );
                   },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -364,16 +378,14 @@ class _LoginViewState extends State<LoginView> {
                       Text(
                         "Đăng ký",
                         style: TextStyle(
-                            color: TColor.black,
+                            color: TColor.primaryColor1,
                             fontSize: 14,
                             fontWeight: FontWeight.w700),
                       )
                     ],
                   ),
                 ),
-                SizedBox(
-                  height: media.width * 0.04,
-                ),
+                SizedBox(height: 20),
               ],
             ),
           ),

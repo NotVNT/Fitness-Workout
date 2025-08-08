@@ -15,39 +15,62 @@ class MealScheduleView extends StatefulWidget {
 class _MealScheduleViewState extends State<MealScheduleView> {
   DateTime _selectedDate = DateTime.now();
 
-  List breakfastArr = [
-    {
-      "name": "Honey Pancake",
-      "time": "07:00am",
-      "image": "assets/img/honey_pan.png"
-    },
-    {"name": "Coffee", "time": "07:30am", "image": "assets/img/coffee.png"},
-  ];
+  List<Map<String, String>> get breakfastArr => [
+        {
+          "name": AppLocalizations.of(context)?.phoGaKhongDauMo ??
+              "Phở gà không dầu mỡ",
+          "time": "07:00am",
+          "image": "assets/img/honey_pan.png"
+        },
+        {
+          "name": AppLocalizations.of(context)?.chaoYenMachChuoi ??
+              "Cháo yến mạch chuối",
+          "time": "07:30am",
+          "image": "assets/img/coffee.png"
+        },
+      ];
 
-  List lunchArr = [
-    {
-      "name": "Chicken Steak",
-      "time": "01:00pm",
-      "image": "assets/img/chicken.png"
-    },
-    {
-      "name": "Milk",
-      "time": "01:20pm",
-      "image": "assets/img/glass-of-milk 1.png"
-    },
-  ];
-  List snacksArr = [
-    {"name": "Orange", "time": "04:30pm", "image": "assets/img/orange.png"},
-    {
-      "name": "Apple Pie",
-      "time": "04:40pm",
-      "image": "assets/img/apple_pie.png"
-    },
-  ];
-  List dinnerArr = [
-    {"name": "Salad", "time": "07:10pm", "image": "assets/img/salad.png"},
-    {"name": "Oatmeal", "time": "08:10pm", "image": "assets/img/oatmeal.png"},
-  ];
+  List<Map<String, String>> get lunchArr => [
+        {
+          "name": AppLocalizations.of(context)?.comGaoLutCaThuNuong ??
+              "Cơm gạo lứt + Cá thu nướng",
+          "time": "01:00pm",
+          "image": "assets/img/chicken.png"
+        },
+        {
+          "name": AppLocalizations.of(context)?.canhChuaCaChua ??
+              "Canh chua cà chua",
+          "time": "01:20pm",
+          "image": "assets/img/glass-of-milk 1.png"
+        },
+      ];
+  List<Map<String, String>> get snacksArr => [
+        {
+          "name": AppLocalizations.of(context)?.cheDauXanhKhongDuong ??
+              "Chè đậu xanh không đường",
+          "time": "04:30pm",
+          "image": "assets/img/orange.png"
+        },
+        {
+          "name":
+              AppLocalizations.of(context)?.sinhToBo ?? "Sinh tố bơ sữa chua",
+          "time": "04:40pm",
+          "image": "assets/img/apple_pie.png"
+        },
+      ];
+  List<Map<String, String>> get dinnerArr => [
+        {
+          "name": AppLocalizations.of(context)?.canhChuaCaBasa ??
+              "Canh chua cá basa",
+          "time": "07:10pm",
+          "image": "assets/img/salad.png"
+        },
+        {
+          "name": AppLocalizations.of(context)?.goiGaBapCai ?? "Gỏi gà bắp cải",
+          "time": "08:10pm",
+          "image": "assets/img/oatmeal.png"
+        },
+      ];
 
   List nutritionArr = [
     {

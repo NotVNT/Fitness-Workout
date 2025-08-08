@@ -9,6 +9,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'common/colo_extension.dart';
 import 'providers/language_provider.dart';
 import 'providers/user_provider.dart';
+import 'providers/meal_plan_provider.dart';
 import 'l10n/app_localizations.dart';
 
 void main() async {
@@ -16,11 +17,14 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => LanguageProvider()),
         ChangeNotifierProvider(create: (context) => UserProvider()),
+        ChangeNotifierProvider(create: (context) => MealPlanProvider()),
       ],
       child: const MyApp(),
     ),

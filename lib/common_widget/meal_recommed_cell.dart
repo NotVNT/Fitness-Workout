@@ -6,7 +6,9 @@ import '../common/colo_extension.dart';
 class MealRecommendCell extends StatelessWidget {
   final Map fObj;
   final int index;
-  const MealRecommendCell({super.key, required this.index, required this.fObj});
+  final VoidCallback? onTap;
+  const MealRecommendCell(
+      {super.key, required this.index, required this.fObj, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -27,52 +29,55 @@ class MealRecommendCell extends StatelessWidget {
                     TColor.secondaryColor1.withOpacity(0.5)
                   ],
           ),
-          borderRadius:  BorderRadius.circular(25)),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Image.asset(
-                fObj["image"].toString(),
-                width: media.width * 0.3,
-                height: media.width * 0.25,
-                fit: BoxFit.contain,
+          borderRadius: BorderRadius.circular(25)),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Text(
+                fObj["name"],
+                style: TextStyle(
+                    color: TColor.black,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
               ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: Text(
-              fObj["name"],
-              style: TextStyle(
-                  color: TColor.black,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: Text(
-              "${fObj["size"]} | ${fObj["time"]} | ${fObj["kcal"]}",
-              style: TextStyle(color: TColor.gray, fontSize: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Text(
+                "${fObj["size"]} | ${fObj["time"]} | ${fObj["kcal"]}",
+                style: TextStyle(color: TColor.gray, fontSize: 12),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
             ),
-          ),
-          const SizedBox(
-            height: 15,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: SizedBox(
-              width: 90,
-              height: 35,
-              child: RoundButton(
-                  fontSize: 12,
-                  type: isEvent
-                      ? RoundButtonType.bgGradient
-                      : RoundButtonType.bgSGradient,
-                  title: "View",
-                  onPressed: () {}),
+            const SizedBox(
+              height: 15,
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: SizedBox(
+                width: 90,
+                height: 35,
+                child: RoundButton(
+                    fontSize: 12,
+                    type: isEvent
+                        ? RoundButtonType.bgGradient
+                        : RoundButtonType.bgSGradient,
+                    title: "View",
+                    onPressed: onTap ?? () {}),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

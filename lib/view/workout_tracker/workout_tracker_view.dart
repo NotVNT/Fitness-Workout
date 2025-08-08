@@ -1,13 +1,18 @@
 import 'package:fitness/common/colo_extension.dart';
-import 'package:fitness/view/workout_tracker/workour_detail_view.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../common_widget/round_button.dart';
 import '../../common_widget/upcoming_workout_row.dart';
-import '../../common_widget/what_train_row.dart';
 import '../../common_widget/icon_text_button.dart';
 import '../../l10n/app_localizations.dart';
+import '../../providers/user_provider.dart';
+import '../../services/workout_service.dart';
+import '../../services/exercise_service.dart';
+import '../../models/workout_model.dart';
+import '../../models/exercise_model.dart';
+import '../workout_detail/workout_detail_view.dart';
 
 class WorkoutTrackerView extends StatefulWidget {
   const WorkoutTrackerView({super.key});
@@ -17,6 +22,10 @@ class WorkoutTrackerView extends StatefulWidget {
 }
 
 class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
+  List<WorkoutModel> userWorkouts = [];
+  List<ExerciseModel> allExercises = [];
+  bool isLoadingWorkouts = true;
+
   List latestArr = [
     {
       "image": "assets/img/Workout1.png",
@@ -50,6 +59,73 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
       "time": "20mins"
     }
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserWorkouts();
+    _loadExercises();
+  }
+
+  // Load workouts của user từ Firestore
+  Future<void> _loadUserWorkouts() async {
+    try {
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      if (userProvider.user != null) {
+        print(
+            '🏋️ WorkoutTracker: Đang load workouts hôm nay cho user ${userProvider.user!.fullName}');
+
+        final allWorkouts =
+            await WorkoutService.getUserWorkouts(userProvider.user!.id);
+
+        // Lọc chỉ workouts hôm nay
+        final today = DateTime.now();
+        final todayWorkouts = allWorkouts.where((workout) {
+          if (workout.startTime == null) return false;
+
+          final workoutDate = workout.startTime!;
+          return workoutDate.year == today.year &&
+              workoutDate.month == today.month &&
+              workoutDate.day == today.day;
+        }).toList();
+
+        setState(() {
+          userWorkouts = todayWorkouts;
+          isLoadingWorkouts = false;
+        });
+
+        print(
+            '🏋️ WorkoutTracker: Đã load ${allWorkouts.length} workouts, ${todayWorkouts.length} workouts hôm nay');
+        for (var workout in todayWorkouts) {
+          print(
+              '🏋️ - ${workout.name}: ${workout.exercises.length} exercises (${workout.status})');
+        }
+      } else {
+        setState(() {
+          isLoadingWorkouts = false;
+        });
+        print('🏋️ WorkoutTracker: User chưa đăng nhập');
+      }
+    } catch (e) {
+      setState(() {
+        isLoadingWorkouts = false;
+      });
+      print('🏋️ WorkoutTracker: Lỗi load workouts: $e');
+    }
+  }
+
+  // Load all exercises
+  Future<void> _loadExercises() async {
+    try {
+      final exerciseService = ExerciseService();
+      allExercises = await exerciseService.getAllExercises();
+      print('🏋️ WorkoutTracker: Đã load ${allExercises.length} exercises');
+    } catch (e) {
+      print('🏋️ WorkoutTracker: Lỗi load exercises: $e');
+      // Fallback to empty list
+      allExercises = [];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -326,8 +402,7 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        AppLocalizations.of(context)?.whatDoYouWantToTrain ??
-                            "What Do You Want to Train",
+                        "Bài tập hôm nay",
                         style: TextStyle(
                             color: TColor.black,
                             fontSize: 16,
@@ -335,24 +410,57 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                       ),
                     ],
                   ),
-                  ListView.builder(
-                      padding: EdgeInsets.zero,
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: whatArr.length,
-                      itemBuilder: (context, index) {
-                        var wObj = whatArr[index] as Map? ?? {};
-                        return InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => WorkoutDetailView(
-                                            dObj: wObj,
-                                          )));
-                            },
-                            child: WhatTrainRow(wObj: wObj));
-                      }),
+                  // Hiển thị workouts thực từ Firestore
+                  isLoadingWorkouts
+                      ? const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(20),
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          ),
+                        )
+                      : userWorkouts.isEmpty
+                          ? Container(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    Icons.fitness_center_outlined,
+                                    size: 60,
+                                    color: TColor.white.withValues(alpha: 0.7),
+                                  ),
+                                  const SizedBox(height: 15),
+                                  Text(
+                                    "Chưa có bài tập hôm nay",
+                                    style: TextStyle(
+                                      color: TColor.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    "Hãy cập nhật thông tin BMI để tạo bài tập cho hôm nay",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color:
+                                          TColor.white.withValues(alpha: 0.8),
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : ListView.builder(
+                              padding: EdgeInsets.zero,
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: userWorkouts.length,
+                              itemBuilder: (context, index) {
+                                final workout = userWorkouts[index];
+                                return _buildWorkoutCard(workout, index);
+                              }),
                   SizedBox(
                     height: media.width * 0.1,
                   ),
@@ -363,6 +471,223 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
         ),
       ),
     );
+  }
+
+  // Build workout card từ WorkoutModel
+  Widget _buildWorkoutCard(WorkoutModel workout, int index) {
+    // Tính tổng thời gian ước tính
+    int totalMinutes = _calculateWorkoutDuration(workout);
+
+    // Format thời gian
+    String timeText = _formatWorkoutTime(workout.startTime);
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        color: TColor.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: () {
+          print('🏋️ Clicked workout: ${workout.name}');
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => WorkoutDetailView(
+                workout: workout,
+                allExercises: allExercises,
+              ),
+            ),
+          );
+        },
+        child: Row(
+          children: [
+            // Workout icon
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(colors: TColor.primaryG),
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Icon(
+                _getWorkoutIconData(workout.workoutType ?? 'mixed'),
+                color: TColor.white,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 15),
+
+            // Workout info
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    workout.name,
+                    style: TextStyle(
+                      color: TColor.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "${workout.exercises.length} bài tập",
+                    style: TextStyle(
+                      color: TColor.gray,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    "${totalMinutes} phút",
+                    style: TextStyle(
+                      color: TColor.gray,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Status and time
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: _getStatusColor(workout.status),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    _getStatusText(workout.status),
+                    style: TextStyle(
+                      color: TColor.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  timeText,
+                  style: TextStyle(
+                    color: TColor.gray,
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Tính thời gian workout (phút)
+  int _calculateWorkoutDuration(WorkoutModel workout) {
+    int totalSeconds = 0;
+
+    for (var exercise in workout.exercises) {
+      for (var set in exercise.sets) {
+        if (set.duration != null && set.duration! > 0) {
+          totalSeconds += set.duration!;
+        } else {
+          // Ước tính 3 giây mỗi rep
+          totalSeconds += (set.reps * 3);
+        }
+        // Thêm thời gian nghỉ
+        totalSeconds += (set.restTime ?? 60);
+      }
+    }
+
+    return (totalSeconds / 60).ceil();
+  }
+
+  // Get workout icon path
+  String _getWorkoutIcon(String workoutType) {
+    switch (workoutType) {
+      case 'lose_weight':
+        return "assets/img/what_1.png";
+      case 'gain_muscle':
+        return "assets/img/what_2.png";
+      case 'maintain':
+        return "assets/img/what_3.png";
+      default:
+        return "assets/img/what_1.png";
+    }
+  }
+
+  // Get workout icon data
+  IconData _getWorkoutIconData(String workoutType) {
+    switch (workoutType) {
+      case 'lose_weight':
+        return Icons.local_fire_department;
+      case 'gain_muscle':
+        return Icons.fitness_center;
+      case 'maintain':
+        return Icons.balance;
+      default:
+        return Icons.fitness_center;
+    }
+  }
+
+  // Get status color
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'planned':
+        return TColor.primaryColor1;
+      case 'in_progress':
+        return Colors.orange;
+      case 'completed':
+        return Colors.green;
+      case 'cancelled':
+        return Colors.red;
+      default:
+        return TColor.gray;
+    }
+  }
+
+  // Get status text
+  String _getStatusText(String status) {
+    switch (status) {
+      case 'planned':
+        return 'Đã lên kế hoạch';
+      case 'in_progress':
+        return 'Đang thực hiện';
+      case 'completed':
+        return 'Hoàn thành';
+      case 'cancelled':
+        return 'Đã hủy';
+      default:
+        return 'Không xác định';
+    }
+  }
+
+  // Format workout time
+  String _formatWorkoutTime(DateTime? dateTime) {
+    if (dateTime == null) return "Chưa xác định";
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final workoutDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
+
+    if (workoutDate == today) {
+      return "Hôm nay, ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
+    } else {
+      return "${dateTime.day}/${dateTime.month}, ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
+    }
   }
 
   LineTouchData get lineTouchData1 => LineTouchData(

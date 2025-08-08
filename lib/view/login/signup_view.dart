@@ -18,6 +18,7 @@ class _SignUpViewState extends State<SignUpView> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   bool _isLoading = false;
 
   Future<void> _signUp() async {
@@ -40,6 +41,18 @@ class _SignUpViewState extends State<SignUpView> {
     }
     if (_passwordController.text.length < 6) {
       _showErrorMessage('Mật khẩu phải có ít nhất 6 ký tự');
+      return;
+    }
+
+    final phone = _phoneController.text.trim();
+    if (phone.isEmpty) {
+      _showErrorMessage('Vui lòng nhập số điện thoại');
+      return;
+    }
+    // Mẫu VN: 0xxxxxxxxx hoặc +84xxxxxxxxx, đầu số 3/5/7/8/9
+    final vnPhoneRegex = RegExp(r'^(0|\+?84)(3|5|7|8|9)\d{8}$');
+    if (!vnPhoneRegex.hasMatch(phone)) {
+      _showErrorMessage('Số điện thoại không hợp lệ');
       return;
     }
 
@@ -148,6 +161,8 @@ class _SignUpViewState extends State<SignUpView> {
   }
 
   bool isCheck = false;
+  bool _isPasswordVisible = false; // Thêm biến để quản lý hiện/ẩn mật khẩu
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -190,6 +205,16 @@ class _SignUpViewState extends State<SignUpView> {
                 SizedBox(
                   height: media.width * 0.04,
                 ),
+                // Phone number (Vietnam)
+                RoundTextField(
+                  hitText: "Số điện thoại",
+                  icon: "assets/img/p_contact.png",
+                  keyboardType: TextInputType.phone,
+                  controller: _phoneController,
+                ),
+                SizedBox(
+                  height: media.width * 0.04,
+                ),
                 RoundTextField(
                   hitText: "Email",
                   icon: "assets/img/email.png",
@@ -202,24 +227,27 @@ class _SignUpViewState extends State<SignUpView> {
                 RoundTextField(
                   hitText: "Mật khẩu",
                   icon: "assets/img/lock.png",
-                  obscureText: true,
+                  obscureText: !_isPasswordVisible,
                   controller: _passwordController,
                   rigtIcon: TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
                       child: Container(
                           alignment: Alignment.center,
                           width: 20,
                           height: 20,
-                          child: Image.asset(
-                            "assets/img/show_password.png",
-                            width: 20,
-                            height: 20,
-                            fit: BoxFit.contain,
+                          child: Icon(
+                            _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
                             color: TColor.gray,
+                            size: 20,
                           ))),
                 ),
                 Row(
-                  // crossAxisAlignment: CrossAxisAlignment.,
                   children: [
                     IconButton(
                       onPressed: () {
@@ -235,13 +263,17 @@ class _SignUpViewState extends State<SignUpView> {
                         size: 20,
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: Text(
-                        "Bằng cách tiếp tục, bạn đồng ý với Chính sách bảo mật\nvà Điều khoản sử dụng của chúng tôi",
-                        style: TextStyle(color: TColor.gray, fontSize: 10),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text(
+                          "Bằng cách tiếp tục, bạn đồng ý với Chính sách bảo mật\nvà Điều khoản sử dụng của chúng tôi",
+                          style: TextStyle(color: TColor.gray, fontSize: 10),
+                          softWrap: true,
+                          overflow: TextOverflow.visible,
+                        ),
                       ),
-                    )
+                    ),
                   ],
                 ),
                 SizedBox(

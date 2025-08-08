@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/user_model.dart';
 import '../services/firestore_service.dart';
+import '../services/workout_service.dart';
 
 class UserProvider with ChangeNotifier {
   UserModel? _user;
@@ -120,6 +121,10 @@ class UserProvider with ChangeNotifier {
 
       _error = null;
       notifyListeners();
+
+      // Tự động tạo workout nếu user có đủ thông tin
+      await _autoCreateWorkoutIfNeeded();
+
       return true;
     } catch (e) {
       _error = 'Failed to update weight, height and target weight: $e';
@@ -229,5 +234,82 @@ class UserProvider with ChangeNotifier {
     } else {
       return Colors.red; // Obese
     }
+  }
+
+  // Tự động tạo workout nếu user có đủ thông tin
+  Future<void> _autoCreateWorkoutIfNeeded() async {
+    print('🔥 UserProvider: _autoCreateWorkoutIfNeeded() được gọi');
+
+    if (_user == null) {
+      print('❌ UserProvider: _user is null');
+      return;
+    }
+
+    // Kiểm tra user có đủ thông tin để tạo workout không
+    print(
+        '📊 UserProvider: weight=${_user!.weight}, height=${_user!.height}, targetWeight=${_user!.targetWeight}, firstName="${_user!.firstName}"');
+
+    if (_user!.weight > 0 &&
+        _user!.height > 0 &&
+        _user!.targetWeight > 0 &&
+        _user!.firstName.isNotEmpty) {
+      try {
+        print('UserProvider: Tạo workout tự động cho user ${_user!.fullName}');
+        print(
+            'UserProvider: BMI = ${_user!.bmi.toStringAsFixed(1)}, Weight = ${_user!.weight}kg, Target = ${_user!.targetWeight}kg');
+
+        final workouts = await WorkoutService.create7DayWorkoutsForUser(_user!);
+
+        if (workouts != null && workouts.isNotEmpty) {
+          print(
+              'UserProvider: ✅ Đã tạo ${workouts.length} workouts cho 7 ngày thành công');
+          for (int i = 0; i < workouts.length; i++) {
+            final workout = workouts[i];
+            print(
+                'UserProvider: - ${workout.name}: ${workout.exercises.length} bài tập');
+          }
+        } else {
+          print('UserProvider: ❌ Không thể tạo workouts');
+        }
+      } catch (e) {
+        print('UserProvider: Lỗi khi tạo workout tự động: $e');
+      }
+    } else {
+      print('UserProvider: User chưa có đủ thông tin để tạo workout');
+    }
+  }
+
+  // Set demo user for testing
+  void setDemoUser() {
+    _user = UserModel(
+      id: 'demo_user',
+      email: 'demo@example.com',
+      firstName: 'Demo',
+      lastName: 'User',
+      dateOfBirth: '1990-01-01',
+      gender: 'Nam',
+      weight: 70.0,
+      height: 170.0,
+      targetWeight: 65.0,
+      goal: 'Giảm cân',
+    );
+    notifyListeners();
+  }
+
+  // Method for testing without Firebase
+  void initializeTestData() {
+    _user = UserModel(
+      id: 'test_user',
+      email: 'test@example.com',
+      firstName: 'Test',
+      lastName: 'User',
+      dateOfBirth: '1990-01-01',
+      gender: 'Nam',
+      weight: 75.0,
+      height: 170.0,
+      targetWeight: 70.0,
+      goal: 'Giảm cân',
+    );
+    notifyListeners();
   }
 }
