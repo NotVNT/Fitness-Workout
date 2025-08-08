@@ -1,6 +1,6 @@
 import 'package:fitness/common_widget/on_boarding_page.dart';
 import 'package:fitness/common/smooth_page_route.dart';
-import 'package:fitness/view/login/signup_view.dart';
+import 'package:fitness/view/login/login_view.dart';
 import 'package:flutter/material.dart';
 
 import '../../common/colo_extension.dart';
@@ -97,7 +97,8 @@ class _OnBoardingViewState extends State<OnBoardingView> {
                   ),
                 ),
                 Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 30, vertical: 30),
                   width: 60,
                   height: 60,
                   decoration: BoxDecoration(
@@ -118,9 +119,9 @@ class _OnBoardingViewState extends State<OnBoardingView> {
 
                         setState(() {});
                       } else {
-                        // Chuyển đến màn hình đăng ký
+                        // Sau onboarding -> chuyển đến màn hình đăng nhập
                         Navigator.push(context,
-                            UltraSmoothPageRoute(child: const SignUpView()));
+                            UltraSmoothPageRoute(child: const LoginView()));
                       }
                     },
                   ),

@@ -7,10 +7,12 @@ import 'target_weight_input_view.dart';
 
 class CurrentWeightInputView extends StatefulWidget {
   final double height;
+  final bool navigateToMainOnComplete;
 
   const CurrentWeightInputView({
     super.key,
     required this.height,
+    this.navigateToMainOnComplete = false,
   });
 
   @override
@@ -43,6 +45,7 @@ class _CurrentWeightInputViewState extends State<CurrentWeightInputView> {
         builder: (context) => TargetWeightInputView(
           height: widget.height,
           currentWeight: _selectedWeight,
+          navigateToMainOnComplete: widget.navigateToMainOnComplete,
         ),
       ),
     );

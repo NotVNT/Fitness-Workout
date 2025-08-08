@@ -7,12 +7,14 @@ class CreatingScheduleView extends StatefulWidget {
   final double height;
   final double currentWeight;
   final double targetWeight;
+  final bool navigateToMainOnComplete;
 
   const CreatingScheduleView({
     super.key,
     required this.height,
     required this.currentWeight,
     required this.targetWeight,
+    this.navigateToMainOnComplete = false,
   });
 
   @override
@@ -63,8 +65,13 @@ class _CreatingScheduleViewState extends State<CreatingScheduleView>
       await Future.delayed(const Duration(milliseconds: 500));
 
       if (mounted) {
-        // Navigate back to home and refresh data
-        Navigator.of(context).popUntil((route) => route.isFirst);
+        // Nếu được khởi chạy từ Login, đi thẳng vào MainTabView, ngược lại chỉ pop về trước đó
+        if (widget.navigateToMainOnComplete) {
+          Navigator.of(context)
+              .pushNamedAndRemoveUntil('/main', (route) => false);
+        } else {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        }
 
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(

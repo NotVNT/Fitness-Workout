@@ -6,10 +6,15 @@ import '../../common/colo_extension.dart';
 import '../../common_widget/round_button.dart';
 import '../../common_widget/setting_row.dart';
 import '../../common_widget/title_subtitle_cell.dart';
-import '../../common_widget/language_selector.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/auth_service.dart';
 import '../../models/user_model.dart';
+import 'personal_data_view.dart';
+import 'achievement_view.dart';
+import 'activity_history_view.dart';
+import 'privacy_policy_view.dart';
+import 'settings_view.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
@@ -25,6 +30,10 @@ class _ProfileViewState extends State<ProfileView> {
   File? _profileImage;
   final TextEditingController _goalController = TextEditingController();
   bool _isEditingGoal = false;
+
+  // Liên hệ hỗ trợ
+  final Uri _supportUri =
+      Uri.parse('https://www.facebook.com/profile.php?id=61579017999960');
 
   // Danh sách accountArr sử dụng AppLocalizations
   List<Map<String, String>> get accountArr => [
@@ -247,6 +256,28 @@ class _ProfileViewState extends State<ProfileView> {
   void dispose() {
     _goalController.dispose();
     super.dispose();
+  }
+
+  Future<void> _openSupportLink() async {
+    try {
+      final ok =
+          await launchUrl(_supportUri, mode: LaunchMode.externalApplication);
+      if (!ok && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Không mở được đường link hỗ trợ'),
+              backgroundColor: Colors.red),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Không mở được đường link hỗ trợ'),
+              backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   @override
@@ -513,12 +544,37 @@ class _ProfileViewState extends State<ProfileView> {
                             return SettingRow(
                               icon: iObj["image"].toString(),
                               title: iObj["name"].toString(),
-                              onPressed: () {},
+                              onPressed: () {
+                                if (iObj["tag"] == "1") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const PersonalDataView(),
+                                    ),
+                                  );
+                                } else if (iObj["tag"] == "2") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const AchievementView(),
+                                    ),
+                                  );
+                                } else if (iObj["tag"] == "3") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ActivityHistoryView(),
+                                    ),
+                                  );
+                                }
+                              },
                             );
                           },
                         ),
-                        const SizedBox(height: 8),
-                        const LanguageSelector(),
+                        // Đã chuyển tùy chỉnh ngôn ngữ sang màn Cài đặt
                       ],
                     ),
                   ),
@@ -669,7 +725,25 @@ class _ProfileViewState extends State<ProfileView> {
                               icon: iObj["image"].toString(),
                               title: iObj["name"].toString(),
                               onPressed: () {
-                                if (iObj["tag"] == "8") {
+                                if (iObj["tag"] == "5") {
+                                  _openSupportLink();
+                                } else if (iObj["tag"] == "6") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const PrivacyPolicyView(),
+                                    ),
+                                  );
+                                } else if (iObj["tag"] == "7") {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const SettingsView(),
+                                    ),
+                                  );
+                                } else if (iObj["tag"] == "8") {
                                   // Xử lý cho mục Test User Data nếu cần
                                 }
                               },

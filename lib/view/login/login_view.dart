@@ -3,6 +3,8 @@ import 'package:fitness/common_widget/round_button.dart';
 import 'package:fitness/common_widget/round_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness/services/auth_service.dart';
+import '../bmi_edit/height_input_view.dart';
+import 'package:fitness/view/login/signup_view.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -39,11 +41,14 @@ class _LoginViewState extends State<LoginView> {
       );
 
       if (result != null) {
-        // Đăng nhập thành công, navigate trực tiếp đến MainTabView
+        // Đăng nhập thành công -> đi vào flow BMI trước khi vào Home
         if (mounted) {
-          Navigator.of(context).pushNamedAndRemoveUntil(
-            '/main',
-            (route) => false,
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => const HeightInputView(
+                navigateToMainOnComplete: true,
+              ),
+            ),
           );
         }
       }
@@ -349,7 +354,12 @@ class _LoginViewState extends State<LoginView> {
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SignUpView(),
+                      ),
+                    );
                   },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
