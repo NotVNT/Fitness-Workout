@@ -20,6 +20,24 @@ class WorkoutDetailView extends StatefulWidget {
 }
 
 class _WorkoutDetailViewState extends State<WorkoutDetailView> {
+  List<ExerciseModel> _catalog = [];
+  bool _loadingCatalog = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadExerciseCatalog();
+  }
+
+  Future<void> _loadExerciseCatalog() async {
+    setState(() => _loadingCatalog = true);
+    final catalog = await ExerciseService().getAllExercises();
+    setState(() {
+      _catalog = catalog;
+      _loadingCatalog = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -293,26 +311,28 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
 
   // Get exercise by ID
   ExerciseModel _getExerciseById(String exerciseId) {
+    // 1) Provided list (from parent)
     try {
-      // First try to find in provided exercises
       return widget.allExercises.firstWhere((ex) => ex.id == exerciseId);
-    } catch (e) {
-      // If not found, try ExerciseService
-      final exerciseService = ExerciseService();
-      final exercise = exerciseService.getExerciseById(exerciseId);
-      if (exercise != null) {
-        return exercise;
-      }
+    } catch (_) {}
 
-      // Fallback to unknown exercise
-      return ExerciseModel(
-        id: exerciseId,
-        name: "Unknown Exercise",
-        vietnameseName: "Bài tập không xác định",
-        description: "Bài tập không xác định",
-        exerciseType: "reps",
-      );
-    }
+    // 2) Local catalog we loaded (from Firestore)
+    try {
+      return _catalog.firstWhere((ex) => ex.id == exerciseId);
+    } catch (_) {}
+
+    // 3) Service fallback (default list)
+    final exercise = ExerciseService().getExerciseById(exerciseId);
+    if (exercise != null) return exercise;
+
+    // 4) Last resort: placeholder
+    return ExerciseModel(
+      id: exerciseId,
+      name: "Unknown Exercise",
+      vietnameseName: "Bài tập không xác định",
+      description: "Bài tập không xác định",
+      exerciseType: "reps",
+    );
   }
 
   // Calculate total workout time
@@ -427,7 +447,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
       MaterialPageRoute(
         builder: (context) => WorkoutExerciseView(
           workout: widget.workout,
-          allExercises: widget.allExercises,
+          allExercises: _catalog.isNotEmpty ? _catalog : widget.allExercises,
         ),
       ),
     );

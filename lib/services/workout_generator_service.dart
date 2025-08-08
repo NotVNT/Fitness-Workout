@@ -55,6 +55,14 @@ class WorkoutGeneratorService {
       );
     }).toList();
 
+    // Tính tổng calories đốt cháy cho toàn bộ bài tập trong ngày
+    final totalCalories = _estimateCaloriesForWorkout(
+      user: user,
+      workoutExercises: workoutExercises,
+      goal: goal,
+      intensity: intensity,
+    );
+
     return WorkoutModel(
       id: "${DateTime.now().millisecondsSinceEpoch}_day$dayNumber",
       userId: user.id,
@@ -66,6 +74,7 @@ class WorkoutGeneratorService {
       status: 'planned',
       workoutType: goal,
       dayNumber: dayNumber,
+      caloriesBurned: totalCalories,
     );
   }
 
@@ -373,6 +382,104 @@ class WorkoutGeneratorService {
     base = (base * setMultiplier).round();
 
     return base.clamp(15, 600); // 15 giây đến 10 phút
+  }
+
+  // Ước tính tổng calories đốt cháy cho toàn bộ workout trong ngày
+  static int _estimateCaloriesForWorkout({
+    required UserModel user,
+    required List<WorkoutExercise> workoutExercises,
+    required String goal,
+    required double intensity,
+  }) {
+    double totalKcal = 0.0;
+    final double userWeight = (user.weight <= 0) ? 65.0 : user.weight; // kg
+
+    for (final we in workoutExercises) {
+      final String name = we.exercise?.name ?? '';
+      final double baseMet = _getBaseMetForExercise(name);
+      final double met = _adjustMetForIntensity(baseMet, intensity, goal);
+
+      for (final set in we.sets) {
+        // Tính thời lượng set (giây)
+        final int durationSeconds = set.duration ??
+            _estimateDurationForReps(name: name, reps: set.reps);
+        if (durationSeconds <= 0) continue;
+
+        final double minutes = durationSeconds / 60.0;
+        // Công thức chuẩn: kcal/phút = MET * 3.5 * cân nặng(kg) / 200
+        final double kcal = (met * 3.5 * userWeight / 200.0) * minutes;
+        totalKcal += kcal;
+      }
+    }
+
+    // Làm tròn và giới hạn an toàn
+    final int result = totalKcal.round().clamp(20, 3000);
+    return result;
+  }
+
+  // MET cơ bản cho từng bài tập (ước lượng)
+  static double _getBaseMetForExercise(String name) {
+    final map = <String, double>{
+      // Cardio nhẹ - vừa
+      'Walking': 3.5,
+      'Jogging': 7.0,
+      'Cycling': 6.8,
+      'Jump Rope': 11.0,
+      'Jumping Jack': 8.0,
+      'Mountain Climber': 8.0,
+      // Sức mạnh/bodyweight
+      'Push-up': 6.0,
+      'Squat': 5.0,
+      'Sit-up': 4.0,
+      'Plank': 3.3,
+    };
+
+    // Tìm theo key khớp gần đúng (phòng khi có biến thể tên)
+    for (final entry in map.entries) {
+      if (name.toLowerCase().contains(entry.key.toLowerCase())) {
+        return entry.value;
+      }
+    }
+
+    // Mặc định nếu không khớp
+    return 5.0;
+  }
+
+  // Điều chỉnh MET theo cường độ và mục tiêu
+  static double _adjustMetForIntensity(
+      double baseMet, double intensity, String goal) {
+    // intensity: 1.0 - 3.0 => factor ~ 0.85 - 1.35
+    final double intensityFactor =
+        (0.85 + 0.25 * (intensity - 1)).clamp(0.75, 1.5);
+
+    // Nếu mục tiêu là giảm cân, hơi tăng thêm cường độ đốt calo
+    final double goalFactor = (goal == 'lose_weight') ? 1.05 : 1.0;
+
+    return baseMet * intensityFactor * goalFactor;
+  }
+
+  // Ước tính thời lượng cho bài tập theo reps khi không có duration
+  static int _estimateDurationForReps(
+      {required String name, required int reps}) {
+    if (reps <= 0) return 0;
+
+    // Thời gian trung bình mỗi rep (giây)
+    double secondsPerRep;
+    final lower = name.toLowerCase();
+    if (lower.contains('mountain climber')) {
+      secondsPerRep = 1.0;
+    } else if (lower.contains('sit-up') || lower.contains('sit up')) {
+      secondsPerRep = 1.5;
+    } else if (lower.contains('push-up') || lower.contains('push up')) {
+      secondsPerRep = 2.0;
+    } else if (lower.contains('squat')) {
+      secondsPerRep = 2.0;
+    } else {
+      secondsPerRep = 1.5; // mặc định
+    }
+
+    final int totalSeconds = (reps * secondsPerRep).round();
+    return totalSeconds.clamp(10, 600); // mỗi set tối thiểu 10s, tối đa 10 phút
   }
 
   // Tính thời gian nghỉ

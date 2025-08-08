@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/exercise_model.dart';
 
 class ExerciseService {
@@ -5,7 +6,10 @@ class ExerciseService {
   factory ExerciseService() => _instance;
   ExerciseService._internal();
 
-  // Danh sách exercises mặc định
+  // Cache exercises tải từ Firestore để tra cứu nhanh
+  static List<ExerciseModel> _cache = [];
+
+  // Danh sách exercises mặc định (fallback nếu Firestore trống)
   static final List<ExerciseModel> _defaultExercises = [
     // Duration exercises
     ExerciseModel(
@@ -117,14 +121,29 @@ class ExerciseService {
     ),
   ];
 
-  // Get all exercises
+  // Get all exercises (load once, cache)
   Future<List<ExerciseModel>> getAllExercises() async {
-    // Simulate API call delay
-    await Future.delayed(const Duration(milliseconds: 500));
-    return List.from(_defaultExercises);
+    if (_cache.isNotEmpty) return _cache;
+
+    try {
+      final snapshot =
+          await FirebaseFirestore.instance.collection('exercises').get();
+      if (snapshot.docs.isNotEmpty) {
+        _cache = snapshot.docs
+            .map((doc) => ExerciseModel.fromFirestore(doc))
+            .toList();
+        return _cache;
+      }
+    } catch (e) {
+      print('🏋️ ExerciseService: Lỗi khi lấy exercises từ Firestore: $e');
+    }
+
+    // Fallback to default list if Firestore failed or empty
+    _cache = List<ExerciseModel>.from(_defaultExercises);
+    return _cache;
   }
 
-  // Get exercise by ID
+  // Get exercise by ID (use cache and fallback)
   ExerciseModel? getExerciseById(String exerciseId) {
     try {
       return _defaultExercises

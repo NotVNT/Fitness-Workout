@@ -53,11 +53,19 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
       if (currentExercise!.exerciseType == 'duration') {
         _currentTime =
             currentWorkoutExercise!.sets[currentSetIndex].duration ?? 30;
+        // Tự động bắt đầu đếm khi là bài tập theo thời gian
+        isPaused = false;
+        _startTimer();
       } else {
-        _currentTime = currentWorkoutExercise!.sets[currentSetIndex].reps ?? 10;
+        // Bài tập theo reps không dùng timer, đảm bảo tắt timer cũ nếu có
+        _timer?.cancel();
+        isPaused = false;
+        _currentTime = 0; // không dùng _currentTime cho reps
       }
 
       setState(() {});
+    } else {
+      _timer?.cancel();
     }
   }
 
@@ -101,6 +109,7 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
                 _completeCurrentSet();
               }
             }
+            // Với bài reps không đếm, không thay đổi _currentTime ở đây
           }
         });
       }
@@ -122,7 +131,7 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
         _currentTime =
             currentWorkoutExercise!.sets[currentSetIndex].duration ?? 30;
       } else {
-        _currentTime = currentWorkoutExercise!.sets[currentSetIndex].reps ?? 10;
+        _currentTime = 0; // reps: không dùng đồng hồ
       }
       setState(() {});
     } else {
@@ -220,66 +229,82 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
               ),
             ),
 
-            // Exercise content
+            // Exercise content (scrollable + responsive size to avoid overflow)
             Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Exercise image placeholder
-                  Container(
-                    width: media.width * 0.8,
-                    height: media.width * 0.8,
-                    decoration: BoxDecoration(
-                      color: TColor.lightGray,
-                      borderRadius: BorderRadius.circular(20),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final maxH = constraints.maxHeight;
+                  final baseSize = media.width * 0.8;
+                  final imageSize = baseSize > maxH * 0.5
+                      ? maxH * 0.5
+                      : baseSize; // <= 50% viewport height
+
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: maxH - 20),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // Exercise image placeholder
+                          Container(
+                            width: imageSize,
+                            height: imageSize,
+                            decoration: BoxDecoration(
+                              color: TColor.lightGray,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Icon(
+                              currentExercise!.exerciseType == 'duration'
+                                  ? Icons.timer_outlined
+                                  : Icons.repeat,
+                              color: TColor.gray,
+                              size: 100,
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          // Exercise name
+                          Text(
+                            currentExercise!.vietnameseName,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: TColor.black,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          // Timer/Counter
+                          Text(
+                            currentExercise!.exerciseType == 'duration'
+                                ? _formatTime(_currentTime)
+                                : "x $_currentTime",
+                            style: TextStyle(
+                              color: TColor.black,
+                              fontSize: 48,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // Set info
+                          Text(
+                            "Set ${currentSetIndex + 1}/${currentWorkoutExercise!.sets.length}",
+                            style: TextStyle(
+                              color: TColor.gray,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    child: Icon(
-                      currentExercise!.exerciseType == 'duration'
-                          ? Icons.timer_outlined
-                          : Icons.repeat,
-                      color: TColor.gray,
-                      size: 100,
-                    ),
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  // Exercise name
-                  Text(
-                    currentExercise!.vietnameseName,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: TColor.black,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  // Timer/Counter
-                  Text(
-                    currentExercise!.exerciseType == 'duration'
-                        ? _formatTime(_currentTime)
-                        : "x $_currentTime",
-                    style: TextStyle(
-                      color: TColor.black,
-                      fontSize: 48,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Set info
-                  Text(
-                    "Set ${currentSetIndex + 1}/${currentWorkoutExercise!.sets.length}",
-                    style: TextStyle(
-                      color: TColor.gray,
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
+                  );
+                },
               ),
             ),
 
@@ -378,43 +403,76 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
     return Scaffold(
       backgroundColor: TColor.primaryColor1,
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.self_improvement,
-              color: TColor.white,
-              size: 100,
-            ),
-            const SizedBox(height: 30),
-            Text(
-              "NGHỈ NGƠI",
-              style: TextStyle(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.self_improvement,
                 color: TColor.white,
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
+                size: 100,
               ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              _formatTime(_restTime),
-              style: TextStyle(
-                color: TColor.white,
-                fontSize: 48,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 30),
-            if (currentExerciseIndex + 1 < widget.workout.exercises.length)
+              const SizedBox(height: 30),
               Text(
-                "Tiếp theo: ${_getExerciseById(widget.workout.exercises[currentExerciseIndex + 1].exerciseId).vietnameseName}",
+                "NGHỈ NGƠI",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: TColor.white,
-                  fontSize: 16,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
-          ],
+              const SizedBox(height: 20),
+              Text(
+                _formatTime(_restTime),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: TColor.white,
+                  fontSize: 48,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 30),
+              if (currentExerciseIndex + 1 < widget.workout.exercises.length)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    "Tiếp theo: ${_getExerciseById(widget.workout.exercises[currentExerciseIndex + 1].exerciseId).vietnameseName}",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: TColor.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+
+              const SizedBox(height: 30),
+
+              // Skip rest button
+              MaterialButton(
+                onPressed: () {
+                  // Bỏ qua thời gian nghỉ, chuyển ngay sang bài tiếp theo
+                  _timer?.cancel();
+                  _nextExercise();
+                },
+                height: 50,
+                minWidth: 200,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                color: TColor.white,
+                child: Text(
+                  "BỎ QUA NGHỈ",
+                  style: TextStyle(
+                    color: TColor.primaryColor1,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -424,52 +482,61 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
     return Scaffold(
       backgroundColor: TColor.primaryColor1,
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.celebration,
-              color: TColor.white,
-              size: 100,
-            ),
-            const SizedBox(height: 30),
-            Text(
-              "HOÀN THÀNH!",
-              style: TextStyle(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.celebration,
                 color: TColor.white,
-                fontSize: 24,
-                fontWeight: FontWeight.w700,
+                size: 100,
               ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              "Bạn đã hoàn thành workout",
-              style: TextStyle(
-                color: TColor.white,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 50),
-            MaterialButton(
-              onPressed: () {
-                Navigator.popUntil(context, (route) => route.isFirst);
-              },
-              height: 50,
-              minWidth: 200,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25),
-              ),
-              color: TColor.white,
-              child: Text(
-                "HOÀN THÀNH",
+              const SizedBox(height: 30),
+              Text(
+                "HOÀN THÀNH!",
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: TColor.primaryColor1,
-                  fontSize: 16,
+                  color: TColor.white,
+                  fontSize: 24,
                   fontWeight: FontWeight.w700,
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  "Bạn đã hoàn thành workout",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: TColor.white,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 50),
+              // Centered button
+              MaterialButton(
+                onPressed: () {
+                  Navigator.popUntil(context, (route) => route.isFirst);
+                },
+                height: 50,
+                minWidth: 200,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                color: TColor.white,
+                child: Text(
+                  "HOÀN THÀNH",
+                  style: TextStyle(
+                    color: TColor.primaryColor1,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
