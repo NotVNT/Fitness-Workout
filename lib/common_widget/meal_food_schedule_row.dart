@@ -4,34 +4,54 @@ import 'package:flutter/material.dart';
 class MealFoodScheduleRow extends StatelessWidget {
   final Map mObj;
   final int index;
-  const MealFoodScheduleRow({super.key, required this.mObj, required this.index});
+  const MealFoodScheduleRow(
+      {super.key, required this.mObj, required this.index});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+        margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: TColor.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color:
+                (index % 2 == 0 ? TColor.primaryColor1 : TColor.secondaryColor1)
+                    .withOpacity(0.2),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 3,
+              offset: const Offset(0, 1),
+            )
+          ],
+        ),
         child: Row(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Container(
-                height: 55,
-                width: 55,
-                decoration: BoxDecoration(
-                    color: index % 2 == 0 ? TColor.primaryColor2.withOpacity(0.4) : TColor.secondaryColor2.withOpacity(0.4) ,
-                    borderRadius: BorderRadius.circular(10)),
-                  alignment: Alignment.center,
-                child: Image.asset(
-                  mObj["image"].toString(),
-                  width: 40,
-                  height: 40,
-                  fit: BoxFit.contain,
+            // Icon thay thế hình ảnh
+            Container(
+              height: 40,
+              width: 40,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: index % 2 == 0
+                      ? [TColor.primaryColor2, TColor.primaryColor1]
+                      : [TColor.secondaryColor2, TColor.secondaryColor1],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Icon(
+                _getFoodIcon(mObj["name"].toString()),
+                color: TColor.white,
+                size: 20,
               ),
             ),
-            const SizedBox(
-              width: 15,
-            ),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -40,28 +60,69 @@ class MealFoodScheduleRow extends StatelessWidget {
                     mObj["name"].toString(),
                     style: TextStyle(
                         color: TColor.black,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600),
                   ),
+                  const SizedBox(height: 2),
                   Text(
                     mObj["time"].toString(),
                     style: TextStyle(
                       color: TColor.gray,
-                      fontSize: 10,
+                      fontSize: 11,
                     ),
                   ),
                 ],
               ),
             ),
-            IconButton(
-              onPressed: () {},
-              icon: Image.asset(
-                "assets/img/next_go.png",
-                width: 25,
-                height: 25,
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: TColor.lightGray.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(
+                Icons.arrow_forward_ios,
+                color: TColor.gray,
+                size: 16,
               ),
             )
           ],
         ));
+  }
+
+  // Helper method để lấy icon phù hợp cho món ăn
+  IconData _getFoodIcon(String foodName) {
+    final name = foodName.toLowerCase();
+
+    if (name.contains('phở') || name.contains('bún') || name.contains('miến')) {
+      return Icons.ramen_dining;
+    } else if (name.contains('cơm') || name.contains('gạo')) {
+      return Icons.rice_bowl;
+    } else if (name.contains('bánh') || name.contains('chè')) {
+      return Icons.cake;
+    } else if (name.contains('gà') ||
+        name.contains('thịt') ||
+        name.contains('heo')) {
+      return Icons.lunch_dining;
+    } else if (name.contains('cá') ||
+        name.contains('tôm') ||
+        name.contains('cua')) {
+      return Icons.set_meal;
+    } else if (name.contains('rau') ||
+        name.contains('củ') ||
+        name.contains('salad')) {
+      return Icons.eco;
+    } else if (name.contains('trứng')) {
+      return Icons.egg;
+    } else if (name.contains('sữa') ||
+        name.contains('yaourt') ||
+        name.contains('yogurt')) {
+      return Icons.local_drink;
+    } else if (name.contains('trái cây') || name.contains('hoa quả')) {
+      return Icons.apple;
+    } else {
+      return Icons.restaurant;
+    }
   }
 }

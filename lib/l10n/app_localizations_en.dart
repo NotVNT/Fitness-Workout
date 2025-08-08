@@ -243,6 +243,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recommendationForDiet => 'Recommendation\nfor Diet';
 
   @override
+  String get dinnerRecommendations => 'Dinner\nRecommendations';
+
+  @override
   String get popular => 'Popular';
 
   @override
@@ -420,4 +423,73 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noBMIData => 'No BMI data available';
+
+  @override
+  String get lastNightSleep => 'Last Night Sleep';
+
+  @override
+  String get dailySleepSchedule => 'Daily Sleep Schedule';
+
+  @override
+  String get todaySchedule => 'Today Schedule';
+
+  @override
+  String get alarm => 'Alarm';
+
+  @override
+  String inHoursMinutes(Object hours, Object minutes) {
+    return 'in ${hours}hours ${minutes}minutes';
+  }
+
+  @override
+  String hoursMinutes(Object hours, Object minutes) {
+    return '${hours}hours ${minutes}minutes';
+  }
+
+  @override
+  String sleepDuration(Object hours, Object minutes) {
+    return '${hours}h ${minutes}m';
+  }
+
+  @override
+  String get phoGaKhongDauMo => 'Fat-free Chicken Pho';
+
+  @override
+  String get chaoYenMachChuoi => 'Banana Oatmeal Porridge';
+
+  @override
+  String get comGaoLutCaThuNuong => 'Brown Rice + Grilled Mackerel';
+
+  @override
+  String get canhChuaCaChua => 'Tomato Sour Soup';
+
+  @override
+  String get cheDauXanhKhongDuong => 'Sugar-free Mung Bean Dessert';
+
+  @override
+  String get sinhToBo => 'Avocado Smoothie';
+
+  @override
+  String get canhChuaCaBasa => 'Basa Fish Sour Soup';
+
+  @override
+  String get goiGaBapCai => 'Chicken Cabbage Salad';
+
+  @override
+  String get goiCuonTomThit => 'Shrimp Pork Spring Rolls';
+
+  @override
+  String get banhMiNguyenCamChaBong => 'Whole Wheat Bread with Pork Floss';
+
+  @override
+  String get waterAdvice => 'Drink enough water';
+
+  @override
+  String get litersPerDay => 'liters per day';
+
+  @override
+  String get sleepAdvice => 'Get 8 hours of sleep a day';
+
+  @override
+  String get shouldDo => 'Should Do';
 }

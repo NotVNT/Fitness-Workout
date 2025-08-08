@@ -430,13 +430,14 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
   String _getExerciseDescription(
       ExerciseModel exercise, WorkoutExercise workoutExercise) {
     if (exercise.exerciseType == 'duration') {
-      final totalDuration = workoutExercise.sets
-          .fold(0, (sum, set) => sum + (set.duration ?? 30));
-      return "${totalDuration}s";
+      final hasSet = workoutExercise.sets.isNotEmpty;
+      final firstDuration =
+          hasSet ? (workoutExercise.sets.first.duration ?? 30) : 30;
+      return "${firstDuration}s";
     } else {
-      final totalReps =
-          workoutExercise.sets.fold(0, (sum, set) => sum + (set.reps ?? 10));
-      return "x $totalReps";
+      final hasSet = workoutExercise.sets.isNotEmpty;
+      final firstReps = hasSet ? workoutExercise.sets.first.reps : 10;
+      return "x $firstReps";
     }
   }
 

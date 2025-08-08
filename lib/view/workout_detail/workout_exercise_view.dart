@@ -51,8 +51,8 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
       currentExercise = _getExerciseById(currentWorkoutExercise!.exerciseId);
 
       if (currentExercise!.exerciseType == 'duration') {
-        _currentTime =
-            currentWorkoutExercise!.sets[currentSetIndex].duration ?? 30;
+        final sets = currentWorkoutExercise!.sets;
+        _currentTime = sets.isNotEmpty ? (sets.first.duration ?? 30) : 30;
         // Tự động bắt đầu đếm khi là bài tập theo thời gian
         isPaused = false;
         _startTimer();
@@ -123,21 +123,8 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
   }
 
   void _completeCurrentSet() {
-    // Move to next set or exercise
-    if (currentSetIndex < currentWorkoutExercise!.sets.length - 1) {
-      // Next set of same exercise
-      currentSetIndex++;
-      if (currentExercise!.exerciseType == 'duration') {
-        _currentTime =
-            currentWorkoutExercise!.sets[currentSetIndex].duration ?? 30;
-      } else {
-        _currentTime = 0; // reps: không dùng đồng hồ
-      }
-      setState(() {});
-    } else {
-      // Start rest period before next exercise
-      _startRestPeriod();
-    }
+    // Mỗi bài tập chỉ tập 1 lần: bỏ qua logic đổi set, chuyển sang nghỉ/tiếp theo
+    _startRestPeriod();
   }
 
   void _startRestPeriod() {
@@ -282,7 +269,7 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
                           Text(
                             currentExercise!.exerciseType == 'duration'
                                 ? _formatTime(_currentTime)
-                                : "x $_currentTime",
+                                : "x ${currentWorkoutExercise!.sets.isNotEmpty ? currentWorkoutExercise!.sets.first.reps : 0}",
                             style: TextStyle(
                               color: TColor.black,
                               fontSize: 48,
@@ -292,14 +279,8 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
 
                           const SizedBox(height: 16),
 
-                          // Set info
-                          Text(
-                            "Set ${currentSetIndex + 1}/${currentWorkoutExercise!.sets.length}",
-                            style: TextStyle(
-                              color: TColor.gray,
-                              fontSize: 16,
-                            ),
-                          ),
+                          // Set info (ẩn vì mỗi bài tập chỉ tập 1 lần)
+                          const SizedBox.shrink(),
                         ],
                       ),
                     ),

@@ -17,20 +17,23 @@ class SleepScheduleView extends StatefulWidget {
 class _SleepScheduleViewState extends State<SleepScheduleView> {
   late DateTime _selectedDate;
 
-  List todaySleepArr = [
-    {
-      "name": "Bedtime",
-      "image": "assets/img/bed.png",
-      "time": "01/06/2023 09:00 PM",
-      "duration": "in 6hours 22minutes"
-    },
-    {
-      "name": "Alarm",
-      "image": "assets/img/alaarm.png",
-      "time": "02/06/2023 05:10 AM",
-      "duration": "in 14hours 30minutes"
-    },
-  ];
+  List<Map<String, String>> get todaySleepArr => [
+        {
+          "name": AppLocalizations.of(context)?.bedtime ?? "Bedtime",
+          "image": "assets/img/bed.png",
+          "time": "01/06/2023 09:00 PM",
+          "duration": AppLocalizations.of(context)?.inHoursMinutes('6', '22') ??
+              "in 6hours 22minutes"
+        },
+        {
+          "name": AppLocalizations.of(context)?.alarm ?? "Alarm",
+          "image": "assets/img/alaarm.png",
+          "time": "02/06/2023 05:10 AM",
+          "duration":
+              AppLocalizations.of(context)?.inHoursMinutes('14', '30') ??
+                  "in 14hours 30minutes"
+        },
+      ];
 
   List<int> showingTooltipOnSpots = [4];
 
@@ -134,7 +137,9 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
                                 ),
                               ),
                               Text(
-                                "8hours 30minutes",
+                                AppLocalizations.of(context)
+                                        ?.hoursMinutes('8', '30') ??
+                                    "8hours 30minutes",
                                 style: TextStyle(
                                     color: TColor.primaryColor2,
                                     fontSize: 16,

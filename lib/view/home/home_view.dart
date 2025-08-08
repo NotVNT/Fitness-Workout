@@ -1,10 +1,8 @@
-import 'package:dotted_dashed_line/dotted_dashed_line.dart';
 import 'package:fitness/common_widget/round_button.dart';
 import 'package:fitness/common_widget/workout_row.dart';
 import 'package:fitness/common_widget/icon_text_button.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:percent_indicator/percent_indicator.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 import 'package:provider/provider.dart';
 import '../../common/colo_extension.dart';
@@ -128,8 +126,8 @@ class _HomeViewState extends State<HomeView> {
         belowBarData: BarAreaData(
           show: true,
           gradient: LinearGradient(colors: [
-            TColor.primaryColor2.withOpacity(0.4),
-            TColor.primaryColor1.withOpacity(0.1),
+            TColor.primaryColor2.withValues(alpha: 0.4),
+            TColor.primaryColor1.withValues(alpha: 0.1),
           ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
         ),
         dotData: FlDotData(show: false),
@@ -161,13 +159,18 @@ class _HomeViewState extends State<HomeView> {
                               "Welcome Back,",
                           style: TextStyle(color: TColor.gray, fontSize: 12),
                         ),
-                        Text(
-                          AppLocalizations.of(context)?.stefaniWong ??
-                              "Stefani Wong",
-                          style: TextStyle(
-                              color: TColor.black,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700),
+                        Consumer<UserProvider>(
+                          builder: (context, userProvider, child) {
+                            return Text(
+                              userProvider.user?.fullName ??
+                                  (AppLocalizations.of(context)?.stefaniWong ??
+                                      "User"),
+                              style: TextStyle(
+                                  color: TColor.black,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w700),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -313,9 +316,9 @@ class _HomeViewState extends State<HomeView> {
                 SizedBox(
                   height: media.width * 0.05,
                 ),
+                // Should Do Section Title
                 Text(
-                  AppLocalizations.of(context)?.activityStatus ??
-                      "Activity Status",
+                  AppLocalizations.of(context)?.shouldDo ?? "Should Do",
                   style: TextStyle(
                       color: TColor.black,
                       fontSize: 16,
@@ -324,152 +327,147 @@ class _HomeViewState extends State<HomeView> {
                 SizedBox(
                   height: media.width * 0.02,
                 ),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(25),
-                  child: Container(
-                    height: media.width * 0.4,
-                    width: double.maxFinite,
-                    decoration: BoxDecoration(
-                      color: TColor.primaryColor2.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                    child: Stack(
-                      alignment: Alignment.topLeft,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 20, horizontal: 20),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                AppLocalizations.of(context)?.heartRate ??
-                                    "Heart Rate",
-                                style: TextStyle(
-                                    color: TColor.black,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700),
-                              ),
-                              ShaderMask(
-                                blendMode: BlendMode.srcIn,
-                                shaderCallback: (bounds) {
-                                  return LinearGradient(
-                                          colors: TColor.primaryG,
-                                          begin: Alignment.centerLeft,
-                                          end: Alignment.centerRight)
-                                      .createShader(Rect.fromLTRB(
-                                          0, 0, bounds.width, bounds.height));
-                                },
-                                child: Text(
-                                  "78 BPM",
-                                  style: TextStyle(
-                                      color:
-                                          TColor.white.withValues(alpha: 0.7),
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 18),
-                                ),
-                              ),
-                            ],
-                          ),
+                // Water Advice Row
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: const [
+                      BoxShadow(color: Colors.black12, blurRadius: 2)
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(colors: TColor.secondaryG),
+                          borderRadius: BorderRadius.circular(15),
                         ),
-                        LineChart(
-                          LineChartData(
-                            showingTooltipIndicators:
-                                showingTooltipOnSpots.map((index) {
-                              return ShowingTooltipIndicators([
-                                LineBarSpot(
-                                  tooltipsOnBar,
-                                  lineBarsData.indexOf(tooltipsOnBar),
-                                  tooltipsOnBar.spots[index],
-                                ),
-                              ]);
-                            }).toList(),
-                            lineTouchData: LineTouchData(
-                              enabled: true,
-                              handleBuiltInTouches: false,
-                              touchCallback: (FlTouchEvent event,
-                                  LineTouchResponse? response) {
-                                if (response == null ||
-                                    response.lineBarSpots == null) {
-                                  return;
-                                }
-                                if (event is FlTapUpEvent) {
-                                  final spotIndex =
-                                      response.lineBarSpots!.first.spotIndex;
-                                  showingTooltipOnSpots.clear();
-                                  setState(() {
-                                    showingTooltipOnSpots.add(spotIndex);
-                                  });
-                                }
+                        child: Icon(
+                          Icons.water_drop,
+                          color: TColor.white,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 15),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              AppLocalizations.of(context)?.waterAdvice ??
+                                  "Drink enough water",
+                              style: TextStyle(
+                                  color: TColor.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700),
+                            ),
+                            const SizedBox(height: 5),
+                            ShaderMask(
+                              blendMode: BlendMode.srcIn,
+                              shaderCallback: (bounds) {
+                                return LinearGradient(
+                                        colors: TColor.primaryG,
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight)
+                                    .createShader(Rect.fromLTRB(
+                                        0, 0, bounds.width, bounds.height));
                               },
-                              mouseCursorResolver: (FlTouchEvent event,
-                                  LineTouchResponse? response) {
-                                if (response == null ||
-                                    response.lineBarSpots == null) {
-                                  return SystemMouseCursors.basic;
-                                }
-                                return SystemMouseCursors.click;
-                              },
-                              getTouchedSpotIndicator:
-                                  (LineChartBarData barData,
-                                      List<int> spotIndexes) {
-                                return spotIndexes.map((index) {
-                                  return TouchedSpotIndicatorData(
-                                    FlLine(
-                                      color: Colors.red,
-                                    ),
-                                    FlDotData(
-                                      show: true,
-                                      getDotPainter:
-                                          (spot, percent, barData, index) =>
-                                              FlDotCirclePainter(
-                                        radius: 3,
-                                        color: Colors.white,
-                                        strokeWidth: 3,
-                                        strokeColor: TColor.secondaryColor1,
-                                      ),
-                                    ),
-                                  );
-                                }).toList();
-                              },
-                              touchTooltipData: LineTouchTooltipData(
-                                getTooltipColor: (touchedSpot) =>
-                                    TColor.secondaryColor1,
-                                tooltipRoundedRadius: 20,
-                                getTooltipItems:
-                                    (List<LineBarSpot> lineBarsSpot) {
-                                  return lineBarsSpot.map((lineBarSpot) {
-                                    return LineTooltipItem(
-                                      "${lineBarSpot.x.toInt()} ${AppLocalizations.of(context)?.minsAgo ?? "mins ago"}",
-                                      const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    );
-                                  }).toList();
-                                },
+                              child: Text(
+                                "2-3 ${AppLocalizations.of(context)?.litersPerDay ?? "liters per day"}",
+                                style: TextStyle(
+                                    color: TColor.white.withValues(alpha: 0.7),
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 16),
                               ),
                             ),
-                            lineBarsData: lineBarsData,
-                            minY: 0,
-                            maxY: 130,
-                            titlesData: FlTitlesData(
-                              show: false,
-                            ),
-                            gridData: FlGridData(show: false),
-                            borderData: FlBorderData(
-                              show: true,
-                              border: Border.all(
-                                color: Colors.transparent,
+                            const SizedBox(height: 5),
+                            Text(
+                              "Uống đủ nước giúp cơ thể khỏe mạnh và tăng cường trao đổi chất",
+                              style: TextStyle(
+                                color: TColor.gray,
+                                fontSize: 11,
                               ),
                             ),
-                          ),
-                        )
-                      ],
-                    ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: media.width * 0.05,
+                ),
+                // Sleep Advice Row
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: const [
+                      BoxShadow(color: Colors.black12, blurRadius: 2)
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(colors: TColor.primaryG),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Icon(
+                          Icons.bedtime,
+                          color: TColor.white,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: 15),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              AppLocalizations.of(context)?.sleepAdvice ??
+                                  "Get 8 hours of sleep a day",
+                              style: TextStyle(
+                                  color: TColor.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700),
+                            ),
+                            const SizedBox(height: 5),
+                            ShaderMask(
+                              blendMode: BlendMode.srcIn,
+                              shaderCallback: (bounds) {
+                                return LinearGradient(
+                                        colors: TColor.primaryG,
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight)
+                                    .createShader(Rect.fromLTRB(
+                                        0, 0, bounds.width, bounds.height));
+                              },
+                              child: Text(
+                                "8 tiếng/ngày",
+                                style: TextStyle(
+                                    color: TColor.white.withValues(alpha: 0.7),
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 16),
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              "Ngủ đủ giấc giúp cơ thể phục hồi và tăng cường sức khỏe tinh thần",
+                              style: TextStyle(
+                                color: TColor.gray,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(
@@ -478,250 +476,10 @@ class _HomeViewState extends State<HomeView> {
                 Row(
                   children: [
                     Expanded(
-                      child: Container(
-                        height: media.width * 0.95,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 25, horizontal: 20),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(25),
-                            boxShadow: const [
-                              BoxShadow(color: Colors.black12, blurRadius: 2)
-                            ]),
-                        child: Row(
-                          children: [
-                            Flexible(
-                              child: RotatedBox(
-                                quarterTurns: 1,
-                                child: LinearPercentIndicator(
-                                  width: media.width * 0.7,
-                                  lineHeight: media.width * 0.06,
-                                  percent: 0.5,
-                                  backgroundColor: Colors.grey.shade100,
-                                  linearGradient: LinearGradient(
-                                      colors: TColor.primaryG,
-                                      begin: Alignment.centerLeft,
-                                      end: Alignment.centerRight),
-                                  barRadius: Radius.circular(15),
-                                  animation: true,
-                                  animationDuration: 3000,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Flexible(
-                              child: SingleChildScrollView(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      AppLocalizations.of(context)
-                                              ?.waterIntake ??
-                                          "Water Intake",
-                                      style: TextStyle(
-                                          color: TColor.black,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w700),
-                                    ),
-                                    ShaderMask(
-                                      blendMode: BlendMode.srcIn,
-                                      shaderCallback: (bounds) {
-                                        return LinearGradient(
-                                                colors: TColor.primaryG,
-                                                begin: Alignment.centerLeft,
-                                                end: Alignment.centerRight)
-                                            .createShader(Rect.fromLTRB(0, 0,
-                                                bounds.width, bounds.height));
-                                      },
-                                      child: Text(
-                                        "4 Liters",
-                                        style: TextStyle(
-                                            color: TColor.white
-                                                .withValues(alpha: 0.7),
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 14),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    Text(
-                                      AppLocalizations.of(context)
-                                              ?.realTimeUpdates ??
-                                          "Real time updates",
-                                      style: TextStyle(
-                                        color: TColor.gray,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: waterArr.map((wObj) {
-                                        var isLast = wObj == waterArr.last;
-                                        return Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                Container(
-                                                  margin: const EdgeInsets
-                                                      .symmetric(vertical: 4),
-                                                  width: 10,
-                                                  height: 10,
-                                                  decoration: BoxDecoration(
-                                                    color: TColor
-                                                        .secondaryColor1
-                                                        .withValues(alpha: 0.5),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5),
-                                                  ),
-                                                ),
-                                                if (!isLast)
-                                                  DottedDashedLine(
-                                                      height:
-                                                          media.width * 0.078,
-                                                      width: 0,
-                                                      dashColor: TColor
-                                                          .secondaryColor1
-                                                          .withValues(
-                                                              alpha: 0.5),
-                                                      axis: Axis.vertical)
-                                              ],
-                                            ),
-                                            const SizedBox(
-                                              width: 10,
-                                            ),
-                                            Expanded(
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    wObj["title"].toString(),
-                                                    style: TextStyle(
-                                                      color: TColor.gray,
-                                                      fontSize: 10,
-                                                    ),
-                                                  ),
-                                                  ShaderMask(
-                                                    blendMode: BlendMode.srcIn,
-                                                    shaderCallback: (bounds) {
-                                                      return LinearGradient(
-                                                              colors: TColor
-                                                                  .secondaryG,
-                                                              begin: Alignment
-                                                                  .centerLeft,
-                                                              end: Alignment
-                                                                  .centerRight)
-                                                          .createShader(
-                                                              Rect.fromLTRB(
-                                                                  0,
-                                                                  0,
-                                                                  bounds.width,
-                                                                  bounds
-                                                                      .height));
-                                                    },
-                                                    child: Text(
-                                                      wObj["subtitle"]
-                                                          .toString(),
-                                                      style: TextStyle(
-                                                          color: TColor.white
-                                                              .withValues(
-                                                                  alpha: 0.7),
-                                                          fontSize: 12),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            )
-                                          ],
-                                        );
-                                      }).toList(),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: media.width * 0.05,
-                    ),
-                    Expanded(
                         child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Container(
-                          width: double.maxFinite,
-                          constraints: BoxConstraints(
-                            minHeight: media.width * 0.35,
-                            maxHeight: media.width * 0.42,
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 15, horizontal: 12),
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(25),
-                              boxShadow: const [
-                                BoxShadow(color: Colors.black12, blurRadius: 2)
-                              ]),
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  AppLocalizations.of(context)?.sleep ??
-                                      "Sleep",
-                                  style: TextStyle(
-                                      color: TColor.black,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w700),
-                                ),
-                                ShaderMask(
-                                  blendMode: BlendMode.srcIn,
-                                  shaderCallback: (bounds) {
-                                    return LinearGradient(
-                                            colors: TColor.primaryG,
-                                            begin: Alignment.centerLeft,
-                                            end: Alignment.centerRight)
-                                        .createShader(Rect.fromLTRB(
-                                            0, 0, bounds.width, bounds.height));
-                                  },
-                                  child: Text(
-                                    "8h 20m",
-                                    style: TextStyle(
-                                        color:
-                                            TColor.white.withValues(alpha: 0.7),
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 13),
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-                                Flexible(
-                                  child: Image.asset(
-                                      "assets/img/sleep_grap.png",
-                                      width: double.maxFinite,
-                                      fit: BoxFit.fitWidth),
-                                )
-                              ]),
-                        ),
-                        SizedBox(
-                          height: media.width * 0.05,
-                        ),
                         Container(
                           width: double.maxFinite,
                           constraints: BoxConstraints(

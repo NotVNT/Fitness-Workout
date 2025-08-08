@@ -566,6 +566,12 @@ abstract class AppLocalizations {
   /// **'Recommendation\nfor Diet'**
   String get recommendationForDiet;
 
+  /// No description provided for @dinnerRecommendations.
+  ///
+  /// In en, this message translates to:
+  /// **'Dinner\nRecommendations'**
+  String get dinnerRecommendations;
+
   /// No description provided for @popular.
   ///
   /// In en, this message translates to:
@@ -919,6 +925,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No BMI data available'**
   String get noBMIData;
+
+  /// No description provided for @lastNightSleep.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Night Sleep'**
+  String get lastNightSleep;
+
+  /// No description provided for @dailySleepSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Sleep Schedule'**
+  String get dailySleepSchedule;
+
+  /// No description provided for @todaySchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Today Schedule'**
+  String get todaySchedule;
+
+  /// No description provided for @alarm.
+  ///
+  /// In en, this message translates to:
+  /// **'Alarm'**
+  String get alarm;
+
+  /// No description provided for @inHoursMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'in {hours}hours {minutes}minutes'**
+  String inHoursMinutes(Object hours, Object minutes);
+
+  /// No description provided for @hoursMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}hours {minutes}minutes'**
+  String hoursMinutes(Object hours, Object minutes);
+
+  /// No description provided for @sleepDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h {minutes}m'**
+  String sleepDuration(Object hours, Object minutes);
+
+  /// No description provided for @phoGaKhongDauMo.
+  ///
+  /// In en, this message translates to:
+  /// **'Fat-free Chicken Pho'**
+  String get phoGaKhongDauMo;
+
+  /// No description provided for @chaoYenMachChuoi.
+  ///
+  /// In en, this message translates to:
+  /// **'Banana Oatmeal Porridge'**
+  String get chaoYenMachChuoi;
+
+  /// No description provided for @comGaoLutCaThuNuong.
+  ///
+  /// In en, this message translates to:
+  /// **'Brown Rice + Grilled Mackerel'**
+  String get comGaoLutCaThuNuong;
+
+  /// No description provided for @canhChuaCaChua.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomato Sour Soup'**
+  String get canhChuaCaChua;
+
+  /// No description provided for @cheDauXanhKhongDuong.
+  ///
+  /// In en, this message translates to:
+  /// **'Sugar-free Mung Bean Dessert'**
+  String get cheDauXanhKhongDuong;
+
+  /// No description provided for @sinhToBo.
+  ///
+  /// In en, this message translates to:
+  /// **'Avocado Smoothie'**
+  String get sinhToBo;
+
+  /// No description provided for @canhChuaCaBasa.
+  ///
+  /// In en, this message translates to:
+  /// **'Basa Fish Sour Soup'**
+  String get canhChuaCaBasa;
+
+  /// No description provided for @goiGaBapCai.
+  ///
+  /// In en, this message translates to:
+  /// **'Chicken Cabbage Salad'**
+  String get goiGaBapCai;
+
+  /// No description provided for @goiCuonTomThit.
+  ///
+  /// In en, this message translates to:
+  /// **'Shrimp Pork Spring Rolls'**
+  String get goiCuonTomThit;
+
+  /// No description provided for @banhMiNguyenCamChaBong.
+  ///
+  /// In en, this message translates to:
+  /// **'Whole Wheat Bread with Pork Floss'**
+  String get banhMiNguyenCamChaBong;
+
+  /// No description provided for @waterAdvice.
+  ///
+  /// In en, this message translates to:
+  /// **'Drink enough water'**
+  String get waterAdvice;
+
+  /// No description provided for @litersPerDay.
+  ///
+  /// In en, this message translates to:
+  /// **'liters per day'**
+  String get litersPerDay;
+
+  /// No description provided for @sleepAdvice.
+  ///
+  /// In en, this message translates to:
+  /// **'Get 8 hours of sleep a day'**
+  String get sleepAdvice;
+
+  /// No description provided for @shouldDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Should Do'**
+  String get shouldDo;
 }
 
 class _AppLocalizationsDelegate

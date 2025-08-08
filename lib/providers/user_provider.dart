@@ -278,4 +278,38 @@ class UserProvider with ChangeNotifier {
       print('UserProvider: User chưa có đủ thông tin để tạo workout');
     }
   }
+
+  // Set demo user for testing
+  void setDemoUser() {
+    _user = UserModel(
+      id: 'demo_user',
+      email: 'demo@example.com',
+      firstName: 'Demo',
+      lastName: 'User',
+      dateOfBirth: '1990-01-01',
+      gender: 'Nam',
+      weight: 70.0,
+      height: 170.0,
+      targetWeight: 65.0,
+      goal: 'Giảm cân',
+    );
+    notifyListeners();
+  }
+
+  // Method for testing without Firebase
+  void initializeTestData() {
+    _user = UserModel(
+      id: 'test_user',
+      email: 'test@example.com',
+      firstName: 'Test',
+      lastName: 'User',
+      dateOfBirth: '1990-01-01',
+      gender: 'Nam',
+      weight: 75.0,
+      height: 170.0,
+      targetWeight: 70.0,
+      goal: 'Giảm cân',
+    );
+    notifyListeners();
+  }
 }

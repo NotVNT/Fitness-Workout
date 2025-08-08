@@ -6,7 +6,8 @@ import '../../providers/user_provider.dart';
 import 'current_weight_input_view.dart';
 
 class HeightInputView extends StatefulWidget {
-  const HeightInputView({super.key});
+  final bool navigateToMainOnComplete;
+  const HeightInputView({super.key, this.navigateToMainOnComplete = false});
 
   @override
   State<HeightInputView> createState() => _HeightInputViewState();
@@ -35,7 +36,10 @@ class _HeightInputViewState extends State<HeightInputView> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CurrentWeightInputView(height: _selectedHeight),
+        builder: (context) => CurrentWeightInputView(
+          height: _selectedHeight,
+          navigateToMainOnComplete: widget.navigateToMainOnComplete,
+        ),
       ),
     );
   }

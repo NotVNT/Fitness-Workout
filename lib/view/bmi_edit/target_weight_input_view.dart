@@ -8,11 +8,13 @@ import 'creating_schedule_view.dart';
 class TargetWeightInputView extends StatefulWidget {
   final double height;
   final double currentWeight;
+  final bool navigateToMainOnComplete;
 
   const TargetWeightInputView({
     super.key,
     required this.height,
     required this.currentWeight,
+    this.navigateToMainOnComplete = false,
   });
 
   @override
@@ -52,6 +54,7 @@ class _TargetWeightInputViewState extends State<TargetWeightInputView> {
           height: widget.height,
           currentWeight: widget.currentWeight,
           targetWeight: _selectedTargetWeight,
+          navigateToMainOnComplete: widget.navigateToMainOnComplete,
         ),
       ),
     );
