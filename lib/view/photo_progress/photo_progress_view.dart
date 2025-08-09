@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 
 import '../../common/colo_extension.dart';
 import '../../common_widget/round_button.dart';
@@ -16,6 +17,39 @@ class PhotoProgressView extends StatefulWidget {
 
 class _PhotoProgressViewState extends State<PhotoProgressView> {
   bool _showReminder = true; // State để quản lý việc hiển thị reminder
+  int _reminderDay = 8; // Ngày trong tháng để nhắc chụp ảnh (1..28)
+
+  DateTime _computeNextReminderDate() {
+    final now = DateTime.now();
+    final year = now.year;
+    final month = now.month;
+    final thisMonthLastDay = DateTime(year, month + 1, 0).day;
+    final desiredDay = _reminderDay.clamp(1, 28);
+
+    if (now.day <= desiredDay && desiredDay <= thisMonthLastDay) {
+      return DateTime(year, month, desiredDay);
+    } else {
+      final nextMonthLastDay = DateTime(year, month + 2, 0).day;
+      final safeDay =
+          desiredDay <= nextMonthLastDay ? desiredDay : nextMonthLastDay;
+      return DateTime(year, month + 1, safeDay);
+    }
+  }
+
+  String _formatMonthDay(DateTime d) {
+    final locale = Localizations.localeOf(context).languageCode;
+    final pattern = locale == 'vi' ? 'dd MMMM' : 'MMMM dd';
+    return DateFormat(pattern, locale).format(d);
+  }
+
+  String _reminderDescription() {
+    final next = _computeNextReminderDate();
+    final dateStr = _formatMonthDay(next);
+    final locale = Localizations.localeOf(context).languageCode;
+    return locale == 'vi'
+        ? 'Ảnh tiếp theo vào ngày $dateStr'
+        : 'Next photos on $dateStr';
+  }
 
   @override
   void initState() {
@@ -28,22 +62,126 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _showReminder = prefs.getBool('show_photo_reminder') ?? true;
+      _reminderDay = prefs.getInt('reminder_day') ?? 8;
     });
   }
 
   // Save trạng thái reminder vào SharedPreferences
   _saveReminderState(bool value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool('show_photo_reminder', value);
+    await prefs.setBool('show_photo_reminder', value);
+  }
+
+  // Lưu ngày nhắc nhở
+  _saveReminderDay(int day) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('reminder_day', day);
   }
 
   // Reset reminder (có thể dùng cho testing hoặc settings)
   _resetReminder() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool('show_photo_reminder', true);
+    await prefs.setBool('show_photo_reminder', true);
+    await prefs.setInt('reminder_day', 8);
     setState(() {
       _showReminder = true;
+      _reminderDay = 8;
     });
+  }
+
+  // Mở bottom sheet cài đặt theo dõi tiến độ
+  void _showTrackProgressOptions() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        int tempDay = _reminderDay;
+        bool tempShow = _showReminder;
+        return StatefulBuilder(builder: (context, setModalState) {
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.info_outline, color: TColor.primaryColor1),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        AppLocalizations.of(context)?.trackYourProgress ??
+                            'Theo dõi tiến độ của bạn mỗi tháng bằng ảnh',
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: TColor.black,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text('Bật nhắc nhở hàng tháng',
+                      style: TextStyle(color: TColor.black)),
+                  value: tempShow,
+                  onChanged: (v) {
+                    setModalState(() => tempShow = v);
+                    setState(() => _showReminder = v);
+                    _saveReminderState(v);
+                  },
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Ngày nhắc mỗi tháng',
+                        style: TextStyle(color: TColor.black)),
+                    DropdownButton<int>(
+                      value: tempDay,
+                      items: List.generate(28, (i) => i + 1)
+                          .map((d) => DropdownMenuItem<int>(
+                                value: d,
+                                child: Text(d.toString()),
+                              ))
+                          .toList(),
+                      onChanged: (v) {
+                        if (v == null) return;
+                        setModalState(() => tempDay = v);
+                        setState(() => _reminderDay = v);
+                        _saveReminderDay(v);
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  height: 45,
+                  child: RoundButton(
+                    type: RoundButtonType.bgSGradient,
+                    title: AppLocalizations.of(context)?.compareMyPhoto ??
+                        'So sánh ảnh của tôi',
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        this.context,
+                        MaterialPageRoute(
+                          builder: (context) => const ComparisonView(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 10),
+              ],
+            ),
+          );
+        });
+      },
+    );
   }
 
   List photoArr = [
@@ -166,9 +304,7 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
                                         fontWeight: FontWeight.w500),
                                   ),
                                   Text(
-                                    AppLocalizations.of(context)
-                                            ?.nextPhotosFallOn ??
-                                        "Next Photos Fall On July 08",
+                                    _reminderDescription(),
                                     style: TextStyle(
                                         color: TColor.black,
                                         fontSize: 14,
@@ -198,53 +334,57 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
                 Padding(
                   padding:
                       const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  child: Container(
-                    width: double.maxFinite,
-                    padding: const EdgeInsets.all(20),
-                    height: media.width * 0.4,
-                    decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: [
-                          TColor.primaryColor2.withOpacity(0.4),
-                          TColor.primaryColor1.withOpacity(0.4)
-                        ]),
-                        borderRadius: BorderRadius.circular(20)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Flexible(
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(
-                                  height: 15,
-                                ),
-                                Text(
-                                  AppLocalizations.of(context)
-                                          ?.trackYourProgress ??
-                                      "Track Your Progress Each\nMonth With Photo",
-                                  style: TextStyle(
-                                    color: TColor.black,
-                                    fontSize: 12,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(20),
+                    onTap: _showTrackProgressOptions,
+                    child: Container(
+                      width: double.maxFinite,
+                      padding: const EdgeInsets.all(20),
+                      height: media.width * 0.4,
+                      decoration: BoxDecoration(
+                          gradient: LinearGradient(colors: [
+                            TColor.primaryColor2.withValues(alpha: 0.4),
+                            TColor.primaryColor1.withValues(alpha: 0.4)
+                          ]),
+                          borderRadius: BorderRadius.circular(20)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(
+                                    height: 15,
                                   ),
-                                ),
-                                const Spacer(),
-                                SizedBox(
-                                  width: 110,
-                                  height: 35,
-                                  child: RoundButton(
-                                      icon: Icons.info_outline,
-                                      iconSize: 16,
-                                      onPressed: () {}),
-                                )
-                              ]),
-                        ),
-                        Flexible(
-                          child: Image.asset(
-                            "assets/img/progress_each_photo.png",
-                            width: media.width * 0.35,
+                                  Text(
+                                    AppLocalizations.of(context)
+                                            ?.trackYourProgress ??
+                                        "Track Your Progress Each\nMonth With Photo",
+                                    style: TextStyle(
+                                      color: TColor.black,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  SizedBox(
+                                    width: 110,
+                                    height: 35,
+                                    child: RoundButton(
+                                        icon: Icons.info_outline,
+                                        iconSize: 16,
+                                        onPressed: _showTrackProgressOptions),
+                                  )
+                                ]),
                           ),
-                        )
-                      ],
+                          Flexible(
+                            child: Image.asset(
+                              "assets/img/progress_each_photo.png",
+                              width: media.width * 0.35,
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
