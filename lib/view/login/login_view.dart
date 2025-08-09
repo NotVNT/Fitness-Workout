@@ -18,6 +18,7 @@ class _LoginViewState extends State<LoginView> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
 
   Future<void> _signIn() async {
     // Validation
@@ -233,28 +234,31 @@ class _LoginViewState extends State<LoginView> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                 ),
-                SizedBox(
-                  height: media.width * 0.04,
-                ),
+                SizedBox(height: 20),
                 RoundTextField(
                   hitText: "Mật khẩu",
                   icon: "assets/img/lock.png",
-                  obscureText: true,
+                  obscureText: !_isPasswordVisible,
                   controller: _passwordController,
                   rigtIcon: TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
                       child: Container(
                           alignment: Alignment.center,
                           width: 20,
                           height: 20,
-                          child: Image.asset(
-                            "assets/img/show_password.png",
-                            width: 20,
-                            height: 20,
-                            fit: BoxFit.contain,
+                          child: Icon(
+                            _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
                             color: TColor.gray,
+                            size: 20,
                           ))),
                 ),
+                SizedBox(height: 15),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -374,16 +378,14 @@ class _LoginViewState extends State<LoginView> {
                       Text(
                         "Đăng ký",
                         style: TextStyle(
-                            color: TColor.black,
+                            color: TColor.primaryColor1,
                             fontSize: 14,
                             fontWeight: FontWeight.w700),
                       )
                     ],
                   ),
                 ),
-                SizedBox(
-                  height: media.width * 0.04,
-                ),
+                SizedBox(height: 20),
               ],
             ),
           ),

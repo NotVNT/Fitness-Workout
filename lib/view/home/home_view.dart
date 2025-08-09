@@ -188,7 +188,7 @@ class _HomeViewState extends State<HomeView> {
                           width: 25,
                           height: 25,
                           fit: BoxFit.fitHeight,
-                        ))
+                        )),
                   ],
                 ),
                 SizedBox(
