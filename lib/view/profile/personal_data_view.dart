@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../common/colo_extension.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/user_model.dart';
 import '../../services/auth_service.dart';
+import '../../services/firestore_service.dart';
+import 'widgets/editable_info_tile.dart';
 
 class PersonalDataView extends StatefulWidget {
   const PersonalDataView({super.key});
@@ -59,7 +62,10 @@ class _PersonalDataViewState extends State<PersonalDataView> {
           String dob =
               user?.dateOfBirth.isNotEmpty == true ? user!.dateOfBirth : '--';
           String gender = user?.gender.isNotEmpty == true ? user!.gender : '--';
-          String goal = user?.goal.isNotEmpty == true ? user!.goal : '--';
+          String phone = (userData != null &&
+                  (userData['phone']?.toString().isNotEmpty == true))
+              ? userData['phone']
+              : '--';
 
           return Stack(
             children: [
@@ -110,22 +116,30 @@ class _PersonalDataViewState extends State<PersonalDataView> {
                               value: email,
                             ),
                             const Divider(height: 1),
-                            _InfoTile(
+                            // Ngày sinh (Việt hóa)
+                            EditableInfoTile(
                               icon: Icons.cake_outlined,
-                              label: 'Date of birth',
+                              label: 'Ngày sinh',
                               value: dob,
+                              fieldKey: 'dateOfBirth',
+                              keyboardType: TextInputType.datetime,
                             ),
                             const Divider(height: 1),
-                            _InfoTile(
+                            // Giới tính: chỉ được phép thay đổi
+                            EditableInfoTile(
                               icon: Icons.wc_outlined,
-                              label: 'Gender',
+                              label: 'Giới tính',
                               value: gender,
+                              fieldKey: 'gender',
                             ),
                             const Divider(height: 1),
-                            _InfoTile(
-                              icon: Icons.flag_outlined,
-                              label: 'Goal',
-                              value: goal,
+                            // Số điện thoại mới
+                            EditableInfoTile(
+                              icon: Icons.phone_outlined,
+                              label: 'Số điện thoại',
+                              value: userData?['phone'] ?? '--',
+                              fieldKey: 'phone',
+                              keyboardType: TextInputType.phone,
                             ),
                           ],
                         ),

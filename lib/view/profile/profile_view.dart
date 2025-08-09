@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:animated_toggle_switch/animated_toggle_switch.dart';
+
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../common/colo_extension.dart';
@@ -9,6 +9,7 @@ import '../../common_widget/title_subtitle_cell.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/auth_service.dart';
 import '../../models/user_model.dart';
+import '../../services/workout_reminder_service.dart';
 import 'personal_data_view.dart';
 import 'achievement_view.dart';
 import 'activity_history_view.dart';
@@ -24,12 +25,26 @@ class ProfileView extends StatefulWidget {
 }
 
 class _ProfileViewState extends State<ProfileView> {
-  bool positive = false;
   final AuthService _authService = AuthService();
   final ImagePicker _picker = ImagePicker();
   File? _profileImage;
   final TextEditingController _goalController = TextEditingController();
   bool _isEditingGoal = false;
+  TimeOfDay? _workoutReminder;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadReminder();
+  }
+
+  Future<void> _loadReminder() async {
+    final res = await WorkoutReminderService.load();
+    if (!mounted) return;
+    setState(() {
+      _workoutReminder = res == null ? null : TimeOfDay(hour: res.h, minute: res.m);
+    });
+  }
 
   // Liên hệ hỗ trợ
   final Uri _supportUri =
@@ -616,74 +631,63 @@ class _ProfileViewState extends State<ProfileView> {
                               const SizedBox(width: 15),
                               Expanded(
                                 child: Text(
-                                  AppLocalizations.of(context)
-                                          ?.popUpNotification ??
-                                      "Pop-up Notification",
+                                  AppLocalizations.of(context)?.popUpNotification ?? "Pop-up Notification",
                                   style: TextStyle(
                                     color: TColor.black,
                                     fontSize: 12,
                                   ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  softWrap: false,
                                 ),
                               ),
-                              CustomAnimatedToggleSwitch<bool>(
-                                current: positive,
-                                values: [false, true],
-                                indicatorSize: const Size.square(30.0),
-                                animationDuration:
-                                    const Duration(milliseconds: 200),
-                                animationCurve: Curves.linear,
-                                onChanged: (b) => setState(() => positive = b),
-                                iconBuilder: (context, local, global) {
-                                  return const SizedBox();
+                              // Nút chọn giờ nhắc tập luyện thay cho nút bật/tắt
+                              GestureDetector(
+                                onTap: () async {
+                                  final picked = await showTimePicker(
+                                    context: context,
+                                    initialTime: _workoutReminder ?? const TimeOfDay(hour: 7, minute: 0),
+                                  );
+                                  if (picked != null) {
+                                    await WorkoutReminderService.save(picked.hour, picked.minute);
+                                    if (!mounted) return;
+                                    setState(() => _workoutReminder = picked);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Chọn giờ tập luyện thành công: ${picked.format(context)}')),
+                                    );
+                                  }
                                 },
-                                onTap: (tapProperties) => setState(() =>
-                                    positive = tapProperties.tapped?.value ??
-                                        !positive),
-                                iconsTappable: false,
-                                wrapperBuilder: (context, global, child) {
-                                  return Stack(
-                                    alignment: Alignment.center,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(colors: TColor.secondaryG),
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Positioned(
-                                        left: 10.0,
-                                        right: 10.0,
-                                        height: 30.0,
-                                        child: DecoratedBox(
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                                colors: TColor.secondaryG),
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                              Radius.circular(50.0),
-                                            ),
-                                          ),
+                                      Text(
+                                        'Chọn giờ',
+                                        style: TextStyle(
+                                          color: TColor.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                       ),
-                                      child,
+                                      if (_workoutReminder != null) ...[
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          _workoutReminder!.format(context),
+                                          style: TextStyle(
+                                            color: TColor.white,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ]
                                     ],
-                                  );
-                                },
-                                foregroundIndicatorBuilder: (context, global) {
-                                  return SizedBox.fromSize(
-                                    size: const Size(10, 10),
-                                    child: DecoratedBox(
-                                      decoration: BoxDecoration(
-                                        color: TColor.white,
-                                        borderRadius: const BorderRadius.all(
-                                          Radius.circular(50.0),
-                                        ),
-                                        boxShadow: const [
-                                          BoxShadow(
-                                            color: Colors.black38,
-                                            spreadRadius: 0.05,
-                                            blurRadius: 1.1,
-                                            offset: Offset(0.0, 0.8),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
+                                  ),
+                                ),
                               ),
                             ],
                           ),

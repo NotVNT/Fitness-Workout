@@ -119,7 +119,7 @@ class _TodaySleepScheduleRowState extends State<TodaySleepScheduleRow> {
                                 child: DecoratedBox(
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
-                                        colors: TColor.secondaryG),
+                                        colors: TColor.primaryG),
                                     borderRadius: const BorderRadius.all(
                                         Radius.circular(50.0)),
                                   ),

@@ -23,21 +23,12 @@ class WorkoutTrackerView extends StatefulWidget {
 
 class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
   List<WorkoutModel> userWorkouts = [];
+  List<WorkoutModel> upcomingWorkouts = [];
   List<ExerciseModel> allExercises = [];
   bool isLoadingWorkouts = true;
 
-  List latestArr = [
-    {
-      "image": "assets/img/Workout1.png",
-      "title": "fullbodyWorkout",
-      "time": "Today, 03:00pm"
-    },
-    {
-      "image": "assets/img/Workout2.png",
-      "title": "upperbodyWorkout",
-      "time": "June 05, 02:00pm"
-    },
-  ];
+  // Dữ liệu mẫu cũ đã bỏ, danh sách "Bài tập sắp tới" sẽ lấy từ Firestore
+  final List<Map<String, String>> latestArr = const [];
 
   List whatArr = [
     {
@@ -78,28 +69,48 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
         final allWorkouts =
             await WorkoutService.getUserWorkouts(userProvider.user!.id);
 
-        // Lọc chỉ workouts hôm nay
-        final today = DateTime.now();
-        final todayWorkouts = allWorkouts.where((workout) {
-          if (workout.startTime == null) return false;
+        // Chia workouts theo hôm nay và sắp tới theo yêu cầu
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
 
-          final workoutDate = workout.startTime!;
-          return workoutDate.year == today.year &&
-              workoutDate.month == today.month &&
-              workoutDate.day == today.day;
-        }).toList();
+        final todayAll = <WorkoutModel>[];
+        final todayIncomplete = <WorkoutModel>[];
+        final futureIncomplete = <WorkoutModel>[];
+
+        for (final w in allWorkouts) {
+          final d = DateTime(w.startTime.year, w.startTime.month, w.startTime.day);
+          final done = w.isCompleted;
+          if (d == today) {
+            todayAll.add(w);
+            if (!done) todayIncomplete.add(w);
+          } else if (d.isAfter(today)) {
+            if (!done) futureIncomplete.add(w);
+          }
+        }
+
+        // Xác định danh sách "Bài tập sắp tới"
+        if (todayIncomplete.isNotEmpty) {
+          // Còn bài chưa hoàn thành trong hôm nay => hiển thị các bài đó
+          upcomingWorkouts = todayIncomplete..sort((a,b)=>a.startTime.compareTo(b.startTime));
+        } else {
+          // Hôm nay đã tập xong => lấy các bài của ngày tương lai gần nhất
+          if (futureIncomplete.isNotEmpty) {
+            futureIncomplete.sort((a,b)=>a.startTime.compareTo(b.startTime));
+            final nextDay = DateTime(futureIncomplete.first.startTime.year, futureIncomplete.first.startTime.month, futureIncomplete.first.startTime.day);
+            upcomingWorkouts = futureIncomplete.where((w){
+              final d = DateTime(w.startTime.year, w.startTime.month, w.startTime.day);
+              return d == nextDay;
+            }).toList();
+          } else {
+            upcomingWorkouts = [];
+          }
+        }
 
         setState(() {
-          userWorkouts = todayWorkouts;
+          // "Bài tập hôm nay" giữ nguyên logic cũ: tất cả workouts của hôm nay
+          userWorkouts = todayAll;
           isLoadingWorkouts = false;
         });
-
-        print(
-            '🏋️ WorkoutTracker: Đã load ${allWorkouts.length} workouts, ${todayWorkouts.length} workouts hôm nay');
-        for (var workout in todayWorkouts) {
-          print(
-              '🏋️ - ${workout.name}: ${workout.exercises.length} exercises (${workout.status})');
-        }
       } else {
         setState(() {
           isLoadingWorkouts = false;
@@ -390,10 +401,16 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                       padding: EdgeInsets.zero,
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount: latestArr.length,
+                      itemCount: upcomingWorkouts.length,
                       itemBuilder: (context, index) {
-                        var wObj = latestArr[index] as Map? ?? {};
-                        return UpcomingWorkoutRow(wObj: wObj);
+                        final w = upcomingWorkouts[index];
+                        // Map cho widget cũ
+                        final map = {
+                          "image": _getWorkoutIcon(w.workoutType ?? ''),
+                          "title": w.name,
+                          "time": _formatWorkoutTime(w.startTime),
+                        };
+                        return UpcomingWorkoutRow(wObj: map);
                       }),
                   SizedBox(
                     height: media.width * 0.05,
@@ -486,12 +503,12 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: TColor.white,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
+            color: Colors.black.withValues(alpha: 0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -521,7 +538,7 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
               child: Icon(
                 _getWorkoutIconData(workout.workoutType ?? 'mixed'),
                 color: TColor.white,
-                size: 24,
+                size: 22,
               ),
             ),
             const SizedBox(width: 15),
@@ -532,7 +549,7 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    workout.name,
+                    _cleanTitle(workout.name),
                     style: TextStyle(
                       color: TColor.black,
                       fontSize: 16,
@@ -688,6 +705,11 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
     } else {
       return "${dateTime.day}/${dateTime.month}, ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
     }
+  }
+
+  // Loại bỏ phần "Thứ ..." khỏi tên hiển thị (ví dụ: "Ngày 2 - Thứ Ba" -> "Ngày 2")
+  String _cleanTitle(String title) {
+    return title.replaceAll(RegExp(r"\s*-?\s*Thứ\s*[A-Za-zÀ-ỹ]+", caseSensitive: false), '').trim();
   }
 
   LineTouchData get lineTouchData1 => LineTouchData(

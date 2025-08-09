@@ -70,7 +70,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
           ),
         ),
         title: Text(
-          widget.workout.name,
+          _cleanTitle(widget.workout.name),
           style: TextStyle(
             color: TColor.black,
             fontSize: 16,
@@ -112,14 +112,8 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
               padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
               child: Column(
                 children: [
-                  Text(
-                    widget.workout.name.toUpperCase(),
-                    style: TextStyle(
-                      color: TColor.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+                  // Loại bỏ dòng tiêu đề lặp lại để gọn giao diện
+                  // (tránh hiển thị 2 lần "Ngày 2 - ...")
                   const SizedBox(height: 15),
                   Text(
                     widget.workout.description ?? "Workout được tạo tự động",
@@ -335,6 +329,11 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
     );
   }
 
+  // Loại bỏ phần "Thứ ..." khỏi tên hiển thị (ví dụ: "Ngày 2 - Thứ Ba" -> "Ngày 2")
+  String _cleanTitle(String title) {
+    return title.replaceAll(RegExp(r"\s*-?\s*Thứ\s*[A-Za-zÀ-ỹ]+", caseSensitive: false), '').trim();
+  }
+
   // Calculate total workout time
   int _calculateTotalTime() {
     int totalSeconds = 0;
@@ -350,7 +349,8 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
       } else {
         // Reps exercises: estimate 2 seconds per rep
         for (var set in workoutExercise.sets) {
-          totalSeconds += (set.reps ?? 10) * 2; // 2 seconds per rep
+          final reps = set.reps ?? 10;
+          totalSeconds += reps * 2;
         }
       }
 
