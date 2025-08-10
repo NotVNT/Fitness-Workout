@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fitness/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:fitness/providers/user_provider.dart';
+
 import '../bmi_edit/height_input_view.dart';
 import 'package:fitness/view/login/signup_view.dart';
 
@@ -44,6 +45,7 @@ class _LoginViewState extends State<LoginView> {
       );
 
       if (result != null) {
+
         // Đăng nhập thành công: nếu user đã có đủ BMI (height, weight, targetWeight) thì vào thẳng Main.
         // Nếu thiếu, dẫn qua flow nhập BMI.
         final userProvider = Provider.of<UserProvider>(context, listen: false);

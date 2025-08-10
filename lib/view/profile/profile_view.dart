@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:animated_toggle_switch/animated_toggle_switch.dart';
+
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../common/colo_extension.dart';
@@ -9,7 +11,9 @@ import '../../common_widget/title_subtitle_cell.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/auth_service.dart';
 import '../../models/user_model.dart';
+
 import '../../services/workout_reminder_service.dart';
+
 import 'personal_data_view.dart';
 import 'achievement_view.dart';
 import 'activity_history_view.dart';
@@ -30,6 +34,7 @@ class _ProfileViewState extends State<ProfileView> {
   File? _profileImage;
   final TextEditingController _goalController = TextEditingController();
   bool _isEditingGoal = false;
+
   TimeOfDay? _workoutReminder;
 
   @override
@@ -45,6 +50,7 @@ class _ProfileViewState extends State<ProfileView> {
       _workoutReminder = res == null ? null : TimeOfDay(hour: res.h, minute: res.m);
     });
   }
+
 
   // Liên hệ hỗ trợ
   final Uri _supportUri =

@@ -19,6 +19,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+
   runApp(
     MultiProvider(
       providers: [
@@ -28,6 +29,7 @@ void main() async {
         ChangeNotifierProvider(
           create: (context) => StepCounterProvider()..initialize(isMock: false),
         ),
+
       ],
       child: const MyApp(),
     ),
