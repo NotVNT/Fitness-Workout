@@ -122,6 +122,31 @@ class WorkoutService {
     }
   }
 
+  // Lấy các workout đã hoàn thành gần đây của user
+  static Future<List<WorkoutModel>> getRecentCompletedWorkouts(
+      String userId, {
+      int limit = 3,
+    }) async {
+    try {
+      final snapshot = await _firestore
+          .collection(usersCollection)
+          .doc(userId)
+          .collection(workoutsSubcollection)
+          .where('status', isEqualTo: 'completed')
+          .orderBy('endTime', descending: true)
+          .limit(limit)
+          .get();
+
+      return snapshot.docs
+          .map((doc) => WorkoutModel.fromFirestore(doc))
+          .toList();
+    } catch (e) {
+      print('Lỗi khi lấy recent completed workouts: $e');
+      return [];
+    }
+  }
+
+
   // Lấy workout theo ngày hiện tại (dựa trên dayNumber)
   static Future<WorkoutModel?> getTodayWorkout(String userId) async {
     try {
