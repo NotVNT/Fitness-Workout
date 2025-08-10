@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import '../providers/user_provider.dart';
+import '../view/bmi_edit/height_input_view.dart';
 import '../view/main_tab/main_tab_view.dart';
 import '../view/on_boarding/started_view.dart';
 

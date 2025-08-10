@@ -93,7 +93,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get notification => 'Thông báo';
 
   @override
-  String get popUpNotification => 'Thông báo bật lên';
+  String get popUpNotification => 'Thông báo giờ tập luyện';
 
   @override
   String get workoutTracker => 'Theo dõi tập luyện';
@@ -336,7 +336,61 @@ class AppLocalizationsVi extends AppLocalizations {
   String get gallery => 'Thư viện';
 
   @override
+  String get photo => 'Ảnh';
+
+  @override
+  String get statistic => 'Thống kê';
+
+  @override
+  String get averageProgress => 'Tiến độ trung bình';
+
+  @override
+  String get good => 'Tốt';
+
+  @override
+  String get frontFacing => 'Mặt trước';
+
+  @override
+  String get backFacing => 'Mặt sau';
+
+  @override
+  String get leftFacing => 'Bên trái';
+
+  @override
+  String get rightFacing => 'Bên phải';
+
+  @override
+  String get loseWeight => 'Giảm cân';
+
+  @override
+  String get heightIncrease => 'Tăng chiều cao';
+
+  @override
+  String get muscleMassIncrease => 'Tăng khối lượng cơ';
+
+  @override
+  String get abs => 'Cơ bụng';
+
+  @override
+  String get result => 'Kết quả';
+
+  @override
   String get comparison => 'So sánh';
+
+  @override
+  String get selectMonth1 => 'Chọn tháng 1';
+
+  @override
+  String get selectMonth2 => 'Chọn tháng 2';
+
+  @override
+  String get selectMonth => 'Chọn tháng';
+
+  @override
+  String get selectMonthHelp => 'Chọn tháng';
+
+  @override
+  String get pleaseSelectTwoMonths => 'Vui lòng chọn đủ hai tháng để so sánh.';
 
   @override
   String get reminderReset => 'Đã khôi phục nhắc nhở!';

@@ -72,6 +72,7 @@ class FirestoreService {
     String? lastName,
     String? dateOfBirth,
     String? gender,
+    String? phone,
     double? weight,
     double? height,
     double? targetWeight,
@@ -86,6 +87,7 @@ class FirestoreService {
       if (lastName != null) updateData['lastName'] = lastName;
       if (dateOfBirth != null) updateData['dateOfBirth'] = dateOfBirth;
       if (gender != null) updateData['gender'] = gender;
+      if (phone != null) updateData['phone'] = phone;
       if (weight != null) updateData['weight'] = weight;
       if (height != null) updateData['height'] = height;
       if (targetWeight != null) updateData['targetWeight'] = targetWeight;

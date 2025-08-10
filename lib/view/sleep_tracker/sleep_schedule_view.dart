@@ -1,11 +1,14 @@
 import 'package:fitness/view/sleep_tracker/sleep_add_alarm_view.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:intl/intl.dart';
 
 import '../../common/colo_extension.dart';
 import '../../common_widget/round_button.dart';
 import '../../common_widget/today_sleep_schedule_row.dart';
 import '../../l10n/app_localizations.dart';
+import '../../models/sleep_schedule.dart';
+import '../../services/sleep_schedule_service.dart';
 
 class SleepScheduleView extends StatefulWidget {
   const SleepScheduleView({super.key});
@@ -16,24 +19,56 @@ class SleepScheduleView extends StatefulWidget {
 
 class _SleepScheduleViewState extends State<SleepScheduleView> {
   late DateTime _selectedDate;
+  SleepSchedule? _schedule;
 
-  List<Map<String, String>> get todaySleepArr => [
-        {
-          "name": AppLocalizations.of(context)?.bedtime ?? "Bedtime",
-          "image": "assets/img/bed.png",
-          "time": "01/06/2023 09:00 PM",
-          "duration": AppLocalizations.of(context)?.inHoursMinutes('6', '22') ??
-              "in 6hours 22minutes"
-        },
-        {
-          "name": AppLocalizations.of(context)?.alarm ?? "Alarm",
-          "image": "assets/img/alaarm.png",
-          "time": "02/06/2023 05:10 AM",
-          "duration":
-              AppLocalizations.of(context)?.inHoursMinutes('14', '30') ??
-                  "in 14hours 30minutes"
-        },
-      ];
+  List<Map<String, String>> get todaySleepArr {
+        final bedtimeText = AppLocalizations.of(context)?.bedtime ?? 'Giờ đi ngủ';
+        final alarmText = AppLocalizations.of(context)?.alarm ?? 'Báo thức';
+        return _buildSleepList(bedtimeText, alarmText);
+      }
+
+      List<Map<String, String>> _buildSleepList(String bedtimeText, String alarmText) {
+        if (_schedule != null) {
+          final bed = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day, _schedule!.bedtimeHour, _schedule!.bedtimeMinute);
+          final wake = bed.add(Duration(hours: _schedule!.sleepHours, minutes: _schedule!.sleepMinutes));
+          return [
+            {
+              "name": bedtimeText,
+              "image": "assets/img/bed.png",
+              "time": "${bed.day}/${bed.month}/${bed.year} ${_formatTime(bed)}",
+              "duration": AppLocalizations.of(context)?.inHoursMinutes('0', '0') ?? ''
+            },
+            {
+              "name": alarmText,
+              "image": "assets/img/alaarm.png",
+              "time": "${wake.day}/${wake.month}/${wake.year} ${_formatTime(wake)}",
+              "duration": AppLocalizations.of(context)?.inHoursMinutes('${_schedule!.sleepHours}', '${_schedule!.sleepMinutes}') ?? ''
+            },
+          ];
+        }
+        // Dữ liệu giả nếu chưa có thiết lập
+        return [
+          {
+            "name": bedtimeText,
+            "image": "assets/img/bed.png",
+            "time": "01/06/2023 09:00 PM",
+            "duration": AppLocalizations.of(context)?.inHoursMinutes('6', '22') ?? 'trong 6 giờ 22 phút'
+          },
+          {
+            "name": alarmText,
+            "image": "assets/img/alaarm.png",
+            "time": "02/06/2023 05:10 AM",
+            "duration": AppLocalizations.of(context)?.inHoursMinutes('14', '30') ?? 'trong 14 giờ 30 phút'
+          },
+        ];
+      }
+
+      String _formatTime(DateTime dt) {
+        final hour = dt.hour % 12 == 0 ? 12 : dt.hour % 12;
+        final minute = dt.minute.toString().padLeft(2, '0');
+        final ampm = dt.hour >= 12 ? 'PM' : 'AM';
+        return '$hour:$minute $ampm';
+      }
 
   List<int> showingTooltipOnSpots = [4];
 
@@ -41,6 +76,12 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
   void initState() {
     super.initState();
     _selectedDate = DateTime.now();
+    _loadSchedule();
+  }
+
+  Future<void> _loadSchedule() async {
+    _schedule = await SleepScheduleService.load(_selectedDate);
+    if (mounted) setState(() {});
   }
 
   @override
@@ -228,7 +269,7 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "You will get 8hours 10minutes\nfor tonight",
+                          '${AppLocalizations.of(context)?.hoursMinutes('8', '10') ?? '8hours 10minutes'}\n${AppLocalizations.of(context)?.today ?? 'for tonight'}',
                           style: TextStyle(
                             color: TColor.black,
                             fontSize: 12,
@@ -247,7 +288,7 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
                                 percent: 0.96,
                                 backgroundColor: Colors.grey.shade100,
                                 linearGradient: LinearGradient(
-                                    colors: TColor.secondaryG,
+                                    colors: TColor.primaryG,
                                     begin: Alignment.centerLeft,
                                     end: Alignment.centerRight),
                                 barRadius: Radius.circular(7.5),
@@ -275,8 +316,8 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
         ),
       ),
       floatingActionButton: InkWell(
-        onTap: () {
-          Navigator.push(
+        onTap: () async {
+          final changed = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => SleepAddAlarmView(
@@ -284,12 +325,13 @@ class _SleepScheduleViewState extends State<SleepScheduleView> {
               ),
             ),
           );
+          if (changed == true) setState(() {});
         },
         child: Container(
           width: 55,
           height: 55,
           decoration: BoxDecoration(
-              gradient: LinearGradient(colors: TColor.secondaryG),
+              gradient: LinearGradient(colors: TColor.primaryG),
               borderRadius: BorderRadius.circular(27.5),
               boxShadow: const [
                 BoxShadow(

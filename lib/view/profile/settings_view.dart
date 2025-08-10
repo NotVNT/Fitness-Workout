@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../common/colo_extension.dart';
 import '../../common_widget/language_selector.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/workout_reminder_service.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
@@ -13,6 +14,21 @@ class SettingsView extends StatefulWidget {
 
 class _SettingsViewState extends State<SettingsView> {
   bool _pushEnabled = true;
+  TimeOfDay? _workoutReminder;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadReminder();
+  }
+
+  Future<void> _loadReminder() async {
+    final res = await WorkoutReminderService.load();
+    if (!mounted) return;
+    setState(() {
+      _workoutReminder = res == null ? null : TimeOfDay(hour: res.h, minute: res.m);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,12 +88,41 @@ class _SettingsViewState extends State<SettingsView> {
                         ),
                         const SizedBox(width: 15),
                         Expanded(
-                          child: Text(
-                            AppLocalizations.of(context)?.popUpNotification ??
-                                'Thông báo bật lên',
-                            style: TextStyle(
-                              color: TColor.black,
-                              fontSize: 12,
+                          child: InkWell(
+                            onTap: () async {
+                              final picked = await showTimePicker(
+                                context: context,
+                                initialTime: _workoutReminder ?? const TimeOfDay(hour: 7, minute: 0),
+                              );
+                              if (picked != null) {
+                                await WorkoutReminderService.save(picked.hour, picked.minute);
+                                if (!mounted) return;
+                                setState(() => _workoutReminder = picked);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Chọn giờ tập luyện thành công: ${picked.format(context)}')),
+                                );
+                              }
+                            },
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  AppLocalizations.of(context)?.popUpNotification ?? 'Giờ tập luyện',
+                                  style: TextStyle(color: TColor.black, fontSize: 12),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  softWrap: false,
+                                ),
+                                if (_workoutReminder != null)
+                                  Text(
+                                    _workoutReminder!.format(context),
+                                    style: TextStyle(
+                                      color: TColor.primaryColor2,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
                         ),

@@ -4,6 +4,8 @@ import '../../common/colo_extension.dart';
 import '../../common_widget/icon_title_next_row.dart';
 import '../../common_widget/round_button.dart';
 import '../../l10n/app_localizations.dart';
+import '../../models/sleep_schedule.dart';
+import '../../services/sleep_schedule_service.dart';
 
 class SleepAddAlarmView extends StatefulWidget {
   final DateTime date;
@@ -15,6 +17,30 @@ class SleepAddAlarmView extends StatefulWidget {
 
 class _SleepAddAlarmViewState extends State<SleepAddAlarmView> {
   bool positive = false;
+
+  TimeOfDay _bedTime = const TimeOfDay(hour: 21, minute: 0);
+  int _sleepHours = 8;
+  int _sleepMinutes = 30;
+  String _repeat = 'Mon to Fri';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadExisting();
+  }
+
+  Future<void> _loadExisting() async {
+    final loaded = await SleepScheduleService.load(widget.date);
+    if (loaded != null) {
+      setState(() {
+        _bedTime = TimeOfDay(hour: loaded.bedtimeHour, minute: loaded.bedtimeMinute);
+        _sleepHours = loaded.sleepHours;
+        _sleepMinutes = loaded.sleepMinutes;
+        positive = loaded.vibrate;
+        _repeat = loaded.repeat;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,29 +104,121 @@ class _SleepAddAlarmViewState extends State<SleepAddAlarmView> {
           ),
           IconTitleNextRow(
               icon: "assets/img/Bed_Add.png",
-              title: AppLocalizations.of(context)?.bedtime ?? "Bedtime",
-              time: "09:00 PM",
+              title: AppLocalizations.of(context)?.bedtime ?? "Giờ đi ngủ",
+              time: _bedTime.format(context),
               color: TColor.lightGray,
-              onPressed: () {}),
+              onPressed: () async {
+                final picked = await showTimePicker(
+                  context: context,
+                  initialTime: _bedTime,
+                );
+                if (picked != null) {
+                  setState(() => _bedTime = picked);
+                }
+              }),
           const SizedBox(
             height: 10,
           ),
           IconTitleNextRow(
               icon: "assets/img/HoursTime.png",
               title: AppLocalizations.of(context)?.hoursOfSleep ??
-                  "Hours of sleep",
-              time: "8hours 30minutes",
+                  "Số giờ ngủ",
+              time: AppLocalizations.of(context)?.hoursMinutes(_sleepHours.toString(), _sleepMinutes.toString()) ?? '${_sleepHours}hours ${_sleepMinutes}minutes',
               color: TColor.lightGray,
-              onPressed: () {}),
+              onPressed: () async {
+                // Hiển thị bottom sheet đơn giản chọn giờ & phút
+                final result = await showModalBottomSheet<Map<String, int>>(
+                  context: context,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                  ),
+                  builder: (ctx) {
+                    int hours = _sleepHours;
+                    int minutes = _sleepMinutes;
+                    return StatefulBuilder(builder: (ctx, setSt) {
+                      return Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(AppLocalizations.of(context)?.hoursOfSleep ?? 'Số giờ ngủ', style: TextStyle(fontWeight: FontWeight.w600, color: TColor.black)),
+                            const SizedBox(height: 12),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                DropdownButton<int>(
+                                  value: hours,
+                                  items: List.generate(13, (i) => i)
+                                      .map((e) => DropdownMenuItem(value: e, child: Text('$e h')))
+                                      .toList(),
+                                  onChanged: (v) => setSt(() => hours = v ?? hours),
+                                ),
+                                DropdownButton<int>(
+                                  value: minutes,
+                                  items: [0, 15, 30, 45]
+                                      .map((e) => DropdownMenuItem(value: e, child: Text('$e m')))
+                                      .toList(),
+                                  onChanged: (v) => setSt(() => minutes = v ?? minutes),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            ElevatedButton(
+                              onPressed: () => Navigator.pop(ctx, {'h': hours, 'm': minutes}),
+                              child: Text(AppLocalizations.of(context)?.save ?? 'Lưu'),
+                            ),
+                          ],
+                        ),
+                      );
+                    });
+                  },
+                );
+
+                if (result != null) {
+                  setState(() {
+                    _sleepHours = result['h'] ?? _sleepHours;
+                    _sleepMinutes = result['m'] ?? _sleepMinutes;
+                  });
+                }
+              }),
           const SizedBox(
             height: 10,
           ),
           IconTitleNextRow(
               icon: "assets/img/Repeat.png",
-              title: AppLocalizations.of(context)?.repeat ?? "Repeat",
-              time: "Mon to Fri",
+              title: AppLocalizations.of(context)?.repeat ?? "Lặp lại",
+              time: _repeat,
               color: TColor.lightGray,
-              onPressed: () {}),
+              onPressed: () async {
+                final options = ['Mon to Fri', 'Everyday', 'Weekends'];
+                final vi = [
+                  'T2 - T6',
+                  'Mỗi ngày',
+                  'Cuối tuần',
+                ];
+                final selected = await showModalBottomSheet<int>(
+                  context: context,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                  ),
+                  builder: (ctx) {
+                    return SafeArea(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: List.generate(options.length, (i) {
+                          return ListTile(
+                            title: Text(vi[i]),
+                            onTap: () => Navigator.pop(ctx, i),
+                          );
+                        }),
+                      ),
+                    );
+                  },
+                );
+                if (selected != null) {
+                  setState(() => _repeat = vi[selected]);
+                }
+              }),
           const SizedBox(
             height: 10,
           ),
@@ -163,7 +281,7 @@ class _SleepAddAlarmViewState extends State<SleepAddAlarmView> {
                                 child: DecoratedBox(
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
-                                        colors: TColor.secondaryG),
+                                        colors: TColor.primaryG),
                                     borderRadius: const BorderRadius.all(
                                         Radius.circular(50.0)),
                                   ),
@@ -199,8 +317,19 @@ class _SleepAddAlarmViewState extends State<SleepAddAlarmView> {
           ),
           const Spacer(),
           RoundButton(
-              title: AppLocalizations.of(context)?.add ?? "Add",
-              onPressed: () {}),
+              title: AppLocalizations.of(context)?.add ?? "Thêm",
+              onPressed: () async {
+                final schedule = SleepSchedule(
+                  bedtimeHour: _bedTime.hour,
+                  bedtimeMinute: _bedTime.minute,
+                  sleepHours: _sleepHours,
+                  sleepMinutes: _sleepMinutes,
+                  vibrate: positive,
+                  repeat: _repeat,
+                );
+                await SleepScheduleService.save(widget.date, schedule);
+                if (!mounted) return; Navigator.pop(context, true);
+              }),
           const SizedBox(
             height: 20,
           ),

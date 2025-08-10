@@ -335,7 +335,61 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gallery => 'Gallery';
 
   @override
+  String get photo => 'Photo';
+
+  @override
+  String get statistic => 'Statistic';
+
+  @override
+  String get averageProgress => 'Average Progress';
+
+  @override
+  String get good => 'Good';
+
+  @override
+  String get frontFacing => 'Front Facing';
+
+  @override
+  String get backFacing => 'Back Facing';
+
+  @override
+  String get leftFacing => 'Left Facing';
+
+  @override
+  String get rightFacing => 'Right Facing';
+
+  @override
+  String get loseWeight => 'Lose Weight';
+
+  @override
+  String get heightIncrease => 'Height Increase';
+
+  @override
+  String get muscleMassIncrease => 'Muscle Mass Increase';
+
+  @override
+  String get abs => 'Abs';
+
+  @override
+  String get result => 'Result';
+
+  @override
   String get comparison => 'Comparison';
+
+  @override
+  String get selectMonth1 => 'Select Month 1';
+
+  @override
+  String get selectMonth2 => 'Select Month 2';
+
+  @override
+  String get selectMonth => 'Select Month';
+
+  @override
+  String get selectMonthHelp => 'Select month';
+
+  @override
+  String get pleaseSelectTwoMonths => 'Please select two months to compare.';
 
   @override
   String get reminderReset => 'Reminder reset!';
