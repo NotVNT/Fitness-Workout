@@ -9,9 +9,13 @@ import '../../common_widget/today_target_cell.dart';
 import '../../common_widget/icon_text_button.dart';
 import '../../l10n/app_localizations.dart';
 
+
+import '../../providers/user_provider.dart';
+
 import '../../models/exercise_model.dart';
 import '../../models/workout_model.dart';
 import '../../services/workout_service.dart';
+
 
 class ActivityTrackerView extends StatefulWidget {
   const ActivityTrackerView({super.key});

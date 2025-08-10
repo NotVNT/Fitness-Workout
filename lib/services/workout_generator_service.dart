@@ -124,6 +124,7 @@ class WorkoutGeneratorService {
 
 
 
+
   static List<ExerciseModel> _selectDailyExercises(
       List<ExerciseModel> exercises,
       String goal,
