@@ -122,11 +122,7 @@ class WorkoutGeneratorService {
     }
   }
 
-<<<<<<< HEAD
-=======
 
-
->>>>>>> d00dc3ee52f203c617f5723d94348de42709c1b7
 
   static List<ExerciseModel> _selectDailyExercises(
       List<ExerciseModel> exercises,

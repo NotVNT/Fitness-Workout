@@ -31,15 +31,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
 
   Future<void> _loadExerciseCatalog() async {
 
-<<<<<<< HEAD
     final catalog = await ExerciseService().getAllExercises();
-=======
-    setState(() => _loadingCatalog = true);
-
-    final catalog = await ExerciseService().getAllExercises(forceReload: true);
-
-
->>>>>>> d00dc3ee52f203c617f5723d94348de42709c1b7
     setState(() {
       _catalog = catalog;
     });
@@ -355,17 +347,8 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
       } else {
         // Reps exercises: estimate 2 seconds per rep
         for (var set in workoutExercise.sets) {
-<<<<<<< HEAD
-=======
-
-
-          totalSeconds += (set.reps ?? 10) * 2; // 2 seconds per rep
-
-
->>>>>>> d00dc3ee52f203c617f5723d94348de42709c1b7
           final reps = set.reps;
           totalSeconds += reps * 2;
-
         }
       }
 

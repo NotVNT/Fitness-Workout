@@ -26,6 +26,9 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
 
   List<ExerciseModel> allExercises = [];
   bool isLoadingWorkouts = true;
+  // Upcoming workouts list (if available). Currently left empty to avoid compile errors when not populated.
+  List<WorkoutModel> upcomingWorkouts = [];
+
 
   List latestArr = [
     {
@@ -84,9 +87,7 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
         // Lọc chỉ workouts hôm nay
         final today = DateTime.now();
         final todayWorkouts = allWorkouts.where((workout) {
-          if (workout.startTime == null) return false;
-
-          final workoutDate = workout.startTime!;
+          final workoutDate = workout.startTime;
           return workoutDate.year == today.year &&
               workoutDate.month == today.month &&
               workoutDate.day == today.day;
