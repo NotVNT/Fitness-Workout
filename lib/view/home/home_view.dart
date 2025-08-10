@@ -5,6 +5,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
 import '../../common/colo_extension.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/user_provider.dart';
@@ -27,6 +28,8 @@ class _HomeViewState extends State<HomeView> {
   List lastWorkoutArr = [];
   List<int> showingTooltipOnSpots = [21];
 
+  StreamSubscription<List<WorkoutModel>>? _recentSub;
+
   @override
   void initState() {
     super.initState();
@@ -34,9 +37,37 @@ class _HomeViewState extends State<HomeView> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       await userProvider.loadUserData();
-      await _loadRecentCompletedWorkouts();
+      _subscribeRecentCompletedWorkouts();
     });
   }
+  void _subscribeRecentCompletedWorkouts() {
+    _recentSub?.cancel();
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final user = userProvider.user;
+    if (user == null) return;
+    _recentSub = WorkoutService.recentCompletedWorkoutsStream(user.id, limit: 3)
+        .listen((recents) {
+      if (!mounted) return;
+      setState(() {
+        lastWorkoutArr = recents.map((w) {
+          return {
+            "name": _cleanTitle(w.name),
+            "image": _iconFromType(w.workoutType),
+            "kcal": (w.caloriesBurned ?? 0).toString(),
+            "time": (w.duration ?? _estimateDurationFromExercises(w)).toString(),
+            "progress": 1.0,
+          };
+        }).toList();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _recentSub?.cancel();
+    super.dispose();
+  }
+
 
   Future<void> _showBMIEditDialog() async {
     Navigator.push(
@@ -86,28 +117,6 @@ class _HomeViewState extends State<HomeView> {
         FlSpot(29, 60),
         FlSpot(30, 40)
       ];
-  Future<void> _loadRecentCompletedWorkouts() async {
-    final userProvider = Provider.of<UserProvider>(context, listen: false);
-    if (userProvider.user == null) return;
-
-    final recents = await WorkoutService.getRecentCompletedWorkouts(
-      userProvider.user!.id,
-      limit: 3,
-    );
-
-    if (!mounted) return;
-    setState(() {
-      lastWorkoutArr = recents.map((w) {
-        return {
-          "name": _cleanTitle(w.name),
-          "image": _iconFromType(w.workoutType),
-          "kcal": (w.caloriesBurned ?? 0).toString(),
-          "time": (w.duration ?? _estimateDurationFromExercises(w)).toString(),
-          "progress": 1.0,
-        };
-      }).toList();
-    });
-  }
 
   String _iconFromType(String? workoutType) {
     switch (workoutType) {
@@ -131,7 +140,8 @@ class _HomeViewState extends State<HomeView> {
         } else {
           totalSeconds += (set.reps * 3);
         }
-        totalSeconds += (set.restTime ?? 60);
+        // Thời gian nghỉ cố định 1 phút
+        totalSeconds += (set.restTime ?? 60).clamp(60, 60);
       }
     }
     return (totalSeconds / 60).ceil();

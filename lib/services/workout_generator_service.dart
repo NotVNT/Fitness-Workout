@@ -441,8 +441,7 @@ class WorkoutGeneratorService {
 
   // Tính thời gian nghỉ
   static int _calculateRestTime(double intensity) {
-    // Cường độ cao -> nghỉ lâu hơn
-    int baseRest = (intensity * 30).round();
-    return baseRest.clamp(30, 90); // 30-90 giây
+    // Cố định thời gian nghỉ: 60 giây cho mọi trường hợp
+    return 60;
   }
 }

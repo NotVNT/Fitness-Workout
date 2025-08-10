@@ -92,6 +92,35 @@ class _UpcomingWorkoutRowState extends State<UpcomingWorkoutRow> {
                     fontSize: 10,
                   ),
                 ),
+                // Hiển thị danh sách bài tập (tối đa 3) nếu có
+                if ((widget.wObj["exerciseNames"] as List?) != null &&
+                    (widget.wObj["exerciseNames"] as List).isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  ...((widget.wObj["exerciseNames"] as List)
+                          .cast<String>()
+                          .take(3))
+                      .map((name) => Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Icon(Icons.fitness_center,
+                                    size: 12, color: Colors.grey),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    name,
+                                    style: TextStyle(
+                                      color: TColor.gray,
+                                      fontSize: 11,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ))
+                ]
               ],
             )),
             // Toggle bị loại bỏ theo yêu cầu để giao diện gọn hơn

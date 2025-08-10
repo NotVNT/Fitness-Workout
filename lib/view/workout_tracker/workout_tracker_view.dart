@@ -29,6 +29,10 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
   // Upcoming workouts list (if available). Currently left empty to avoid compile errors when not populated.
   List<WorkoutModel> upcomingWorkouts = [];
 
+  // Weekly chart data (Sun..Sat), values 0..100
+  List<double> weeklyActual = List.filled(7, 0);
+  List<double> weeklyPlanned = List.filled(7, 0);
+
 
   List latestArr = [
     {
@@ -83,39 +87,72 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
         final allWorkouts =
             await WorkoutService.getUserWorkouts(userProvider.user!.id);
 
-
         // Lọc chỉ workouts hôm nay
-        final today = DateTime.now();
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
         final todayWorkouts = allWorkouts.where((workout) {
-          final workoutDate = workout.startTime;
-          return workoutDate.year == today.year &&
-              workoutDate.month == today.month &&
-              workoutDate.day == today.day;
-        }).toList();
+          final d = workout.startTime;
+          final only = DateTime(d.year, d.month, d.day);
+          return only == today;
+        }).toList()
+          ..sort((a, b) => a.startTime.compareTo(b.startTime));
 
-        setState(() {
-          userWorkouts = todayWorkouts;
-          isLoadingWorkouts = false;
-        });
-
-        print(
-            '🏋️ WorkoutTracker: Đã load ${allWorkouts.length} workouts, ${todayWorkouts.length} workouts hôm nay');
-        for (var workout in todayWorkouts) {
-          print(
-              '🏋️ - ${workout.name}: ${workout.exercises.length} exercises (${workout.status})');
+        // Xác định "Bài tập sắp tới":
+        // - Nếu hôm nay CHƯA hoàn thành -> dùng workout hôm nay
+        // - Nếu hôm nay ĐÃ hoàn thành -> dùng workout của NGÀY MAI (nếu có)
+        WorkoutModel? upcoming;
+        if (todayWorkouts.isNotEmpty) {
+          final todayW = todayWorkouts.first;
+          if (todayW.status != 'completed') {
+            upcoming = todayW;
+          } else {
+            // Tìm workout của ngày mai
+            final tomorrow = today.add(const Duration(days: 1));
+            upcoming = allWorkouts.firstWhere(
+              (w) {
+                final d = w.startTime;
+                return d.year == tomorrow.year &&
+                    d.month == tomorrow.month &&
+                    d.day == tomorrow.day;
+              },
+              orElse: () {
+                // Fallback theo dayNumber kế tiếp
+                final nextDayNumber = ((todayW.dayNumber ?? 0) % 7) + 1;
+                try {
+                  return allWorkouts.firstWhere((w) => w.dayNumber == nextDayNumber);
+                } catch (_) {
+                  return todayW; // cuối cùng vẫn hiển thị hôm nay để không rỗng
+                }
+              },
+            );
+          }
+        } else {
+          // Không có workout hôm nay: chọn workout gần nhất trong tương lai (nếu có)
+          try {
+            upcoming = (allWorkouts
+                  ..sort((a, b) => a.startTime.compareTo(b.startTime)))
+                .firstWhere((w) => w.startTime.isAfter(today));
+          } catch (_) {
+            upcoming = null;
+          }
         }
 
+        // Cập nhật dữ liệu biểu đồ tuần trước khi setState
+        _recomputeWeeklyChart(allWorkouts);
+        setState(() {
+          userWorkouts = todayWorkouts;
+          upcomingWorkouts = upcoming != null ? [upcoming] : [];
+          isLoadingWorkouts = false;
+        });
       } else {
         setState(() {
           isLoadingWorkouts = false;
         });
-        print('🏋️ WorkoutTracker: User chưa đăng nhập');
       }
     } catch (e) {
       setState(() {
         isLoadingWorkouts = false;
       });
-      print('🏋️ WorkoutTracker: Lỗi load workouts: $e');
     }
   }
 
@@ -131,6 +168,37 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
       allExercises = [];
     }
   }
+  // Tính dữ liệu biểu đồ theo tuần (CN..T7)
+  void _recomputeWeeklyChart(List<WorkoutModel> all) {
+    // Xác định tuần hiện tại: lấy ngày Chủ nhật làm mốc bắt đầu
+    final now = DateTime.now();
+    final startOfWeek = now.subtract(Duration(days: now.weekday % 7)); // Chủ nhật
+    final endOfWeek = startOfWeek.add(const Duration(days: 7));
+
+    // Bộ đếm planned và completed theo ngày 0..6
+    final planned = List<int>.filled(7, 0);
+    final completed = List<int>.filled(7, 0);
+
+    for (final w in all) {
+      final d = w.startTime;
+      if (d.isBefore(startOfWeek) || !d.isBefore(endOfWeek)) continue;
+      final dayIndex = d.weekday % 7; // CN=0..T7=6
+      planned[dayIndex] += 1;
+      if (w.status == 'completed') completed[dayIndex] += 1;
+    }
+
+    // Chuyển thành % (0..100). Nếu không có planned -> 0
+    final actualPct = List<double>.generate(7, (i) {
+      if (planned[i] == 0) return 0;
+      return (completed[i] / planned[i]) * 100.0;
+    });
+
+    setState(() {
+      weeklyPlanned = planned.map((c) => c > 0 ? 100.0 : 0.0).toList();
+      weeklyActual = actualPct;
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -342,8 +410,7 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          AppLocalizations.of(context)?.dailyWorkoutSchedule ??
-                              "Daily Workout Schedule",
+                          "Lịch tập hằng ngày",
                           style: TextStyle(
                               color: TColor.black,
                               fontSize: 14,
@@ -356,15 +423,15 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                             icon: Icons.check,
                             iconSize: 16,
                             type: RoundButtonType.bgGradient,
-                            onPressed: () {
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (context) =>
-                              //         const ActivityTrackerView(),
-                              //   ),
-                              // );
-                            },
+                            onPressed: () async {
+                            // Mở Lịch tập hằng ngày thực tế (7 ngày đã tạo)
+                            final userProvider = Provider.of<UserProvider>(context, listen: false);
+                            final user = userProvider.user;
+                            if (user == null) return;
+                            final workouts = await WorkoutService.getUserWorkouts(user.id);
+                            if (!mounted) return;
+                            _showWeeklyScheduleBottomSheet(context, workouts);
+                          },
                           ),
                         )
                       ],
@@ -398,13 +465,39 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                       itemCount: upcomingWorkouts.length,
                       itemBuilder: (context, index) {
                         final w = upcomingWorkouts[index];
-                        // Map cho widget cũ
+                        // Lấy tên bài tập (lọc trùng theo exerciseId)
+                        final seen = <String>{};
+                        final exerciseNames = w.exercises
+                            .where((we) {
+                              if (seen.contains(we.exerciseId)) return false;
+                              seen.add(we.exerciseId);
+                              return we.exercise != null;
+                            })
+                            .map((we) => we.exercise!.vietnameseName.isNotEmpty
+                                ? we.exercise!.vietnameseName
+                                : we.exercise!.name)
+                            .toList();
                         final map = {
                           "image": _getWorkoutIcon(w.workoutType ?? ''),
                           "title": w.name,
                           "time": _formatWorkoutTime(w.startTime),
+                          "exerciseNames": exerciseNames,
                         };
-                        return UpcomingWorkoutRow(wObj: map);
+                        return InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => WorkoutDetailView(
+                                  workout: w,
+                                  allExercises: allExercises,
+                                  isPreviewOnly: true,
+                                ),
+                              ),
+                            );
+                          },
+                          child: UpcomingWorkoutRow(wObj: map),
+                        );
                       }),
                   SizedBox(
                     height: media.width * 0.05,
@@ -546,8 +639,7 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    workout.name,
-
+                    _cleanTitle(workout.name),
                     style: TextStyle(
                       color: TColor.black,
                       fontSize: 16,
@@ -585,13 +677,22 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                     color: _getStatusColor(workout.status),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(
-                    _getStatusText(workout.status),
-                    style: TextStyle(
-                      color: TColor.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (workout.status == 'completed') ...[
+                        Icon(Icons.check, size: 12, color: TColor.white),
+                        const SizedBox(width: 4),
+                      ],
+                      Text(
+                        _getStatusText(workout.status),
+                        style: TextStyle(
+                          color: TColor.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -622,8 +723,8 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
           // Ước tính 3 giây mỗi rep
           totalSeconds += (set.reps * 3);
         }
-        // Thêm thời gian nghỉ
-        totalSeconds += (set.restTime ?? 60);
+        // Thêm thời gian nghỉ (1 phút)
+        totalSeconds += (set.restTime ?? 60).clamp(60, 60);
       }
     }
 
@@ -674,6 +775,90 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
     }
   }
 
+  void _showWeeklyScheduleBottomSheet(BuildContext ctx, List<WorkoutModel> all) {
+    // Lọc 7 ngày theo dayNumber 1-7 và sắp xếp tăng dần
+    final sorted = List<WorkoutModel>.from(all)
+      ..sort((a, b) => (a.dayNumber ?? 0).compareTo(b.dayNumber ?? 0));
+    final Map<int, WorkoutModel> perDay = {};
+    for (final w in sorted) {
+      final d = w.dayNumber ?? 0;
+      if (d >= 1 && d <= 7 && !perDay.containsKey(d)) {
+        perDay[d] = w;
+      }
+    }
+    final week = [for (int d = 1; d <= 7; d++) if (perDay[d] != null) perDay[d]!];
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Lịch tập 7 ngày', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(context),
+                    )
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Flexible(
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: week.length,
+                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    itemBuilder: (context, index) {
+                      final w = week[index];
+                      final title = _cleanTitle(w.name);
+                      final time = _formatWorkoutTime(w.startTime);
+                      final isDone = w.status == 'completed';
+                      return ListTile(
+                        leading: CircleAvatar(
+                          radius: 22,
+                          backgroundColor: TColor.primaryColor1.withValues(alpha: 0.15),
+                          child: Icon(_getWorkoutIconData(w.workoutType ?? 'mixed'), color: TColor.primaryColor1),
+                        ),
+                        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+                        subtitle: Text(time),
+                        trailing: isDone
+                            ? Row(mainAxisSize: MainAxisSize.min, children: const [Icon(Icons.check, color: Colors.green, size: 18), SizedBox(width: 6), Text('Hoàn thành')])
+                            : const SizedBox.shrink(),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => WorkoutDetailView(
+                                workout: w,
+                                allExercises: allExercises,
+                                isPreviewOnly: true,
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+
   // Get status text
   String _getStatusText(String status) {
     switch (status) {
@@ -719,6 +904,7 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
         lineChartBarData1_2,
       ];
 
+  // Đường thực tế: % hoàn thành theo ngày
   LineChartBarData get lineChartBarData1_1 => LineChartBarData(
         isCurved: true,
         color: TColor.white,
@@ -726,34 +912,21 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
         isStrokeCapRound: true,
         dotData: FlDotData(show: false),
         belowBarData: BarAreaData(show: false),
-        spots: const [
-          FlSpot(1, 35),
-          FlSpot(2, 70),
-          FlSpot(3, 40),
-          FlSpot(4, 80),
-          FlSpot(5, 25),
-          FlSpot(6, 70),
-          FlSpot(7, 35),
+        spots: [
+          for (int i = 0; i < 7; i++) FlSpot((i + 1).toDouble(), weeklyActual[i].clamp(0, 100)),
         ],
       );
 
+  // Đường kế hoạch: có bài tập (100) hay không (0) theo ngày
   LineChartBarData get lineChartBarData1_2 => LineChartBarData(
         isCurved: true,
         color: TColor.white.withValues(alpha: 0.5),
         barWidth: 2,
         isStrokeCapRound: true,
         dotData: FlDotData(show: false),
-        belowBarData: BarAreaData(
-          show: false,
-        ),
-        spots: const [
-          FlSpot(1, 80),
-          FlSpot(2, 50),
-          FlSpot(3, 90),
-          FlSpot(4, 40),
-          FlSpot(5, 80),
-          FlSpot(6, 35),
-          FlSpot(7, 60),
+        belowBarData: BarAreaData(show: false),
+        spots: [
+          for (int i = 0; i < 7; i++) FlSpot((i + 1).toDouble(), weeklyPlanned[i].clamp(0, 100)),
         ],
       );
 
@@ -845,4 +1018,12 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
       child: text,
     );
   }
+
+  // Remove the Vietnamese weekday word "Thứ ..." from titles for cleaner display
+  String _cleanTitle(String title) {
+    return title
+        .replaceAll(RegExp(r"\s*-?\s*Thứ\s*[A-Za-zÀ-ỹ]+", caseSensitive: false), '')
+        .trim();
+  }
+
 }
