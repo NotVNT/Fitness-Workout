@@ -10,11 +10,13 @@ import '../../common_widget/icon_text_button.dart';
 import '../../l10n/app_localizations.dart';
 
 
+
 import '../../providers/user_provider.dart';
 
 import '../../models/exercise_model.dart';
 import '../../models/workout_model.dart';
 import '../../services/workout_service.dart';
+import '../../providers/step_counter_provider.dart';
 
 
 class ActivityTrackerView extends StatefulWidget {
@@ -217,7 +219,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                     const SizedBox(
                       height: 15,
                     ),
-                    const Row(
+                    Row(
                       children: [
                         Expanded(
                           child: TodayTargetCell(
@@ -230,11 +232,15 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                           width: 15,
                         ),
                         Expanded(
-                          child: TodayTargetCell(
-                            icon: "assets/img/foot.png",
-                            value: "2400",
-                            title: "Foot Steps",
-                          ),
+                          child: Builder(builder: (context) {
+                            final steps =
+                                context.watch<StepCounterProvider>().stepsToday;
+                            return TodayTargetCell(
+                              icon: "assets/img/foot.png",
+                              value: steps.toString(),
+                              title: "Foot Steps",
+                            );
+                          }),
                         ),
                       ],
                     )
