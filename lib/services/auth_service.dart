@@ -216,9 +216,10 @@ class AuthService {
               'lastName': '',
               'dateOfBirth': '',
               'gender': '',
+              'phone': '',
               'weight': 0.0,
               'height': 0.0,
-              'goal': '',
+              'targetWeight': 0.0,
             };
           }
         },

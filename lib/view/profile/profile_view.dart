@@ -5,6 +5,7 @@ import '../../common/colo_extension.dart';
 import '../../common_widget/round_button.dart';
 import '../../common_widget/setting_row.dart';
 import '../../common_widget/title_subtitle_cell.dart';
+import '../../common_widget/language_selector.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/auth_service.dart';
 import '../../models/user_model.dart';
@@ -15,7 +16,6 @@ import 'personal_data_view.dart';
 import 'achievement_view.dart';
 import 'activity_history_view.dart';
 import 'privacy_policy_view.dart';
-import 'settings_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ProfileView extends StatefulWidget {
@@ -44,10 +44,10 @@ class _ProfileViewState extends State<ProfileView> {
     final res = await WorkoutReminderService.load();
     if (!mounted) return;
     setState(() {
-      _workoutReminder = res == null ? null : TimeOfDay(hour: res.h, minute: res.m);
+      _workoutReminder =
+          res == null ? null : TimeOfDay(hour: res.h, minute: res.m);
     });
   }
-
 
   // Liên hệ hỗ trợ
   final Uri _supportUri =
@@ -79,7 +79,7 @@ class _ProfileViewState extends State<ProfileView> {
         }
       ];
 
-  // Danh sách otherArr tích hợp cả hai nhánh
+  // Danh sách otherArr
   List<Map<String, String>> get otherArr => [
         {
           "image": "assets/img/p_contact.png",
@@ -91,17 +91,6 @@ class _ProfileViewState extends State<ProfileView> {
           "name":
               AppLocalizations.of(context)?.privacyPolicy ?? "Privacy Policy",
           "tag": "6"
-        },
-        {
-          "image": "assets/img/p_setting.png",
-          "name": AppLocalizations.of(context)?.settings ?? "Settings",
-          "tag": "7"
-        },
-        {
-          "image": "assets/img/p_setting.png",
-          "name":
-              AppLocalizations.of(context)?.testUserData ?? "Test User Data",
-          "tag": "8"
         },
       ];
 
@@ -240,30 +229,30 @@ class _ProfileViewState extends State<ProfileView> {
     }
   }
 
-  // Hàm chỉnh sửa goal
-  void _editGoal(String currentGoal) {
-    _goalController.text = currentGoal;
+  // Hàm chỉnh sửa target weight
+  void _editTargetWeight(String currentTargetWeight) {
+    _goalController.text = currentTargetWeight.replaceAll('kg', '');
     setState(() {
       _isEditingGoal = true;
     });
   }
 
-  // Hàm lưu goal
+  // Hàm lưu target weight
   void _saveGoal() {
-    // TODO: Implement save goal to database
+    // TODO: Implement save target weight to database
     setState(() {
       _isEditingGoal = false;
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Mục tiêu đã được cập nhật!'),
+        content: Text('Mục tiêu cân nặng đã được cập nhật!'),
         backgroundColor: Colors.green,
       ),
     );
   }
 
-  // Hàm hủy chỉnh sửa goal
+  // Hàm hủy chỉnh sửa target weight
   void _cancelEditGoal() {
     setState(() {
       _isEditingGoal = false;
@@ -356,14 +345,15 @@ class _ProfileViewState extends State<ProfileView> {
               gender: userData['gender'] ?? '',
               weight: (userData['weight'] ?? 0.0).toDouble(),
               height: (userData['height'] ?? 0.0).toDouble(),
-              goal: userData['goal'] ?? '',
+              targetWeight: (userData['targetWeight'] ?? 0.0).toDouble(),
             );
           }
 
           // Sử dụng UserModel để lấy thông tin
           String fullName = user?.fullName ?? "User";
-          String goal = user?.goal.isNotEmpty == true
-              ? user!.goal
+          String targetWeight = user?.targetWeight != null &&
+                  user!.targetWeight > 0
+              ? "${user.targetWeight.toInt()}kg"
               : AppLocalizations.of(context)?.setYourGoal ?? "Set your goal";
           String height = user?.height != null && user!.height > 0
               ? "${user.height.toInt()}cm"
@@ -478,12 +468,13 @@ class _ProfileViewState extends State<ProfileView> {
                                     ],
                                   )
                                 : GestureDetector(
-                                    onTap: () => _editGoal(goal),
+                                    onTap: () =>
+                                        _editTargetWeight(targetWeight),
                                     child: Row(
                                       children: [
                                         Expanded(
                                           child: Text(
-                                            goal,
+                                            targetWeight,
                                             style: TextStyle(
                                               color: TColor.gray,
                                               fontSize: 12,
@@ -611,12 +602,25 @@ class _ProfileViewState extends State<ProfileView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          AppLocalizations.of(context)?.notification ??
-                              "Notification",
+                          AppLocalizations.of(context)?.settings ?? "Settings",
                           style: TextStyle(
                             color: TColor.black,
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        // Phần đổi ngôn ngữ
+                        const LanguageSelector(),
+                        const SizedBox(height: 15),
+                        // Phần thông báo
+                        Text(
+                          AppLocalizations.of(context)?.notification ??
+                              "Notification",
+                          style: TextStyle(
+                            color: TColor.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -634,7 +638,9 @@ class _ProfileViewState extends State<ProfileView> {
                               const SizedBox(width: 15),
                               Expanded(
                                 child: Text(
-                                  AppLocalizations.of(context)?.popUpNotification ?? "Pop-up Notification",
+                                  AppLocalizations.of(context)
+                                          ?.popUpNotification ??
+                                      "Pop-up Notification",
                                   style: TextStyle(
                                     color: TColor.black,
                                     fontSize: 12,
@@ -649,21 +655,27 @@ class _ProfileViewState extends State<ProfileView> {
                                 onTap: () async {
                                   final picked = await showTimePicker(
                                     context: context,
-                                    initialTime: _workoutReminder ?? const TimeOfDay(hour: 7, minute: 0),
+                                    initialTime: _workoutReminder ??
+                                        const TimeOfDay(hour: 7, minute: 0),
                                   );
                                   if (picked != null) {
-                                    await WorkoutReminderService.save(picked.hour, picked.minute);
+                                    await WorkoutReminderService.save(
+                                        picked.hour, picked.minute);
                                     if (!mounted) return;
                                     setState(() => _workoutReminder = picked);
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Chọn giờ tập luyện thành công: ${picked.format(context)}')),
+                                      SnackBar(
+                                          content: Text(
+                                              'Chọn giờ tập luyện thành công: ${picked.format(context)}')),
                                     );
                                   }
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 6),
                                   decoration: BoxDecoration(
-                                    gradient: LinearGradient(colors: TColor.secondaryG),
+                                    gradient: LinearGradient(
+                                        colors: TColor.secondaryG),
                                     borderRadius: BorderRadius.circular(15),
                                   ),
                                   child: Row(
@@ -742,16 +754,6 @@ class _ProfileViewState extends State<ProfileView> {
                                           const PrivacyPolicyView(),
                                     ),
                                   );
-                                } else if (iObj["tag"] == "7") {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const SettingsView(),
-                                    ),
-                                  );
-                                } else if (iObj["tag"] == "8") {
-                                  // Xử lý cho mục Test User Data nếu cần
                                 }
                               },
                             );
