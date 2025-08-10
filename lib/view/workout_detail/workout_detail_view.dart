@@ -21,7 +21,7 @@ class WorkoutDetailView extends StatefulWidget {
 
 class _WorkoutDetailViewState extends State<WorkoutDetailView> {
   List<ExerciseModel> _catalog = [];
-  bool _loadingCatalog = false;
+
 
   @override
   void initState() {
@@ -30,17 +30,16 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
   }
 
   Future<void> _loadExerciseCatalog() async {
-    setState(() => _loadingCatalog = true);
+
     final catalog = await ExerciseService().getAllExercises();
     setState(() {
       _catalog = catalog;
-      _loadingCatalog = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    var media = MediaQuery.of(context).size;
+
 
     return Scaffold(
       backgroundColor: TColor.white,
@@ -266,7 +265,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                               _getExerciseById(workoutExercise.exerciseId);
 
                           return _buildExerciseRow(
-                              exercise, workoutExercise, index);
+                              exercise, workoutExercise);
                         },
                       ),
                     ),
@@ -349,7 +348,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
       } else {
         // Reps exercises: estimate 2 seconds per rep
         for (var set in workoutExercise.sets) {
-          final reps = set.reps ?? 10;
+          final reps = set.reps;
           totalSeconds += reps * 2;
         }
       }
@@ -369,7 +368,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
 
   // Build exercise row
   Widget _buildExerciseRow(
-      ExerciseModel exercise, WorkoutExercise workoutExercise, int index) {
+      ExerciseModel exercise, WorkoutExercise workoutExercise) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
       padding: const EdgeInsets.all(15),
