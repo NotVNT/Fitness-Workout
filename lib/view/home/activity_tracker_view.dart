@@ -147,7 +147,9 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
           ),
         ),
         title: Text(
-          "Theo dõi hoạt động",
+          (Localizations.localeOf(context).languageCode == 'en')
+              ? 'Activity Tracker'
+              : 'Theo dõi hoạt động',
           style: TextStyle(
               color: TColor.black, fontSize: 16, fontWeight: FontWeight.w700),
         ),
@@ -194,7 +196,9 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Mục tiêu hôm nay",
+                          (Localizations.localeOf(context).languageCode == 'en')
+                              ? 'Today Target'
+                              : 'Mục tiêu hôm nay',
                           style: TextStyle(
                               color: TColor.black,
                               fontSize: 14,
@@ -238,7 +242,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                           child: TodayTargetCell(
                             icon: "assets/img/water.png",
                             value: "8L",
-                            title: "Uống nước",
+                            title: (Localizations.localeOf(context).languageCode == 'en') ? 'Drink water' : 'Uống nước',
                           ),
                         ),
                         SizedBox(
@@ -251,7 +255,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                             return TodayTargetCell(
                               icon: "assets/img/foot.png",
                               value: steps.toString(),
-                              title: "Bước chân",
+                              title: (Localizations.localeOf(context).languageCode == 'en') ? 'Steps' : 'Bước chân',
                             );
                           }),
                         ),
@@ -269,7 +273,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Bài tập hôm nay",
+                    (Localizations.localeOf(context).languageCode == 'en') ? 'Today Workout' : 'Bài tập hôm nay',
                     style: TextStyle(
                         color: TColor.black,
                         fontSize: 16,
@@ -319,7 +323,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                               ),
                               const SizedBox(height: 10),
                               Text(
-                                "Chưa có bài tập hôm nay",
+                                (Localizations.localeOf(context).languageCode == 'en') ? 'No workout for today' : 'Chưa có bài tập hôm nay',
                                 style: TextStyle(
                                   color: TColor.black,
                                   fontSize: 14,
@@ -328,7 +332,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                               ),
                               const SizedBox(height: 5),
                               Text(
-                                "Hãy cập nhật BMI để tạo bài tập 7 ngày",
+                                (Localizations.localeOf(context).languageCode == 'en') ? 'Please update BMI to generate 7-day workouts' : 'Hãy cập nhật BMI để tạo bài tập 7 ngày',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   color: TColor.gray,
@@ -372,7 +376,9 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                                             ),
                                           ),
                                           Text(
-                                            "${todayWorkout!.exercises.length} bài tập",
+                                            (Localizations.localeOf(context).languageCode == 'en')
+                                                ? "${todayWorkout!.exercises.length} exercises"
+                                                : "${todayWorkout!.exercises.length} bài tập",
                                             style: TextStyle(
                                               color: TColor.gray,
                                               fontSize: 12,
@@ -449,7 +455,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Tiến độ hoạt động",
+                    (Localizations.localeOf(context).languageCode == 'en') ? 'Activity Progress' : 'Tiến độ hoạt động',
                     style: TextStyle(
                         color: TColor.black,
                         fontSize: 16,
@@ -464,7 +470,10 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                       ),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton(
-                          items: ["Tuần", "Tháng"]
+                          items: [
+                                (Localizations.localeOf(context).languageCode == 'en') ? 'Weekly' : 'Tuần',
+                                (Localizations.localeOf(context).languageCode == 'en') ? 'Monthly' : 'Tháng'
+                              ]
                               .map((name) => DropdownMenuItem(
                                     value: name,
                                     child: Text(
@@ -477,7 +486,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                           onChanged: (value) {},
                           icon: Icon(Icons.expand_more, color: TColor.white),
                           hint: Text(
-                            "Tuần",
+                            (Localizations.localeOf(context).languageCode == 'en') ? 'Weekly' : 'Tuần',
                             textAlign: TextAlign.center,
                             style: TextStyle(color: TColor.white, fontSize: 12),
                           ),
@@ -500,7 +509,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                     ]),
                 child: ActivityProgressChart(
                   values: const [5, 10.5, 5, 7.5, 15, 5.5, 8.5],
-                  labels: const ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+                  labels: const ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
                 ),
               ),
               SizedBox(
@@ -510,7 +519,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Bài tập gần đây",
+                    (Localizations.localeOf(context).languageCode == 'en') ? 'Latest Workout' : 'Bài tập gần đây',
                     style: TextStyle(
                         color: TColor.black,
                         fontSize: 16,

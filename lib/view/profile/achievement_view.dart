@@ -143,11 +143,11 @@ class _HeaderSummary extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Tổng số thành tích: $total',
+                  Localizations.localeOf(context).languageCode == 'en' ? 'Total achievements: $total' : Localizations.localeOf(context).languageCode == 'en' ? 'Total achievements: $total' : 'Tổng số thành tích: $total',
                   style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
                 ),
                 Text(
-                  'Đã đạt: $earned',
+                  Localizations.localeOf(context).languageCode == 'en' ? 'Earned: $earned' : Localizations.localeOf(context).languageCode == 'en' ? 'Earned: $earned' : 'Đã đạt: $earned',
                   style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 12),
                 ),
               ],
@@ -193,11 +193,11 @@ class _Tabs extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          chip('Tất cả', 0),
+          chip(Localizations.localeOf(context).languageCode == 'en' ? 'All' : 'Tất cả', 0),
           const SizedBox(width: 8),
-          chip('Đã đạt', 1),
+          chip(Localizations.localeOf(context).languageCode == 'en' ? 'Earned' : 'Đã đạt', 1),
           const SizedBox(width: 8),
-          chip('Đang tiến trình', 2),
+          chip(Localizations.localeOf(context).languageCode == 'en' ? 'In progress' : 'Đang tiến trình', 2),
         ],
       ),
     );
@@ -263,10 +263,10 @@ class _AchievementCard extends StatelessWidget {
                     ),
                     if (earned)
                       Row(
-                        children: const [
+                        children: [
                           Icon(Icons.check_circle, color: Colors.green, size: 16),
                           SizedBox(width: 4),
-                          Text('Đã đạt', style: TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.w600)),
+                          Text(Localizations.localeOf(context).languageCode == 'en' ? 'Achieved' : 'Đã đạt', style: TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.w600)),
                         ],
                       ),
                   ],
@@ -284,7 +284,7 @@ class _AchievementCard extends StatelessWidget {
                       style: TextStyle(color: TColor.gray, fontSize: 11),
                     ),
                     Text(
-                      earned ? (date ?? '') : 'Đang cố gắng...',
+                      earned ? (date ?? '') : (Localizations.localeOf(context).languageCode == 'en' ? 'Trying...' : Localizations.localeOf(context).languageCode == 'en' ? 'Trying...' : 'Đang cố gắng...'),
                       style: TextStyle(color: TColor.gray, fontSize: 11),
                     ),
                   ],

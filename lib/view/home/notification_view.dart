@@ -31,7 +31,9 @@ class _NotificationViewState extends State<NotificationView> {
         if (reminder != null)
           {
             "image": "assets/img/Workout1.png",
-            "title": "Đến giờ tập luyện!",
+            "title": (Localizations.localeOf(context).languageCode == 'en')
+                ? 'Time to work out!'
+                : 'Đến giờ tập luyện!',
             "time": "${reminder.h.toString().padLeft(2, '0')}:${reminder.m.toString().padLeft(2, '0')}",
           },
       ];
@@ -46,7 +48,7 @@ class _NotificationViewState extends State<NotificationView> {
     await ActivityLogService.logNotificationsCleared(count);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Đã xóa tất cả thông báo')),
+      SnackBar(content: Text(Localizations.localeOf(context).languageCode == 'en' ? 'All notifications cleared' : 'Đã xóa tất cả thông báo')),
     );
   }
 
@@ -96,7 +98,7 @@ class _NotificationViewState extends State<NotificationView> {
                     children: [
                       ListTile(
                         leading: const Icon(Icons.delete_sweep),
-                        title: const Text('Xóa tất cả thông báo'),
+                        title: Text(Localizations.localeOf(context).languageCode == 'en' ? 'Clear all notifications' : 'Xóa tất cả thông báo'),
                         onTap: () {
                           Navigator.pop(ctx);
                           _clearAll();
@@ -104,7 +106,7 @@ class _NotificationViewState extends State<NotificationView> {
                       ),
                       ListTile(
                         leading: const Icon(Icons.close),
-                        title: const Text('Đóng'),
+                        title: Text(Localizations.localeOf(context).languageCode == 'en' ? 'Close' : 'Đóng'),
                         onTap: () => Navigator.pop(ctx),
                       ),
                     ],
@@ -144,7 +146,7 @@ class _NotificationViewState extends State<NotificationView> {
               await ActivityLogService.logNotificationDeleted(nObj['title'] as String?);
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Đã xóa thông báo')),
+                SnackBar(content: Text(Localizations.localeOf(context).languageCode == 'en' ? 'Notification deleted' : 'Đã xóa thông báo')),
               );
             },
           );

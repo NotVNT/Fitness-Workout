@@ -47,7 +47,9 @@ class _DatePickerTileState extends State<DatePickerTile> {
       initialDate: _selectedDate ?? DateTime.now().subtract(const Duration(days: 365 * 20)),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
-      locale: const Locale('vi', 'VN'),
+      locale: Localizations.localeOf(context).languageCode == 'en'
+          ? const Locale('en', 'US')
+          : const Locale('vi', 'VN'),
     );
     
     if (picked != null) {

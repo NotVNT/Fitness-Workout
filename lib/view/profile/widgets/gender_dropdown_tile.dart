@@ -61,9 +61,13 @@ class _GenderDropdownTileState extends State<GenderDropdownTile> {
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
                   value: _selectedGender,
-                  items: const [
-                    DropdownMenuItem(value: 'Nam', child: Text('Nam')),
-                    DropdownMenuItem(value: 'Nữ', child: Text('Nữ')),
+                  items: [
+                    DropdownMenuItem(
+                        value: Localizations.localeOf(context).languageCode == 'en' ? 'Male' : 'Nam',
+                        child: Text(Localizations.localeOf(context).languageCode == 'en' ? 'Male' : 'Nam')),
+                    DropdownMenuItem(
+                        value: Localizations.localeOf(context).languageCode == 'en' ? 'Female' : 'Nữ',
+                        child: Text(Localizations.localeOf(context).languageCode == 'en' ? 'Female' : 'Nữ')),
                   ],
                   onChanged: (value) {
                     setState(() {
@@ -71,7 +75,7 @@ class _GenderDropdownTileState extends State<GenderDropdownTile> {
                     });
                   },
                   hint: Text(
-                    'Chọn giới tính',
+                    Localizations.localeOf(context).languageCode == 'en' ? 'Select gender' : 'Chọn giới tính',
                     style: TextStyle(color: TColor.gray, fontSize: 12),
                   ),
                   style: TextStyle(color: TColor.gray, fontSize: 12),

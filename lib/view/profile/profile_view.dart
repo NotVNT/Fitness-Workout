@@ -670,7 +670,11 @@ class _ProfileViewState extends State<ProfileView> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                           content: Text(
-                                              'Chọn giờ tập luyện thành công: ${picked.format(context)}')),
+                                            Localizations.localeOf(context).languageCode == 'en'
+                                                ? 'Workout reminder time set: ${picked.format(context)}'
+                                                : 'Chọn giờ tập luyện thành công: ${picked.format(context)}',
+                                          ),
+                                      ),
                                     );
                                   }
                                 },
@@ -686,7 +690,7 @@ class _ProfileViewState extends State<ProfileView> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
-                                        'Chọn giờ',
+                                        Localizations.localeOf(context).languageCode == 'en' ? 'Pick time' : 'Chọn giờ',
                                         style: TextStyle(
                                           color: TColor.white,
                                           fontSize: 12,
