@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 
 class NotificationRow extends StatelessWidget {
   final Map nObj;
-  const NotificationRow({super.key, required this.nObj});
+  final VoidCallback? onDelete;
+  const NotificationRow({super.key, required this.nObj, this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +46,34 @@ class NotificationRow extends StatelessWidget {
             ],
           )),
           IconButton(
-              onPressed: () {},
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                  ),
+                  builder: (ctx) => SafeArea(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          leading: const Icon(Icons.delete_outline),
+                          title: const Text('Xóa thông báo này'),
+                          onTap: () {
+                            Navigator.pop(ctx);
+                            onDelete?.call();
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.close),
+                          title: const Text('Đóng'),
+                          onTap: () => Navigator.pop(ctx),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
               icon: Image.asset(
                 "assets/img/sub_menu.png",
                 width: 15,

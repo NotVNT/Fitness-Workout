@@ -1,11 +1,17 @@
+import 'dart:io';
+import '../../services/activity_log_service.dart';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../common/colo_extension.dart';
 import '../../common_widget/round_button.dart';
 import '../../common_widget/icon_text_button.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/progress_photo_service.dart';
 import 'comparison_view.dart';
 
 class PhotoProgressView extends StatefulWidget {
@@ -55,6 +61,7 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
   void initState() {
     super.initState();
     _loadReminderState();
+    _loadGallery();
   }
 
   // Load trạng thái reminder từ SharedPreferences
@@ -83,9 +90,41 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('show_photo_reminder', true);
     await prefs.setInt('reminder_day', 8);
+    if (!mounted) return;
     setState(() {
       _showReminder = true;
       _reminderDay = 8;
+    });
+  }
+
+  // Tải ảnh người dùng từ SharedPreferences và nhóm theo tháng
+  Future<void> _loadGallery() async {
+    final locale = Localizations.localeOf(context).languageCode;
+    final records = await ProgressPhotoService.getAllRecords();
+    // Nhóm theo (year*100 + month)
+    final Map<int, List<String>> grouped = {};
+    for (final m in records) {
+      final d = DateTime.tryParse(m['date'] as String);
+      final path = m['path'] as String?;
+      if (d == null || path == null) continue;
+      final key = d.year * 100 + d.month;
+      grouped.putIfAbsent(key, () => []).add(path);
+    }
+    // Sắp xếp giảm dần theo thời gian (gần nhất trước)
+    final sortedKeys = grouped.keys.toList()..sort((a, b) => b.compareTo(a));
+    final arr = <Map<String, dynamic>>[];
+    for (final k in sortedKeys) {
+      final year = k ~/ 100;
+      final month = k % 100;
+      final label = DateFormat('MMMM yyyy', locale).format(DateTime(year, month));
+      arr.add({
+        'time': label,
+        'photo': grouped[k] ?? [],
+      });
+    }
+    if (!mounted) return;
+    setState(() {
+      photoArr = arr;
     });
   }
 
@@ -184,26 +223,8 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
     );
   }
 
-  List photoArr = [
-    {
-      "time": "2 June",
-      "photo": [
-        "assets/img/pp_1.png",
-        "assets/img/pp_2.png",
-        "assets/img/pp_3.png",
-        "assets/img/pp_4.png",
-      ]
-    },
-    {
-      "time": "5 May",
-      "photo": [
-        "assets/img/pp_5.png",
-        "assets/img/pp_6.png",
-        "assets/img/pp_7.png",
-        "assets/img/pp_8.png",
-      ]
-    }
-  ];
+  // Thư viện ảnh người dùng (được nhóm theo tháng)
+  List photoArr = [];
 
   @override
   Widget build(BuildContext context) {
@@ -490,12 +511,18 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
                                   ),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(10),
-                                    child: Image.asset(
-                                      imaArr[indexRow] as String? ?? "",
-                                      width: 100,
-                                      height: 100,
-                                      fit: BoxFit.cover,
-                                    ),
+                                    child: Builder(builder: (_) {
+                                      final path = imaArr[indexRow] as String?;
+                                      if (path == null || path.isEmpty) {
+                                        return const SizedBox.shrink();
+                                      }
+                                      return Image.file(
+                                        File(path),
+                                        width: 100,
+                                        height: 100,
+                                        fit: BoxFit.cover,
+                                      );
+                                    }),
                                   ),
                                 );
                               }),
@@ -513,16 +540,7 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
         ),
       ),
       floatingActionButton: InkWell(
-        onTap: () {
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => SleepAddAlarmView(
-          //       date: _selectedDateAppBBar,
-          //     ),
-          //   ),
-          // );
-        },
+        onTap: _onCapturePressed,
         child: Container(
           width: 55,
           height: 55,
@@ -542,5 +560,46 @@ class _PhotoProgressViewState extends State<PhotoProgressView> {
         ),
       ),
     );
+  }
+
+  Future<void> _onCapturePressed() async {
+    try {
+      // Yêu cầu quyền camera nếu cần
+      final status = await Permission.camera.request();
+      if (status.isDenied || status.isPermanentlyDenied) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Vui lòng cấp quyền máy ảnh trong Cài đặt để chụp ảnh'),
+          ),
+        );
+        return;
+      }
+
+      // Mở camera chụp ảnh
+      final picker = ImagePicker();
+      final picked = await picker.pickImage(source: ImageSource.camera, imageQuality: 90);
+      if (picked == null) return;
+
+      // Lưu file vào thư mục app và lưu bản ghi
+      final savedPath = await ProgressPhotoService.persistToAppDir(File(picked.path));
+      await ProgressPhotoService.addPhotoRecord(date: DateTime.now(), path: savedPath);
+      await _loadGallery();
+
+      // Log user action
+      await ActivityLogService.logPhotoCaptured(savedPath);
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Đã lưu ảnh tiến độ.'),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Không thể chụp ảnh: $e')),
+      );
+    }
   }
 }

@@ -4,6 +4,7 @@ import '../../common/colo_extension.dart';
 import '../../common_widget/notification_row.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/workout_reminder_service.dart';
+import '../../services/activity_log_service.dart';
 
 class NotificationView extends StatefulWidget {
   const NotificationView({super.key});
@@ -35,6 +36,18 @@ class _NotificationViewState extends State<NotificationView> {
           },
       ];
     });
+  }
+
+  void _clearAll() async {
+    if (notificationArr.isEmpty) return;
+    final count = notificationArr.length;
+    setState(() => notificationArr.clear());
+    // Log action
+    await ActivityLogService.logNotificationsCleared(count);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Đã xóa tất cả thông báo')),
+    );
   }
 
   @override
@@ -71,7 +84,34 @@ class _NotificationViewState extends State<NotificationView> {
         ),
         actions: [
           InkWell(
-            onTap: () {},
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                builder: (ctx) => SafeArea(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.delete_sweep),
+                        title: const Text('Xóa tất cả thông báo'),
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          _clearAll();
+                        },
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.close),
+                        title: const Text('Đóng'),
+                        onTap: () => Navigator.pop(ctx),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
             child: Container(
               margin: const EdgeInsets.all(8),
               height: 40,
@@ -95,7 +135,19 @@ class _NotificationViewState extends State<NotificationView> {
         padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
         itemBuilder: ((context, index) {
           var nObj = notificationArr[index] as Map? ?? {};
-          return NotificationRow(nObj: nObj);
+          return NotificationRow(
+            nObj: nObj,
+            onDelete: () async {
+              setState(() {
+                notificationArr.removeAt(index);
+              });
+              await ActivityLogService.logNotificationDeleted(nObj['title'] as String?);
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Đã xóa thông báo')),
+              );
+            },
+          );
       }), separatorBuilder: (context, index){
         return Divider(color: TColor.gray.withValues(alpha: 0.5), height: 1, );
       }, itemCount: notificationArr.length),

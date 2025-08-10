@@ -1,4 +1,4 @@
-import 'package:fl_chart/fl_chart.dart';
+
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,7 +9,9 @@ import '../../common/colo_extension.dart';
 
 import '../../common_widget/today_target_cell.dart';
 import '../../common_widget/icon_text_button.dart';
-import '../../l10n/app_localizations.dart';
+
+import '../../common_widget/activity_progress_chart.dart';
+
 
 
 
@@ -18,6 +20,7 @@ import '../../models/workout_model.dart';
 import '../../services/workout_service.dart';
 import '../../providers/step_counter_provider.dart';
 
+import '../../providers/user_provider.dart';
 
 class ActivityTrackerView extends StatefulWidget {
   const ActivityTrackerView({super.key});
@@ -27,7 +30,6 @@ class ActivityTrackerView extends StatefulWidget {
 }
 
 class _ActivityTrackerViewState extends State<ActivityTrackerView> {
-  int touchedIndex = -1;
   List<ExerciseModel> exercises = [];
 
   WorkoutModel? todayWorkout;
@@ -79,9 +81,20 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
     try {
       print('🏃 ActivityTracker: Đang load workout hôm nay...');
 
-      // Cần userId - tạm thời hardcode, sau này lấy từ Provider
-      const String userId =
-          "RzvF1bJ52QQ9ubgovV7AeKnn4Ok2"; // TODO: Lấy từ UserProvider
+      // Lấy userId từ UserProvider thay vì hardcode
+      final userProvider = Provider.of<UserProvider>(context, listen: false);
+      String? userId = userProvider.user?.id;
+      if (userId == null || userId.isEmpty) {
+        // Thử load user data nếu chưa có
+        await userProvider.loadUserData();
+        userId = userProvider.user?.id;
+        if (userId == null || userId.isEmpty) {
+          setState(() {
+            isLoadingTodayWorkout = false;
+          });
+          return;
+        }
+      }
 
       final workout = await WorkoutService.getTodayWorkout(userId);
 
@@ -134,7 +147,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
           ),
         ),
         title: Text(
-          "Activity Tracker",
+          "Theo dõi hoạt động",
           style: TextStyle(
               color: TColor.black, fontSize: 16, fontWeight: FontWeight.w700),
         ),
@@ -181,7 +194,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Today Target",
+                          "Mục tiêu hôm nay",
                           style: TextStyle(
                               color: TColor.black,
                               fontSize: 14,
@@ -225,7 +238,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                           child: TodayTargetCell(
                             icon: "assets/img/water.png",
                             value: "8L",
-                            title: "Water Intake",
+                            title: "Uống nước",
                           ),
                         ),
                         SizedBox(
@@ -238,7 +251,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                             return TodayTargetCell(
                               icon: "assets/img/foot.png",
                               value: steps.toString(),
-                              title: "Foot Steps",
+                              title: "Bước chân",
                             );
                           }),
                         ),
@@ -351,7 +364,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            todayWorkout!.name,
+                                            _cleanTitle(todayWorkout!.name),
                                             style: TextStyle(
                                               color: TColor.black,
                                               fontSize: 16,
@@ -416,8 +429,8 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                                           : ExerciseModel(
                                               id: workoutExercise.exerciseId,
                                               name: "Unknown Exercise",
-                                              vietnameseName: "Bài tập không xác định",
-                                              description: "Bài tập không xác định",
+                                              vietnameseName: "Không xác định",
+                                              description: "Không xác định",
                                               exerciseType: "reps",
                                             ),
                                     );
@@ -436,7 +449,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Activity  Progress",
+                    "Tiến độ hoạt động",
                     style: TextStyle(
                         color: TColor.black,
                         fontSize: 16,
@@ -451,7 +464,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                       ),
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton(
-                          items: ["Weekly", "Monthly"]
+                          items: ["Tuần", "Tháng"]
                               .map((name) => DropdownMenuItem(
                                     value: name,
                                     child: Text(
@@ -464,7 +477,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                           onChanged: (value) {},
                           icon: Icon(Icons.expand_more, color: TColor.white),
                           hint: Text(
-                            "Weekly",
+                            "Tuần",
                             textAlign: TextAlign.center,
                             style: TextStyle(color: TColor.white, fontSize: 12),
                           ),
@@ -485,99 +498,10 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                     boxShadow: const [
                       BoxShadow(color: Colors.black12, blurRadius: 3)
                     ]),
-                child: BarChart(BarChartData(
-                  barTouchData: BarTouchData(
-                    touchTooltipData: BarTouchTooltipData(
-                      getTooltipColor: (group) => Colors.grey,
-                      tooltipHorizontalAlignment: FLHorizontalAlignment.right,
-                      tooltipMargin: 10,
-                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                        String weekDay;
-                        switch (group.x) {
-                          case 0:
-                            weekDay = 'Monday';
-                            break;
-                          case 1:
-                            weekDay = 'Tuesday';
-                            break;
-                          case 2:
-                            weekDay = 'Wednesday';
-                            break;
-                          case 3:
-                            weekDay = 'Thursday';
-                            break;
-                          case 4:
-                            weekDay = 'Friday';
-                            break;
-                          case 5:
-                            weekDay = 'Saturday';
-                            break;
-                          case 6:
-                            weekDay = 'Sunday';
-                            break;
-                          default:
-                            throw Error();
-                        }
-                        return BarTooltipItem(
-                          '$weekDay\n',
-                          const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                          children: <TextSpan>[
-                            TextSpan(
-                              text: (rod.toY - 1).toString(),
-                              style: TextStyle(
-                                color: TColor.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                    touchCallback: (FlTouchEvent event, barTouchResponse) {
-                      setState(() {
-                        if (!event.isInterestedForInteractions ||
-                            barTouchResponse == null ||
-                            barTouchResponse.spot == null) {
-                          touchedIndex = -1;
-                          return;
-                        }
-                        touchedIndex =
-                            barTouchResponse.spot!.touchedBarGroupIndex;
-                      });
-                    },
-                  ),
-                  titlesData: FlTitlesData(
-                    show: true,
-                    rightTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        getTitlesWidget: getTitles,
-                        reservedSize: 38,
-                      ),
-                    ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: false,
-                      ),
-                    ),
-                  ),
-                  borderData: FlBorderData(
-                    show: false,
-                  ),
-                  barGroups: showingGroups(),
-                  gridData: FlGridData(show: false),
-                )),
+                child: ActivityProgressChart(
+                  values: const [5, 10.5, 5, 7.5, 15, 5.5, 8.5],
+                  labels: const ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+                ),
               ),
               SizedBox(
                 height: media.width * 0.05,
@@ -586,8 +510,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    AppLocalizations.of(context)?.latestWorkout ??
-                        "Latest Workout",
+                    "Bài tập gần đây",
                     style: TextStyle(
                         color: TColor.black,
                         fontSize: 16,
@@ -611,105 +534,6 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
     );
   }
 
-  Widget getTitles(double value, TitleMeta meta) {
-    var style = TextStyle(
-      color: TColor.gray,
-      fontWeight: FontWeight.w500,
-      fontSize: 12,
-    );
-    Widget text;
-    switch (value.toInt()) {
-      case 0:
-        text = Text(AppLocalizations.of(context)?.sun ?? 'Sun', style: style);
-        break;
-      case 1:
-        text = Text(AppLocalizations.of(context)?.mon ?? 'Mon', style: style);
-        break;
-      case 2:
-        text = Text(AppLocalizations.of(context)?.tue ?? 'Tue', style: style);
-        break;
-      case 3:
-        text = Text(AppLocalizations.of(context)?.wed ?? 'Wed', style: style);
-        break;
-      case 4:
-        text = Text(AppLocalizations.of(context)?.thu ?? 'Thu', style: style);
-        break;
-      case 5:
-        text = Text(AppLocalizations.of(context)?.fri ?? 'Fri', style: style);
-        break;
-      case 6:
-        text = Text(AppLocalizations.of(context)?.sat ?? 'Sat', style: style);
-        break;
-      default:
-        text = Text('', style: style);
-        break;
-    }
-    return SideTitleWidget(
-      axisSide: meta.axisSide,
-      space: 16,
-      child: text,
-    );
-  }
-
-  List<BarChartGroupData> showingGroups() => List.generate(7, (i) {
-        switch (i) {
-          case 0:
-            return makeGroupData(0, 5, TColor.primaryG,
-                isTouched: i == touchedIndex);
-          case 1:
-            return makeGroupData(1, 10.5, TColor.secondaryG,
-                isTouched: i == touchedIndex);
-          case 2:
-            return makeGroupData(2, 5, TColor.primaryG,
-                isTouched: i == touchedIndex);
-          case 3:
-            return makeGroupData(3, 7.5, TColor.secondaryG,
-                isTouched: i == touchedIndex);
-          case 4:
-            return makeGroupData(4, 15, TColor.primaryG,
-                isTouched: i == touchedIndex);
-          case 5:
-            return makeGroupData(5, 5.5, TColor.secondaryG,
-                isTouched: i == touchedIndex);
-          case 6:
-            return makeGroupData(6, 8.5, TColor.primaryG,
-                isTouched: i == touchedIndex);
-          default:
-            return throw Error();
-        }
-      });
-
-  BarChartGroupData makeGroupData(
-    int x,
-    double y,
-    List<Color> barColor, {
-    bool isTouched = false,
-    double width = 22,
-    List<int> showTooltips = const [],
-  }) {
-    return BarChartGroupData(
-      x: x,
-      barRods: [
-        BarChartRodData(
-          toY: isTouched ? y + 1 : y,
-          gradient: LinearGradient(
-              colors: barColor,
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter),
-          width: width,
-          borderSide: isTouched
-              ? const BorderSide(color: Colors.green)
-              : const BorderSide(color: Colors.white, width: 0),
-          backDrawRodData: BackgroundBarChartRodData(
-            show: true,
-            toY: 20,
-            color: TColor.lightGray,
-          ),
-        ),
-      ],
-      showingTooltipIndicators: showTooltips,
-    );
-  }
 
   // Get exercise icon based on type
   IconData _getExerciseIcon(String exerciseType) {
@@ -736,6 +560,13 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
       default:
         return TColor.gray;
     }
+  }
+
+  // Xóa bớt cụm ' - Thứ ...' khỏi tiêu đề cho gọn
+  String _cleanTitle(String title) {
+    return title
+        .replaceAll(RegExp(r"\s*-?\s*Thứ\s*[A-Za-zÀ-ỹ]+", caseSensitive: false), '')
+        .trim();
   }
 
   String _getStatusText(String status) {

@@ -4,6 +4,7 @@ import 'package:fitness/common_widget/icon_text_button.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
+import '../../helpers/calorie_helper.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
 import '../../common/colo_extension.dart';
@@ -26,7 +27,16 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   // Dữ liệu 'Bài tập gần đây' sẽ được lấy từ Workout Tracker (đã hoàn thành)
   List lastWorkoutArr = [];
-  List<int> showingTooltipOnSpots = [21];
+  List<int> showingTooltipOnSpots = [0];
+  // Dữ liệu biểu đồ tuần (CN..T7)
+  List<double> weeklyActual = List.filled(7, 0);
+  List<double> weeklyPlanned = List.filled(7, 0);
+
+
+  // Calo đốt cháy hôm nay (từ workout đã hoàn thành)
+  int _caloriesBurnedToday = 0;
+  final int _burnTarget = 500; // mục tiêu mặc định 500 kcal/ngày
+
 
   StreamSubscription<List<WorkoutModel>>? _recentSub;
 
@@ -38,6 +48,8 @@ class _HomeViewState extends State<HomeView> {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
       await userProvider.loadUserData();
       _subscribeRecentCompletedWorkouts();
+      _loadWeeklyProgress();
+      _loadTodayCalories();
     });
   }
   void _subscribeRecentCompletedWorkouts() {
@@ -84,6 +96,13 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
+  // Gọi helper để lấy kcal đã đốt hôm nay
+  Future<void> _loadTodayCalories() async {
+    final total = await CalorieHelper.loadTodayBurnedCalories(context);
+    if (!mounted) return;
+    setState(() => _caloriesBurnedToday = total);
+  }
+
   List<FlSpot> get allSpots => const [
         FlSpot(0, 20),
         FlSpot(1, 25),
@@ -117,6 +136,42 @@ class _HomeViewState extends State<HomeView> {
         FlSpot(29, 60),
         FlSpot(30, 40)
       ];
+
+  // Tính dữ liệu biểu đồ tuần (CN..T7)
+  Future<void> _loadWeeklyProgress() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final user = userProvider.user;
+    if (user == null) return;
+
+    final all = await WorkoutService.getUserWorkouts(user.id);
+
+    final now = DateTime.now();
+    final startOfWeek = now.subtract(Duration(days: now.weekday % 7));
+    final endOfWeek = startOfWeek.add(const Duration(days: 7));
+
+    final planned = List<int>.filled(7, 0);
+    final completed = List<int>.filled(7, 0);
+
+    for (final w in all) {
+      final d = w.startTime;
+      if (d.isBefore(startOfWeek) || !d.isBefore(endOfWeek)) continue;
+      final dayIndex = d.weekday % 7; // CN=0..T7=6
+      planned[dayIndex] += 1;
+      if (w.status == 'completed') completed[dayIndex] += 1;
+    }
+
+    final actualPct = List<double>.generate(7, (i) {
+      if (planned[i] == 0) return 0;
+      return (completed[i] / planned[i]) * 100.0;
+    });
+
+    if (!mounted) return;
+    setState(() {
+      weeklyPlanned = planned.map((c) => c > 0 ? 100.0 : 0.0).toList();
+      weeklyActual = actualPct;
+    });
+  }
+
 
   String _iconFromType(String? workoutType) {
     switch (workoutType) {
@@ -565,10 +620,9 @@ class _HomeViewState extends State<HomeView> {
                                             0, 0, bounds.width, bounds.height));
                                   },
                                   child: Text(
-                                    "760 kCal",
+                                    "Đã giảm được $_caloriesBurnedToday calories",
                                     style: TextStyle(
-                                        color:
-                                            TColor.white.withValues(alpha: 0.7),
+                                        color: TColor.white.withValues(alpha: 0.9),
                                         fontWeight: FontWeight.w700,
                                         fontSize: 13),
                                   ),
@@ -596,7 +650,7 @@ class _HomeViewState extends State<HomeView> {
                                             ),
                                             child: FittedBox(
                                               child: Text(
-                                                "230${AppLocalizations.of(context)?.kCalLeft ?? "kCal\nleft"}",
+                                                "${(_burnTarget - _caloriesBurnedToday).clamp(0, _burnTarget)}${AppLocalizations.of(context)?.kCalLeft ?? "kCal\ncòn lại"}",
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
                                                     color: TColor.white,
@@ -609,7 +663,7 @@ class _HomeViewState extends State<HomeView> {
                                             backStrokeWidth: 10,
                                             progressColors: TColor.primaryG,
                                             backColor: Colors.grey.shade100,
-                                            valueNotifier: ValueNotifier(50),
+                                            valueNotifier: ValueNotifier(((_caloriesBurnedToday / _burnTarget) * 100).clamp(0, 100).toDouble()),
                                             startAngle: -180,
                                           ),
                                         ],
@@ -632,7 +686,7 @@ class _HomeViewState extends State<HomeView> {
                     Flexible(
                       child: Text(
                         AppLocalizations.of(context)?.workoutProgress ??
-                            "Workout Progress",
+                            "Tiến độ tập luyện",
                         style: TextStyle(
                             color: TColor.black,
                             fontSize: 16,
@@ -648,23 +702,16 @@ class _HomeViewState extends State<HomeView> {
                         ),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton(
-                            items: ["Weekly", "Monthly"]
-                                .map((name) => DropdownMenuItem(
-                                      value: name,
-                                      child: Text(
-                                        name,
-                                        style: TextStyle(
-                                            color: TColor.gray, fontSize: 14),
-                                      ),
-                                    ))
-                                .toList(),
-                            onChanged: (value) {},
+                            value: 'Tuần',
+                            items: const [
+                              DropdownMenuItem(value: 'Tuần', child: Text('Tuần')),
+                            ],
+                            onChanged: null,
                             icon: Icon(Icons.expand_more, color: TColor.white),
                             hint: Text(
-                              "Weekly",
+                              "Tuần",
                               textAlign: TextAlign.center,
-                              style:
-                                  TextStyle(color: TColor.white, fontSize: 12),
+                              style: TextStyle(color: TColor.white, fontSize: 12),
                             ),
                           ),
                         )),
@@ -672,6 +719,27 @@ class _HomeViewState extends State<HomeView> {
                 ),
                 SizedBox(
                   height: media.width * 0.05,
+                ),
+                // Chú thích (legend)
+                Padding(
+                  padding: const EdgeInsets.only(left: 8, right: 16, bottom: 6),
+                  child: Row(
+                    children: [
+                      Container(width: 10, height: 10, decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: TColor.primaryG),
+                        shape: BoxShape.circle,
+                      )),
+                      const SizedBox(width: 6),
+                      const Text('Thực tế', style: TextStyle(fontSize: 12)),
+                      const SizedBox(width: 16),
+                      Container(width: 16, height: 10, alignment: Alignment.center,
+                        child: Container(height: 2, width: 16, decoration: BoxDecoration(
+                          color: TColor.secondaryColor1, borderRadius: BorderRadius.circular(2),
+                        ))),
+                      const SizedBox(width: 6),
+                      const Text('Kế hoạch', style: TextStyle(fontSize: 12)),
+                    ],
+                  ),
                 ),
                 Container(
                     padding: const EdgeInsets.only(left: 15),
@@ -755,8 +823,8 @@ class _HomeViewState extends State<HomeView> {
                           ),
                         ),
                         lineBarsData: lineBarsData1,
-                        minY: -0.5,
-                        maxY: 110,
+                        minY: 0,
+                        maxY: 100,
                         titlesData: FlTitlesData(
                             show: true,
                             leftTitles: AxisTitles(),
@@ -897,21 +965,18 @@ class _HomeViewState extends State<HomeView> {
   LineChartBarData get lineChartBarData1_1 => LineChartBarData(
         isCurved: true,
         gradient: LinearGradient(colors: [
-          TColor.primaryColor2.withValues(alpha: 0.5),
-          TColor.primaryColor1.withValues(alpha: 0.5),
+          TColor.primaryColor2.withValues(alpha: 0.8),
+          TColor.primaryColor1.withValues(alpha: 0.8),
         ]),
         barWidth: 4,
         isStrokeCapRound: true,
-        dotData: FlDotData(show: false),
-        belowBarData: BarAreaData(show: false),
-        spots: const [
-          FlSpot(1, 35),
-          FlSpot(2, 70),
-          FlSpot(3, 40),
-          FlSpot(4, 80),
-          FlSpot(5, 25),
-          FlSpot(6, 70),
-          FlSpot(7, 35),
+        dotData: FlDotData(show: true),
+        belowBarData: BarAreaData(show: true, gradient: LinearGradient(colors: [
+          TColor.primaryColor2.withValues(alpha: 0.25),
+          TColor.primaryColor1.withValues(alpha: 0.05),
+        ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
+        spots: [
+          for (int i = 0; i < 7; i++) FlSpot((i + 1).toDouble(), weeklyActual[i].clamp(0, 100)),
         ],
       );
 
@@ -921,20 +986,13 @@ class _HomeViewState extends State<HomeView> {
           TColor.secondaryColor2.withValues(alpha: 0.5),
           TColor.secondaryColor1.withValues(alpha: 0.5),
         ]),
-        barWidth: 2,
+        barWidth: 3,
         isStrokeCapRound: true,
+        dashArray: [6, 6],
         dotData: FlDotData(show: false),
-        belowBarData: BarAreaData(
-          show: false,
-        ),
-        spots: const [
-          FlSpot(1, 80),
-          FlSpot(2, 50),
-          FlSpot(3, 90),
-          FlSpot(4, 40),
-          FlSpot(5, 80),
-          FlSpot(6, 35),
-          FlSpot(7, 60),
+        belowBarData: BarAreaData(show: false),
+        spots: [
+          for (int i = 0; i < 7; i++) FlSpot((i + 1).toDouble(), weeklyPlanned[i].clamp(0, 100)),
         ],
       );
 
@@ -986,42 +1044,37 @@ class _HomeViewState extends State<HomeView> {
       );
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
-    var style = TextStyle(
-      color: TColor.gray,
-      fontSize: 12,
-    );
-    Widget text;
+    final style = TextStyle(color: TColor.gray, fontSize: 12);
+    String label;
     switch (value.toInt()) {
       case 1:
-        text = Text(AppLocalizations.of(context)?.sun ?? 'Sun', style: style);
+        label = AppLocalizations.of(context)?.sun ?? 'CN';
         break;
       case 2:
-        text = Text(AppLocalizations.of(context)?.mon ?? 'Mon', style: style);
+        label = AppLocalizations.of(context)?.mon ?? 'T2';
         break;
       case 3:
-        text = Text(AppLocalizations.of(context)?.tue ?? 'Tue', style: style);
+        label = AppLocalizations.of(context)?.tue ?? 'T3';
         break;
       case 4:
-        text = Text(AppLocalizations.of(context)?.wed ?? 'Wed', style: style);
+        label = AppLocalizations.of(context)?.wed ?? 'T4';
         break;
       case 5:
-        text = Text(AppLocalizations.of(context)?.thu ?? 'Thu', style: style);
+        label = AppLocalizations.of(context)?.thu ?? 'T5';
         break;
       case 6:
-        text = Text(AppLocalizations.of(context)?.fri ?? 'Fri', style: style);
+        label = AppLocalizations.of(context)?.fri ?? 'T6';
         break;
       case 7:
-        text = Text(AppLocalizations.of(context)?.sat ?? 'Sat', style: style);
+        label = AppLocalizations.of(context)?.sat ?? 'T7';
         break;
       default:
-        text = const Text('');
-        break;
+        label = '';
     }
-
     return SideTitleWidget(
       axisSide: meta.axisSide,
-      space: 10,
-      child: text,
+      space: 8,
+      child: Text(label, style: style),
     );
   }
 }

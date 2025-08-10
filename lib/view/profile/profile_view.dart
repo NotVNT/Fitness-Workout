@@ -17,11 +17,14 @@ import 'achievement_view.dart';
 import 'activity_history_view.dart';
 import 'privacy_policy_view.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../services/activity_log_service.dart';
 
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
 
   @override
+
+
   State<ProfileView> createState() => _ProfileViewState();
 }
 
@@ -661,6 +664,7 @@ class _ProfileViewState extends State<ProfileView> {
                                   if (picked != null) {
                                     await WorkoutReminderService.save(
                                         picked.hour, picked.minute);
+                                    await ActivityLogService.logReminderSet(picked);
                                     if (!mounted) return;
                                     setState(() => _workoutReminder = picked);
                                     ScaffoldMessenger.of(context).showSnackBar(

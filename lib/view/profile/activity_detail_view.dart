@@ -17,14 +17,14 @@ class ActivityDetailView extends StatelessWidget {
 
   String _typeVi(String t) {
     switch (t) {
-      case 'workout':
-        return 'Tập luyện';
-      case 'meal':
-        return 'Bữa ăn';
-      case 'sleep':
-        return 'Giấc ngủ';
+      case 'notification':
+        return 'Thông báo';
+      case 'photo':
+        return 'Ảnh';
+      case 'settings':
+        return 'Cài đặt';
       default:
-        return t;
+        return 'Khác';
     }
   }
 
@@ -97,11 +97,11 @@ class ActivityDetailView extends StatelessWidget {
 
   Color _typeColor(String? t) {
     switch (t) {
-      case 'workout':
-        return TColor.primaryColor1;
-      case 'meal':
-        return TColor.secondaryColor1;
-      case 'sleep':
+      case 'notification':
+        return Colors.orange;
+      case 'photo':
+        return Colors.purple;
+      case 'settings':
         return Colors.indigo;
       default:
         return TColor.gray;
