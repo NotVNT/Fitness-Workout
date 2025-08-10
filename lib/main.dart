@@ -10,6 +10,7 @@ import 'common/colo_extension.dart';
 import 'providers/language_provider.dart';
 import 'providers/user_provider.dart';
 import 'providers/meal_plan_provider.dart';
+import 'providers/step_counter_provider.dart';
 import 'l10n/app_localizations.dart';
 
 void main() async {
@@ -17,7 +18,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  
+
 
   runApp(
     MultiProvider(
@@ -25,6 +26,10 @@ void main() async {
         ChangeNotifierProvider(create: (context) => LanguageProvider()),
         ChangeNotifierProvider(create: (context) => UserProvider()),
         ChangeNotifierProvider(create: (context) => MealPlanProvider()),
+        ChangeNotifierProvider(
+          create: (context) => StepCounterProvider()..initialize(isMock: false),
+        ),
+
       ],
       child: const MyApp(),
     ),

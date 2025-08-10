@@ -25,7 +25,7 @@ class WorkoutGeneratorService {
     return weeklyWorkouts;
   }
 
-  // Tạo workout cho 1 ngày (5 bài tập)
+
   static WorkoutModel generateDailyWorkout({
     required UserModel user,
     required List<ExerciseModel> availableExercises,
@@ -36,7 +36,7 @@ class WorkoutGeneratorService {
     final intensity = _calculateIntensity(user);
     final goal = _determineGoal(user);
 
-    // Chọn 5 bài tập cho ngày này
+
     final selectedExercises =
         _selectDailyExercises(availableExercises, goal, intensity, dayNumber);
 
@@ -123,19 +123,18 @@ class WorkoutGeneratorService {
   }
 
 
-  // Chọn 5 bài tập cho từng ngày (đa dạng theo ngày)
+
   static List<ExerciseModel> _selectDailyExercises(
       List<ExerciseModel> exercises,
       String goal,
       double intensity,
       int dayNumber) {
-    List<ExerciseModel> selected = [];
 
-    // Danh sách bài tập theo mục tiêu
-    List<String> exercisePool = [];
-
+    // 1) Xây pool theo mục tiêu
+    List<String> pool;
     if (goal == 'lose_weight') {
-      exercisePool = [
+      pool = [
+
         'Jumping Jack',
         'Jump Rope',
         'Mountain Climber',
@@ -147,7 +146,9 @@ class WorkoutGeneratorService {
         'Sit-up'
       ];
     } else if (goal == 'gain_muscle') {
-      exercisePool = [
+
+      pool = [
+
         'Push-up',
         'Squat',
         'Plank',
@@ -157,7 +158,9 @@ class WorkoutGeneratorService {
         'Jump Rope'
       ];
     } else {
-      exercisePool = [
+
+      pool = [
+
         'Push-up',
         'Squat',
         'Plank',
@@ -169,29 +172,44 @@ class WorkoutGeneratorService {
       ];
     }
 
-    // Tạo pattern khác nhau cho mỗi ngày
-    List<String> dailyExercises =
-        _getDailyExercisePattern(exercisePool, dayNumber);
+    // 2) Lấy pattern theo ngày, sau đó chọn 3 bài đầu khác nhau
+    final pattern = _getDailyExercisePattern(pool, dayNumber);
 
-    // Lấy exercises từ tên
-    for (String exerciseName in dailyExercises) {
-      try {
-        final exercise = exercises.firstWhere((ex) => ex.name == exerciseName);
-        selected.add(exercise);
-      } catch (e) {
-        // Nếu không tìm thấy, lấy exercise đầu tiên
-        if (exercises.isNotEmpty) {
-          selected.add(exercises.first);
-        }
+    // 3) Map từ tên -> ExerciseModel, bỏ trùng lặp, lấy tối đa 3
+    final Set<String> seen = {};
+    final List<ExerciseModel> result = [];
+
+    for (final name in pattern) {
+      if (seen.contains(name)) continue; // loại trùng trong ngày
+      final ex = exercises.firstWhere(
+        (e) => e.name == name,
+        orElse: () => exercises.isNotEmpty
+            ? exercises.first
+            : ExerciseModel(
+                id: 'unknown',
+                name: 'Unknown',
+                vietnameseName: 'Không rõ',
+                description: '',
+                exerciseType: 'reps',
+                imageAsset: null,
+              ),
+      );
+      if (result.isEmpty || result.every((r) => r.id != ex.id)) {
+        result.add(ex);
+        seen.add(name);
       }
+      if (result.length == 3) break;
     }
 
-    // Đảm bảo có đúng 5 bài tập
-    while (selected.length < 5 && exercises.isNotEmpty) {
-      selected.add(exercises[selected.length % exercises.length]);
+    // 4) Fallback: nếu chưa đủ 3, thêm ngẫu nhiên nhưng vẫn tránh trùng id trong ngày
+    int idx = 0;
+    while (result.length < 3 && exercises.isNotEmpty) {
+      final ex = exercises[idx % exercises.length];
+      if (result.every((r) => r.id != ex.id)) result.add(ex);
+      idx++;
     }
 
-    return selected.take(5).toList();
+    return result.take(3).toList();
   }
 
   // Tạo pattern bài tập khác nhau cho mỗi ngày
@@ -242,8 +260,10 @@ class WorkoutGeneratorService {
       ExerciseModel exercise, UserModel user, double intensity) {
     List<SetModel> sets = [];
 
-    // Số sets dựa trên cường độ
-    int numSets = (intensity + 1).round().clamp(2, 4);
+
+    // Set mặc định = 1 cho mỗi bài tập
+    const int numSets = 1;
+
 
     for (int i = 1; i <= numSets; i++) {
       if (exercise.exerciseType == 'reps') {
