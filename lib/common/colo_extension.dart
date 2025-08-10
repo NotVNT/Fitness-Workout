@@ -18,7 +18,7 @@ class TColor {
 
 extension ColorExtension on Color {
   /// Replacement for deprecated withOpacity method
-  Color withAlpha(double opacity) {
+  Color withOpacityValue(double opacity) {
     return withValues(alpha: opacity);
   }
 }
