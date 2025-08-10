@@ -5,7 +5,11 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <!-- Permission for step counting on Android Q+ (not used on emulator/mock) -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Legacy body sensors (not strictly required for step counter, but harmless if present) -->
+    <uses-permission android:name="android.permission.BODY_SENSORS" />
 
    <application
         android:label="fitness"
