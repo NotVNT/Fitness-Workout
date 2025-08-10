@@ -15,6 +15,7 @@ class AuthService {
     String? firstName,
     String? lastName,
     String? phone,
+    String? dateOfBirth,
   }) async {
     try {
       UserCredential result =
@@ -31,6 +32,7 @@ class AuthService {
           firstName: firstName,
           lastName: lastName,
           phone: phone,
+          dateOfBirth: dateOfBirth,
           targetWeight: 0.0,
         );
       }

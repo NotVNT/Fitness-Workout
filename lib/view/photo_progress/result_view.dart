@@ -95,26 +95,7 @@ class _ResultViewState extends State<ResultView> {
   }
 
   List imaArr = [
-    {
-      "title": "frontFacing",
-      "month_1_image": "assets/img/pp_1.png",
-      "month_2_image": "assets/img/pp_2.png",
-    },
-    {
-      "title": "backFacing",
-      "month_1_image": "assets/img/pp_3.png",
-      "month_2_image": "assets/img/pp_4.png",
-    },
-    {
-      "title": "leftFacing",
-      "month_1_image": "assets/img/pp_5.png",
-      "month_2_image": "assets/img/pp_6.png",
-    },
-    {
-      "title": "rightFacing",
-      "month_1_image": "assets/img/pp_7.png",
-      "month_2_image": "assets/img/pp_8.png",
-    },
+    // Không có ảnh mẫu - người dùng sẽ thêm ảnh của riêng họ
   ];
 
   List statArr = [

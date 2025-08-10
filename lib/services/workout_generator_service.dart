@@ -38,7 +38,6 @@ class WorkoutGeneratorService {
     final selectedExercises =
         _selectDailyExercises(availableExercises, goal, intensity, dayNumber);
 
-    // Tạo sets cho từng bài tập
     final workoutExercises = selectedExercises.asMap().entries.map((entry) {
       int index = entry.key;
       ExerciseModel exercise = entry.value;
