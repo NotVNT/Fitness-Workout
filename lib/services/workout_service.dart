@@ -8,6 +8,33 @@ class WorkoutService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static const String usersCollection = 'users';
   static const String workoutsSubcollection = 'workouts';
+  // Xóa các workout trạng thái 'planned' hoặc 'in_progress' từ hôm nay trở đi
+  static Future<void> _clearUpcomingPlannedWorkouts(String userId) async {
+    try {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+
+      final snapshot = await _firestore
+          .collection(usersCollection)
+          .doc(userId)
+          .collection(workoutsSubcollection)
+          .where('startTime', isGreaterThanOrEqualTo: Timestamp.fromDate(today))
+          .get();
+
+      final batch = _firestore.batch();
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final status = (data['status'] ?? 'planned') as String;
+        if (status == 'planned') {
+          batch.delete(doc.reference);
+        }
+      }
+      await batch.commit();
+    } catch (e) {
+      print('⚠️ WorkoutService: Lỗi khi dọn lịch tập cũ: $e');
+    }
+  }
+
   static const String exercisesCollection = 'exercises';
 
   // Tạo 7 ngày workout tự động cho user
@@ -19,7 +46,10 @@ class WorkoutService {
       print(
           '🔥 WorkoutService: User BMI: ${user.bmi.toStringAsFixed(1)}, Weight: ${user.weight}kg, Target: ${user.targetWeight}kg');
 
-      // Lấy danh sách bài tập từ Firestore
+      // 1) Dọn dẹp lịch tập PLANNED/IN_PROGRESS từ hôm nay trở đi để tránh trùng lặp
+      await _clearUpcomingPlannedWorkouts(user.id);
+
+      // 2) Lấy danh sách bài tập từ Firestore
       print('🔥 WorkoutService: Đang lấy exercises từ Firestore...');
       final exercisesSnapshot =
           await _firestore.collection(exercisesCollection).get();

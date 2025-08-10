@@ -4,6 +4,7 @@ import 'package:fitness/common_widget/round_textfield.dart';
 import 'package:fitness/view/login/login_view.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness/services/auth_service.dart';
+import 'package:intl/intl.dart';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});
@@ -21,6 +22,7 @@ class _SignUpViewState extends State<SignUpView> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+
   final TextEditingController _dateOfBirthController = TextEditingController();
   DateTime? _selectedDate;
   bool _isLoading = false;
@@ -91,6 +93,7 @@ class _SignUpViewState extends State<SignUpView> {
         _dateOfBirthController.text =
             "${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}";
       });
+
     }
   }
 
@@ -141,6 +144,18 @@ class _SignUpViewState extends State<SignUpView> {
       return;
     }
 
+    // Yêu cầu bắt buộc: ngày sinh
+    if (_dobController.text.trim().isEmpty) {
+      _showErrorMessage('Vui lòng chọn ngày sinh');
+      return;
+    }
+
+    // Yêu cầu phải đồng ý với chính sách bảo mật
+    if (!isCheck) {
+      _showErrorMessage('Vui lòng đồng ý với Chính sách bảo mật và Điều khoản sử dụng');
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
@@ -151,8 +166,10 @@ class _SignUpViewState extends State<SignUpView> {
         _passwordController.text.trim(),
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
+
         phone: _phoneController.text.trim(),
         dateOfBirth: _dateOfBirthController.text.trim(),
+
       );
 
       if (result != null) {
@@ -304,6 +321,7 @@ class _SignUpViewState extends State<SignUpView> {
                 SizedBox(
                   height: media.width * 0.04,
                 ),
+
                 // Date of Birth field
                 GestureDetector(
                   onTap: _selectDateOfBirth,
@@ -327,6 +345,7 @@ class _SignUpViewState extends State<SignUpView> {
                       ),
                     ),
                   ),
+
                 ),
                 SizedBox(
                   height: media.width * 0.04,

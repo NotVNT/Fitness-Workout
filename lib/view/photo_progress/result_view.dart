@@ -1,18 +1,29 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:io';
+import '../../services/progress_photo_service.dart';
+
 
 import 'package:percent_indicator/percent_indicator.dart';
 
 import '../../common/colo_extension.dart';
-import '../../common/common.dart';
 import '../../common_widget/round_button.dart';
 import '../../l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 
 class ResultView extends StatefulWidget {
   final DateTime date1;
   final DateTime date2;
-  const ResultView({super.key, required this.date1, required this.date2});
+  final String? photo1Path;
+  final String? photo2Path;
+  const ResultView({
+    super.key,
+    required this.date1,
+    required this.date2,
+    this.photo1Path,
+    this.photo2Path,
+  });
 
   @override
   State<ResultView> createState() => _ResultViewState();
@@ -348,14 +359,14 @@ class _ResultViewState extends State<ResultView> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          dateToString(widget.date1, formatStr: "MMMM"),
+                          DateFormat('MMMM', Localizations.localeOf(context).languageCode).format(widget.date1),
                           style: TextStyle(
                               color: TColor.gray,
                               fontSize: 16,
                               fontWeight: FontWeight.w700),
                         ),
                         Text(
-                          dateToString(widget.date2, formatStr: "MMMM"),
+                          DateFormat('MMMM', Localizations.localeOf(context).languageCode).format(widget.date2),
                           style: TextStyle(
                               color: TColor.gray,
                               fontSize: 16,
@@ -400,11 +411,27 @@ class _ResultViewState extends State<ResultView> {
                                           child: ClipRRect(
                                             borderRadius:
                                                 BorderRadius.circular(20),
-                                            child: Image.asset(
-                                              iObj["month_1_image"].toString(),
-                                              width: double.maxFinite,
-                                              height: double.maxFinite,
-                                              fit: BoxFit.cover,
+                                            child: FutureBuilder<String?>(
+                                              future: widget.photo1Path != null
+                                                  ? Future.value(widget.photo1Path)
+                                                  : ProgressPhotoService.getLatestPhotoForMonth(widget.date1),
+                                              builder: (context, snap) {
+                                                final path = snap.data;
+                                                if (path != null && path.isNotEmpty) {
+                                                  return Image.file(
+                                                    File(path),
+                                                    width: double.maxFinite,
+                                                    height: double.maxFinite,
+                                                    fit: BoxFit.cover,
+                                                  );
+                                                }
+                                                return Image.asset(
+                                                  iObj["month_1_image"].toString(),
+                                                  width: double.maxFinite,
+                                                  height: double.maxFinite,
+                                                  fit: BoxFit.cover,
+                                                );
+                                              },
                                             ),
                                           ),
                                         ),
@@ -425,11 +452,27 @@ class _ResultViewState extends State<ResultView> {
                                           child: ClipRRect(
                                             borderRadius:
                                                 BorderRadius.circular(20),
-                                            child: Image.asset(
-                                              iObj["month_2_image"].toString(),
-                                              width: double.maxFinite,
-                                              height: double.maxFinite,
-                                              fit: BoxFit.cover,
+                                            child: FutureBuilder<String?>(
+                                              future: widget.photo2Path != null
+                                                  ? Future.value(widget.photo2Path)
+                                                  : ProgressPhotoService.getLatestPhotoForMonth(widget.date2),
+                                              builder: (context, snap) {
+                                                final path = snap.data;
+                                                if (path != null && path.isNotEmpty) {
+                                                  return Image.file(
+                                                    File(path),
+                                                    width: double.maxFinite,
+                                                    height: double.maxFinite,
+                                                    fit: BoxFit.cover,
+                                                  );
+                                                }
+                                                return Image.asset(
+                                                  iObj["month_2_image"].toString(),
+                                                  width: double.maxFinite,
+                                                  height: double.maxFinite,
+                                                  fit: BoxFit.cover,
+                                                );
+                                              },
                                             ),
                                           ),
                                         ),
@@ -569,14 +612,14 @@ class _ResultViewState extends State<ResultView> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          dateToString(widget.date1, formatStr: "MMMM"),
+                          DateFormat('MMMM', Localizations.localeOf(context).languageCode).format(widget.date1),
                           style: TextStyle(
                               color: TColor.gray,
                               fontSize: 16,
                               fontWeight: FontWeight.w700),
                         ),
                         Text(
-                          dateToString(widget.date2, formatStr: "MMMM"),
+                          DateFormat('MMMM', Localizations.localeOf(context).languageCode).format(widget.date2),
                           style: TextStyle(
                               color: TColor.gray,
                               fontSize: 16,

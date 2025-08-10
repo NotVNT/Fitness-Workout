@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../common/colo_extension.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/activity_log_service.dart';
 import 'activity_detail_view.dart';
 
 class ActivityHistoryView extends StatefulWidget {
@@ -12,44 +13,50 @@ class ActivityHistoryView extends StatefulWidget {
 }
 
 class _ActivityHistoryViewState extends State<ActivityHistoryView> {
-  int _selectedFilter = 0; // 0: All, 1: Workout, 2: Meal, 3: Sleep
+  int _selectedFilter = 0; // 0: All, 1: Notification, 2: Photo, 3: Settings
 
-  // Demo activity data; can be replaced with real user history later.
-  // date: yyyy-mm-dd for grouping.
-  final List<Map<String, dynamic>> _activities = [
-    {
-      'date': '2025-08-08',
-      'type': 'workout',
-      'title': 'Tập toàn thân',
-      'subtitle': '320 kcal • 25 phút',
-      'icon': Icons.fitness_center,
-      'kcal': 320,
-      'minutes': 25,
-    },
-    {
-      'date': '2025-08-08',
-      'type': 'meal',
-      'title': 'Bữa trưa lành mạnh',
-      'subtitle': 'Protein cao • 560 kcal',
-      'icon': Icons.restaurant,
-    },
-    {
-      'date': '2025-08-07',
-      'type': 'workout',
-      'title': 'Yoga phục hồi',
-      'subtitle': '120 kcal • 40 phút',
-      'icon': Icons.self_improvement,
-      'kcal': 120,
-      'minutes': 40,
-    },
-    {
-      'date': '2025-08-07',
-      'type': 'sleep',
-      'title': 'Giấc ngủ đêm',
-      'subtitle': '7 giờ 45 phút',
-      'icon': Icons.nightlight_round,
-    },
-  ];
+  // Data model to render (already mapped from raw logs)
+  List<Map<String, dynamic>> _activities = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLogs();
+  }
+
+  Future<void> _loadLogs() async {
+    final logs = await ActivityLogService.getAll();
+    if (!mounted) return;
+    setState(() {
+      _activities = logs.map<Map<String, dynamic>>((m) {
+        final ts = (m['ts'] as String?) ?? DateTime.now().toIso8601String();
+        final date = ts.substring(0, 10);
+        final type = (m['type'] as String?) ?? 'other';
+        final icon = _iconForType(type);
+        return {
+          'date': date,
+          'type': type,
+          'title': (m['title'] as String?) ?? '-',
+          'subtitle': (m['subtitle'] as String?) ?? '',
+          'icon': icon,
+          'ts': ts,
+        };
+      }).toList();
+    });
+  }
+
+  static IconData _iconForType(String t) {
+    switch (t) {
+      case 'notification':
+        return Icons.notifications_rounded;
+      case 'photo':
+        return Icons.photo_camera_rounded;
+      case 'settings':
+        return Icons.settings_rounded;
+      default:
+        return Icons.history_rounded;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,11 +66,11 @@ class _ActivityHistoryViewState extends State<ActivityHistoryView> {
     final filtered = _activities.where((a) {
       switch (_selectedFilter) {
         case 1:
-          return a['type'] == 'workout';
+          return a['type'] == 'notification';
         case 2:
-          return a['type'] == 'meal';
+          return a['type'] == 'photo';
         case 3:
-          return a['type'] == 'sleep';
+          return a['type'] == 'settings';
         default:
           return true;
       }
@@ -122,11 +129,8 @@ class _SummaryHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final workouts = activities.where((a) => a['type'] == 'workout');
-    final kcal =
-        workouts.fold<int>(0, (sum, a) => sum + (a['kcal'] as int? ?? 0));
-    final mins =
-        workouts.fold<int>(0, (sum, a) => sum + (a['minutes'] as int? ?? 0));
+    final photoCount = activities.where((a) => a['type'] == 'photo').length;
+    final notiCount = activities.where((a) => a['type'] == 'notification').length;
 
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 16, 20, 0),
@@ -146,23 +150,23 @@ class _SummaryHeader extends StatelessWidget {
         children: [
           Expanded(
             child: _SummaryItem(
-              icon: Icons.local_fire_department_rounded,
-              label: 'Kcal',
-              value: kcal.toString(),
-            ),
-          ),
-          Expanded(
-            child: _SummaryItem(
-              icon: Icons.timer_rounded,
-              label: 'Phút',
-              value: mins.toString(),
-            ),
-          ),
-          Expanded(
-            child: _SummaryItem(
               icon: Icons.event_available_rounded,
               label: 'Hoạt động',
               value: activities.length.toString(),
+            ),
+          ),
+          Expanded(
+            child: _SummaryItem(
+              icon: Icons.photo_library_rounded,
+              label: 'Ảnh',
+              value: photoCount.toString(),
+            ),
+          ),
+          Expanded(
+            child: _SummaryItem(
+              icon: Icons.notifications_rounded,
+              label: 'Thông báo',
+              value: notiCount.toString(),
             ),
           ),
         ],
@@ -250,9 +254,9 @@ class _FilterChips extends StatelessWidget {
         child: Row(
           children: [
             chip('Tất cả', 0),
-            chip('Tập luyện', 1),
-            chip('Bữa ăn', 2),
-            chip('Giấc ngủ', 3),
+            chip('Thông báo', 1),
+            chip('Ảnh', 2),
+            chip('Cài đặt', 3),
           ],
         ),
       ),
@@ -296,11 +300,11 @@ class _HistoryItem extends StatelessWidget {
 
   Color _typeColor() {
     switch (a['type']) {
-      case 'workout':
-        return TColor.primaryColor1;
-      case 'meal':
-        return TColor.secondaryColor1;
-      case 'sleep':
+      case 'notification':
+        return Colors.orange;
+      case 'photo':
+        return Colors.purple;
+      case 'settings':
         return Colors.indigo;
       default:
         return TColor.gray;

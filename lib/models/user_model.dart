@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class UserModel {
   final String id;
@@ -96,14 +97,20 @@ class UserModel {
   int get age {
     if (dateOfBirth.isEmpty) return 0;
     try {
-      DateTime birthDate = DateTime.parse(dateOfBirth);
-      DateTime now = DateTime.now();
-      int age = now.year - birthDate.year;
+      // dateOfBirth can be stored as 'dd/MM/yyyy' (from UI) or ISO-8601
+      DateTime birthDate;
+      if (dateOfBirth.contains('/')) {
+        birthDate = DateFormat('dd/MM/yyyy').parse(dateOfBirth);
+      } else {
+        birthDate = DateTime.parse(dateOfBirth);
+      }
+      final now = DateTime.now();
+      int years = now.year - birthDate.year;
       if (now.month < birthDate.month ||
           (now.month == birthDate.month && now.day < birthDate.day)) {
-        age--;
+        years--;
       }
-      return age;
+      return years;
     } catch (e) {
       return 0;
     }

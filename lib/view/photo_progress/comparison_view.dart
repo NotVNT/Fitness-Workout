@@ -3,9 +3,12 @@ import 'package:fitness/common_widget/round_button.dart';
 import 'package:fitness/view/photo_progress/result_view.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'dart:io';
 
 import '../../common/colo_extension.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/progress_photo_service.dart';
+import '../../services/activity_log_service.dart';
 
 class ComparisonView extends StatefulWidget {
   const ComparisonView({super.key});
@@ -15,54 +18,109 @@ class ComparisonView extends StatefulWidget {
 }
 
 class _ComparisonViewState extends State<ComparisonView> {
-  DateTime? _month1 = DateTime.now();
-  DateTime? _month2;
+  Map<String, dynamic>? _photo1; // {date: DateTime, path: String}
+  Map<String, dynamic>? _photo2;
+  List<Map<String, dynamic>> _all = [];
 
-  String _fmtMonth(DateTime? d) {
+  String _fmtPhotoLabel(Map<String, dynamic>? p) {
+    if (p == null) return 'Chọn ảnh';
+    final d = p['date'] as DateTime?;
     final locale = Localizations.localeOf(context).languageCode;
-    if (d == null) return AppLocalizations.of(context)?.selectMonth ?? 'Select Month';
-    return DateFormat('MMMM', locale).format(d);
+    if (d == null) return 'Đã chọn';
+    return DateFormat('dd/MM/yyyy', locale).format(d);
   }
 
-  Future<void> _pickMonth({required int which}) async {
-    final now = DateTime.now();
-    final initial = (which == 1 ? _month1 : _month2) ?? now;
-    final DateTime? picked = await showDatePicker(
+  Future<void> _ensureLoaded() async {
+    if (_all.isNotEmpty) return;
+    final recs = await ProgressPhotoService.getAllRecords();
+    _all = recs.map((m) {
+      final d = DateTime.tryParse(m['date'] as String);
+      return {
+        'date': d,
+        'path': m['path'] as String,
+      };
+    }).where((m) => m['date'] != null).cast<Map<String, dynamic>>().toList()
+      ..sort((a, b) => (b['date'] as DateTime).compareTo(a['date'] as DateTime));
+  }
+
+  Future<void> _pickPhoto({required int which}) async {
+    await _ensureLoaded();
+    if (!mounted) return;
+    await showModalBottomSheet(
       context: context,
-      initialDate: initial,
-      firstDate: DateTime(now.year - 5, 1, 1),
-      lastDate: DateTime(now.year + 1, 12, 31),
-      helpText: AppLocalizations.of(context)?.selectMonthHelp ?? 'Select month',
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: _all.isEmpty
+              ? const Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Text('Chưa có ảnh nào. Hãy chụp ảnh trước.'),
+                )
+              : GridView.builder(
+                  padding: const EdgeInsets.all(12),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3, crossAxisSpacing: 8, mainAxisSpacing: 8),
+                  itemCount: _all.length,
+                  itemBuilder: (_, i) {
+                    final p = _all[i];
+                    return InkWell(
+                      onTap: () {
+                        setState(() {
+                          if (which == 1) {
+                            _photo1 = p;
+                          } else {
+                            _photo2 = p;
+                          }
+                        });
+                        Navigator.pop(ctx);
+                      },
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.file(
+                          File(p['path'] as String),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+        );
+      },
     );
-
-    if (picked != null) {
-      setState(() {
-        final monthOnly = DateTime(picked.year, picked.month, 1);
-        if (which == 1) {
-          _month1 = monthOnly;
-        } else {
-          _month2 = monthOnly;
-        }
-      });
-    }
   }
 
-  void _onCompare() {
-    if (_month1 == null || _month2 == null) {
+  Future<void> _onCompare() async {
+    if (_photo1 == null || _photo2 == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)?.pleaseSelectTwoMonths ?? 'Please select two months to compare.'),
-        ),
+        const SnackBar(content: Text('Vui lòng chọn đủ 2 ảnh.')),
+      );
+      return;
+    }
+    if (_photo1!['path'] == _photo2!['path']) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng chọn 2 ảnh khác nhau.')),
       );
       return;
     }
 
+    final d1 = (_photo1!['date'] as DateTime);
+    final d2 = (_photo2!['date'] as DateTime);
+
+    if (!mounted) return;
+    // Log user action
+    await ActivityLogService.logPhotosCompared(_photo1!['path'] as String, _photo2!['path'] as String);
+
+    if (!mounted) return;
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => ResultView(
-          date1: _month1!,
-          date2: _month2!,
+          date1: DateTime(d1.year, d1.month, 1),
+          date2: DateTime(d2.year, d2.month, 1),
+          photo1Path: _photo1!['path'] as String,
+          photo2Path: _photo2!['path'] as String,
         ),
       ),
     );
@@ -128,18 +186,18 @@ class _ComparisonViewState extends State<ComparisonView> {
           children: [
             IconTitleNextRow(
                 icon: "assets/img/date.png",
-                title: AppLocalizations.of(context)?.selectMonth1 ?? "Select Month 1",
-                time: _fmtMonth(_month1),
-                onPressed: () => _pickMonth(which: 1),
+                title: 'Chọn ảnh 1',
+                time: _fmtPhotoLabel(_photo1),
+                onPressed: () => _pickPhoto(which: 1),
                 color: TColor.lightGray),
             const SizedBox(
               height: 15,
             ),
             IconTitleNextRow(
                 icon: "assets/img/date.png",
-                title: AppLocalizations.of(context)?.selectMonth2 ?? "Select Month 2",
-                time: _fmtMonth(_month2),
-                onPressed: () => _pickMonth(which: 2),
+                title: 'Chọn ảnh 2',
+                time: _fmtPhotoLabel(_photo2),
+                onPressed: () => _pickPhoto(which: 2),
                 color: TColor.lightGray),
             const Spacer(),
             RoundButton(
