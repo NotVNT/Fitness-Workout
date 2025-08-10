@@ -16,10 +16,83 @@ class _SignUpViewState extends State<SignUpView> {
   final AuthService _authService = AuthService();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _dateOfBirthController = TextEditingController();
+  DateTime? _selectedDate;
   bool _isLoading = false;
+
+  // Kiểm tra mật khẩu mạnh
+  bool _isPasswordStrong(String password) {
+    if (password.length < 8) return false;
+
+    // Kiểm tra có chữ hoa
+    if (!password.contains(RegExp(r'[A-Z]'))) return false;
+
+    // Kiểm tra có chữ thường
+    if (!password.contains(RegExp(r'[a-z]'))) return false;
+
+    // Kiểm tra có số
+    if (!password.contains(RegExp(r'[0-9]'))) return false;
+
+    return true;
+  }
+
+  // Lấy thông báo lỗi mật khẩu
+  String _getPasswordErrorMessage(String password) {
+    List<String> errors = [];
+
+    if (password.length < 8) {
+      errors.add('ít nhất 8 ký tự');
+    }
+    if (!password.contains(RegExp(r'[A-Z]'))) {
+      errors.add('ít nhất 1 chữ hoa');
+    }
+    if (!password.contains(RegExp(r'[a-z]'))) {
+      errors.add('ít nhất 1 chữ thường');
+    }
+    if (!password.contains(RegExp(r'[0-9]'))) {
+      errors.add('ít nhất 1 số');
+    }
+
+    return 'Mật khẩu phải có: ${errors.join(', ')}';
+  }
+
+  // Method để chọn ngày sinh
+  Future<void> _selectDateOfBirth() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime(2000, 1, 1),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now()
+          .subtract(const Duration(days: 365 * 13)), // Tối thiểu 13 tuổi
+      locale: const Locale('vi', 'VN'),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: TColor.primaryColor1,
+              onPrimary: TColor.white,
+              surface: TColor.white,
+              onSurface: TColor.black,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+        _dateOfBirthController.text =
+            "${picked.day.toString().padLeft(2, '0')}/${picked.month.toString().padLeft(2, '0')}/${picked.year}";
+      });
+    }
+  }
 
   Future<void> _signUp() async {
     // Validation
@@ -39,8 +112,20 @@ class _SignUpViewState extends State<SignUpView> {
       _showErrorMessage('Vui lòng nhập mật khẩu');
       return;
     }
-    if (_passwordController.text.length < 6) {
-      _showErrorMessage('Mật khẩu phải có ít nhất 6 ký tự');
+    if (!_isPasswordStrong(_passwordController.text)) {
+      _showErrorMessage(_getPasswordErrorMessage(_passwordController.text));
+      return;
+    }
+    if (_confirmPasswordController.text.trim().isEmpty) {
+      _showErrorMessage('Vui lòng xác nhận mật khẩu');
+      return;
+    }
+    if (_passwordController.text != _confirmPasswordController.text) {
+      _showErrorMessage('Mật khẩu xác nhận không khớp');
+      return;
+    }
+    if (_selectedDate == null) {
+      _showErrorMessage('Vui lòng chọn ngày sinh');
       return;
     }
 
@@ -66,6 +151,8 @@ class _SignUpViewState extends State<SignUpView> {
         _passwordController.text.trim(),
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
+        phone: _phoneController.text.trim(),
+        dateOfBirth: _dateOfBirthController.text.trim(),
       );
 
       if (result != null) {
@@ -162,6 +249,8 @@ class _SignUpViewState extends State<SignUpView> {
 
   bool isCheck = false;
   bool _isPasswordVisible = false; // Thêm biến để quản lý hiện/ẩn mật khẩu
+  bool _isConfirmPasswordVisible =
+      false; // Thêm biến để quản lý hiện/ẩn mật khẩu xác nhận
 
   @override
   Widget build(BuildContext context) {
@@ -215,6 +304,33 @@ class _SignUpViewState extends State<SignUpView> {
                 SizedBox(
                   height: media.width * 0.04,
                 ),
+                // Date of Birth field
+                GestureDetector(
+                  onTap: _selectDateOfBirth,
+                  child: AbsorbPointer(
+                    child: RoundTextField(
+                      hitText: "Ngày sinh (dd/mm/yyyy)",
+                      icon: "assets/img/date.png",
+                      controller: _dateOfBirthController,
+                      rigtIcon: TextButton(
+                        onPressed: _selectDateOfBirth,
+                        child: Container(
+                          alignment: Alignment.center,
+                          width: 20,
+                          height: 20,
+                          child: Icon(
+                            Icons.calendar_today,
+                            color: TColor.gray,
+                            size: 20,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: media.width * 0.04,
+                ),
                 RoundTextField(
                   hitText: "Email",
                   icon: "assets/img/email.png",
@@ -241,6 +357,33 @@ class _SignUpViewState extends State<SignUpView> {
                           height: 20,
                           child: Icon(
                             _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: TColor.gray,
+                            size: 20,
+                          ))),
+                ),
+                SizedBox(
+                  height: media.width * 0.04,
+                ),
+                RoundTextField(
+                  hitText: "Xác nhận mật khẩu",
+                  icon: "assets/img/lock.png",
+                  obscureText: !_isConfirmPasswordVisible,
+                  controller: _confirmPasswordController,
+                  rigtIcon: TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _isConfirmPasswordVisible =
+                              !_isConfirmPasswordVisible;
+                        });
+                      },
+                      child: Container(
+                          alignment: Alignment.center,
+                          width: 20,
+                          height: 20,
+                          child: Icon(
+                            _isConfirmPasswordVisible
                                 ? Icons.visibility
                                 : Icons.visibility_off,
                             color: TColor.gray,
@@ -285,78 +428,6 @@ class _SignUpViewState extends State<SignUpView> {
                 SizedBox(
                   height: media.width * 0.04,
                 ),
-                Row(
-                  // crossAxisAlignment: CrossAxisAlignment.,
-                  children: [
-                    Expanded(
-                        child: Container(
-                      height: 1,
-                      color: TColor.gray.withOpacity(0.5),
-                    )),
-                    Text(
-                      "  Hoặc  ",
-                      style: TextStyle(color: TColor.black, fontSize: 12),
-                    ),
-                    Expanded(
-                        child: Container(
-                      height: 1,
-                      color: TColor.gray.withOpacity(0.5),
-                    )),
-                  ],
-                ),
-                SizedBox(
-                  height: media.width * 0.04,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: TColor.white,
-                          border: Border.all(
-                            width: 1,
-                            color: TColor.gray.withOpacity(0.4),
-                          ),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Image.asset(
-                          "assets/img/google.png",
-                          width: 20,
-                          height: 20,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: media.width * 0.04,
-                    ),
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: TColor.white,
-                          border: Border.all(
-                            width: 1,
-                            color: TColor.gray.withOpacity(0.4),
-                          ),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Image.asset(
-                          "assets/img/facebook.png",
-                          width: 20,
-                          height: 20,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
                 SizedBox(
                   height: media.width * 0.04,
                 ),
@@ -396,5 +467,17 @@ class _SignUpViewState extends State<SignUpView> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _phoneController.dispose();
+    _dateOfBirthController.dispose();
+    super.dispose();
   }
 }

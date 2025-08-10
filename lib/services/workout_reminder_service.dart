@@ -15,8 +15,22 @@ class WorkoutReminderService {
     final prefs = await SharedPreferences.getInstance();
     final str = prefs.getString(_key);
     if (str == null) return null;
-    final map = json.decode(str) as Map<String, dynamic>;
-    return (h: (map['h'] as num).toInt(), m: (map['m'] as num).toInt());
+
+    try {
+      final map = json.decode(str) as Map<String, dynamic>;
+      final h = map['h'];
+      final m = map['m'];
+
+      // Handle missing fields gracefully
+      if (h == null && m == null) return null;
+
+      return (
+        h: h != null ? (h as num).toInt() : 0,
+        m: m != null ? (m as num).toInt() : 0,
+      );
+    } catch (e) {
+      // Return null if JSON parsing fails
+      return null;
+    }
   }
 }
-

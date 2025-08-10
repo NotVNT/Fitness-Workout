@@ -45,7 +45,6 @@ class _LoginViewState extends State<LoginView> {
       );
 
       if (result != null) {
-
         // Đăng nhập thành công: nếu user đã có đủ BMI (height, weight, targetWeight) thì vào thẳng Main.
         // Nếu thiếu, dẫn qua flow nhập BMI.
         final userProvider = Provider.of<UserProvider>(context, listen: false);
@@ -55,7 +54,9 @@ class _LoginViewState extends State<LoginView> {
         if (!mounted) return;
 
         final u = userProvider.user;
-        final hasBMI = (u?.height ?? 0) > 0 && (u?.weight ?? 0) > 0 && (u?.targetWeight ?? 0) > 0;
+        final hasBMI = (u?.height ?? 0) > 0 &&
+            (u?.weight ?? 0) > 0 &&
+            (u?.targetWeight ?? 0) > 0;
 
         if (hasBMI) {
           navigator.pushReplacementNamed('/main');
@@ -294,81 +295,6 @@ class _LoginViewState extends State<LoginView> {
                 RoundButton(
                     title: _isLoading ? "Đang đăng nhập..." : "Đăng nhập",
                     onPressed: _isLoading ? () {} : () => _signIn()),
-                SizedBox(
-                  height: media.width * 0.04,
-                ),
-                Row(
-                  // crossAxisAlignment: CrossAxisAlignment.,
-                  children: [
-                    Expanded(
-                        child: Container(
-                      height: 1,
-                      color: TColor.gray.withOpacity(0.5),
-                    )),
-                    Text(
-                      "  Hoặc  ",
-                      style: TextStyle(color: TColor.black, fontSize: 12),
-                    ),
-                    Expanded(
-                        child: Container(
-                      height: 1,
-                      color: TColor.gray.withOpacity(0.5),
-                    )),
-                  ],
-                ),
-                SizedBox(
-                  height: media.width * 0.04,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: TColor.white,
-                          border: Border.all(
-                            width: 1,
-                            color: TColor.gray.withOpacity(0.4),
-                          ),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Image.asset(
-                          "assets/img/google.png",
-                          width: 20,
-                          height: 20,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: media.width * 0.04,
-                    ),
-                    GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: TColor.white,
-                          border: Border.all(
-                            width: 1,
-                            color: TColor.gray.withOpacity(0.4),
-                          ),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Image.asset(
-                          "assets/img/facebook.png",
-                          width: 20,
-                          height: 20,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
                 SizedBox(
                   height: media.width * 0.04,
                 ),
