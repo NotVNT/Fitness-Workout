@@ -6,7 +6,11 @@ import '../../l10n/app_localizations.dart';
 import '../../models/user_model.dart';
 import '../../services/auth_service.dart';
 
+
+import '../../services/firestore_service.dart';
+
 import 'widgets/editable_info_tile.dart';
+
 
 class PersonalDataView extends StatefulWidget {
   const PersonalDataView({super.key});
@@ -63,6 +67,13 @@ class _PersonalDataViewState extends State<PersonalDataView> {
               user?.dateOfBirth.isNotEmpty == true ? user!.dateOfBirth : '--';
           String gender = user?.gender.isNotEmpty == true ? user!.gender : '--';
 
+          String goal = user?.goal.isNotEmpty == true ? user!.goal : '--';
+          String phone = (userData != null &&
+                  (userData['phone']?.toString().isNotEmpty == true))
+              ? userData['phone']
+              : '--';
+
+
 
           return Stack(
             children: [
@@ -113,6 +124,24 @@ class _PersonalDataViewState extends State<PersonalDataView> {
                               value: email,
                             ),
                             const Divider(height: 1),
+
+                            _InfoTile(
+                              icon: Icons.cake_outlined,
+                              label: 'Date of birth',
+                              value: dob,
+                            ),
+                            const Divider(height: 1),
+                            _InfoTile(
+                              icon: Icons.wc_outlined,
+                              label: 'Gender',
+                              value: gender,
+                            ),
+                            const Divider(height: 1),
+                            _InfoTile(
+                              icon: Icons.flag_outlined,
+                              label: 'Goal',
+                              value: goal,
+
                             // Ngày sinh (Việt hóa)
                             EditableInfoTile(
                               icon: Icons.cake_outlined,
@@ -137,6 +166,7 @@ class _PersonalDataViewState extends State<PersonalDataView> {
                               value: userData?['phone'] ?? '--',
                               fieldKey: 'phone',
                               keyboardType: TextInputType.phone,
+
                             ),
                           ],
                         ),
