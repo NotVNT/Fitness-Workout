@@ -10,6 +10,8 @@ class RoundTextField extends StatelessWidget {
   final Widget? rigtIcon;
   final bool obscureText;
   final EdgeInsets? margin;
+  final bool readOnly;
+  final VoidCallback? onTap;
 
   const RoundTextField({
     Key? key,
@@ -20,6 +22,8 @@ class RoundTextField extends StatelessWidget {
     this.obscureText = false,
     this.margin = const EdgeInsets.symmetric(vertical: 10),
     this.rigtIcon,
+    this.readOnly = false,
+    this.onTap,
   }) : super(key: key);
 
   @override
@@ -34,6 +38,8 @@ class RoundTextField extends StatelessWidget {
         controller: controller,
         keyboardType: keyboardType,
         obscureText: obscureText,
+        readOnly: readOnly,
+        onTap: onTap,
         // Quan trọng: Hỗ trợ tiếng Việt có dấu
         enableIMEPersonalizedLearning: true,
         autocorrect: false, // Tắt autocorrect để không can thiệp vào dấu

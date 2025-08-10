@@ -4,6 +4,7 @@ import 'package:fitness/common_widget/round_textfield.dart';
 import 'package:fitness/view/login/login_view.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness/services/auth_service.dart';
+import 'package:intl/intl.dart';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});
@@ -19,7 +20,25 @@ class _SignUpViewState extends State<SignUpView> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _dobController = TextEditingController();
   bool _isLoading = false;
+
+  Future<void> _pickDob() async {
+    final DateTime now = DateTime.now();
+    final DateTime initial = DateTime(now.year - 20, now.month, now.day);
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: initial,
+      firstDate: DateTime(1900, 1, 1),
+      lastDate: now,
+      locale: const Locale('vi', 'VN'),
+      helpText: 'Chọn ngày sinh',
+    );
+    if (picked != null) {
+      _dobController.text = DateFormat('dd/MM/yyyy').format(picked);
+      setState(() {});
+    }
+  }
 
   Future<void> _signUp() async {
     // Validation
@@ -56,6 +75,18 @@ class _SignUpViewState extends State<SignUpView> {
       return;
     }
 
+    // Yêu cầu bắt buộc: ngày sinh
+    if (_dobController.text.trim().isEmpty) {
+      _showErrorMessage('Vui lòng chọn ngày sinh');
+      return;
+    }
+
+    // Yêu cầu phải đồng ý với chính sách bảo mật
+    if (!isCheck) {
+      _showErrorMessage('Vui lòng đồng ý với Chính sách bảo mật và Điều khoản sử dụng');
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
@@ -66,6 +97,8 @@ class _SignUpViewState extends State<SignUpView> {
         _passwordController.text.trim(),
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
+        phone: phone,
+        dateOfBirth: _dobController.text.trim(),
       );
 
       if (result != null) {
@@ -211,6 +244,18 @@ class _SignUpViewState extends State<SignUpView> {
                   icon: "assets/img/p_contact.png",
                   keyboardType: TextInputType.phone,
                   controller: _phoneController,
+                ),
+                SizedBox(
+                  height: media.width * 0.04,
+                ),
+                // Date of Birth
+                RoundTextField(
+                  hitText: "Chọn ngày sinh",
+                  icon: "assets/img/date.png",
+                  controller: _dobController,
+                  readOnly: true,
+                  onTap: _pickDob,
+                  rigtIcon: const Icon(Icons.calendar_today, size: 20, color: Colors.grey),
                 ),
                 SizedBox(
                   height: media.width * 0.04,
