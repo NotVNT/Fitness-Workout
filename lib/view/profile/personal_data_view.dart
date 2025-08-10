@@ -120,14 +120,14 @@ class _PersonalDataViewState extends State<PersonalDataView> {
                             const Divider(height: 1),
                             _InfoTile(
                               icon: Icons.flag_outlined,
-                              label: 'Mục tiêu giảm cân',
+                              label: (Localizations.localeOf(context).languageCode == 'en') ? 'Target weight' : 'Mục tiêu giảm cân',
                               value: targetWeight,
                             ),
                             const Divider(height: 1),
                             // Ngày sinh với date picker
                             DatePickerTile(
                               icon: Icons.cake_outlined,
-                              label: 'Ngày sinh',
+                              label: (Localizations.localeOf(context).languageCode == 'en') ? 'Date of birth' : 'Ngày sinh',
                               value: dob,
                               fieldKey: 'dateOfBirth',
                             ),
@@ -135,7 +135,7 @@ class _PersonalDataViewState extends State<PersonalDataView> {
                             // Giới tính với dropdown
                             GenderDropdownTile(
                               icon: Icons.wc_outlined,
-                              label: 'Giới tính',
+                              label: (Localizations.localeOf(context).languageCode == 'en') ? 'Gender' : 'Giới tính',
                               value: gender,
                               fieldKey: 'gender',
                             ),
@@ -143,7 +143,7 @@ class _PersonalDataViewState extends State<PersonalDataView> {
                             // Số điện thoại
                             EditableInfoTile(
                               icon: Icons.phone_outlined,
-                              label: 'Số điện thoại',
+                              label: (Localizations.localeOf(context).languageCode == 'en') ? 'Phone number' : 'Số điện thoại',
                               value: phone,
                               fieldKey: 'phone',
                               keyboardType: TextInputType.phone,

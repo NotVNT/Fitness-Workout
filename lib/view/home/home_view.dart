@@ -63,7 +63,7 @@ class _HomeViewState extends State<HomeView> {
       setState(() {
         lastWorkoutArr = recents.map((w) {
           return {
-            "name": _cleanTitle(w.name),
+            "name": _localizeWorkoutName(_cleanTitle(w.name)),
             "image": _iconFromType(w.workoutType),
             "kcal": (w.caloriesBurned ?? 0).toString(),
             "time": (w.duration ?? _estimateDurationFromExercises(w)).toString(),
@@ -205,6 +205,17 @@ class _HomeViewState extends State<HomeView> {
   String _cleanTitle(String title) {
     return title.replaceAll(RegExp(r"\s*-?\s*Thứ\s*[A-Za-zÀ-ỹ]+", caseSensitive: false), '').trim();
   }
+  String _localizeWorkoutName(String title) {
+    // Convert Vietnamese 'Ngày <n>' to English 'Day <n>' when locale is EN
+    if (Localizations.localeOf(context).languageCode == 'en') {
+      final match = RegExp(r'^Ngày\s*(\d+)').firstMatch(title);
+      if (match != null) {
+        return 'Day ${match.group(1)}';
+      }
+    }
+    return title;
+  }
+
 
 
 
@@ -330,7 +341,23 @@ class _HomeViewState extends State<HomeView> {
                                         fontWeight: FontWeight.w700),
                                   ),
                                   Text(
-                                    userProvider.getBMIStatusMessage(),
+                                    (() {
+                                      final loc = AppLocalizations.of(context);
+                                      final u = userProvider;
+                                      if (u.user == null || u.user!.weight <= 0 || u.user!.height <= 0) {
+                                        return loc?.noBMIData ?? 'No BMI data available';
+                                      }
+                                      final bmiValue = u.bmi;
+                                      if (bmiValue < 18.5) {
+                                        return loc?.youAreUnderweight ?? 'You are underweight';
+                                      } else if (bmiValue < 25) {
+                                        return loc?.youHaveNormalWeight ?? 'You have a normal weight';
+                                      } else if (bmiValue < 30) {
+                                        return loc?.youAreOverweight ?? 'You are overweight';
+                                      } else {
+                                        return loc?.youAreObese ?? 'You are obese';
+                                      }
+                                    })(),
                                     style: TextStyle(
                                         color:
                                             TColor.white.withValues(alpha: 0.7),
@@ -488,7 +515,9 @@ class _HomeViewState extends State<HomeView> {
                             ),
                             const SizedBox(height: 5),
                             Text(
-                              "Uống đủ nước giúp cơ thể khỏe mạnh và tăng cường trao đổi chất",
+                              (Localizations.localeOf(context).languageCode == 'en')
+                                  ? 'Drinking enough water helps keep you healthy and boosts metabolism'
+                                  : 'Uống đủ nước giúp cơ thể khỏe mạnh và tăng cường trao đổi chất',
                               style: TextStyle(
                                 color: TColor.gray,
                                 fontSize: 11,
@@ -552,7 +581,9 @@ class _HomeViewState extends State<HomeView> {
                                         0, 0, bounds.width, bounds.height));
                               },
                               child: Text(
-                                "8 tiếng/ngày",
+                                (Localizations.localeOf(context).languageCode == 'en')
+                                    ? '8 hours/day'
+                                    : '8 tiếng/ngày',
                                 style: TextStyle(
                                     color: TColor.white.withValues(alpha: 0.7),
                                     fontWeight: FontWeight.w700,
@@ -561,7 +592,9 @@ class _HomeViewState extends State<HomeView> {
                             ),
                             const SizedBox(height: 5),
                             Text(
-                              "Ngủ đủ giấc giúp cơ thể phục hồi và tăng cường sức khỏe tinh thần",
+                              (Localizations.localeOf(context).languageCode == 'en')
+                                  ? 'Getting enough sleep helps your body recover and improves mental health'
+                                  : 'Ngủ đủ giấc giúp cơ thể phục hồi và tăng cường sức khỏe tinh thần',
                               style: TextStyle(
                                 color: TColor.gray,
                                 fontSize: 11,
@@ -620,7 +653,9 @@ class _HomeViewState extends State<HomeView> {
                                             0, 0, bounds.width, bounds.height));
                                   },
                                   child: Text(
-                                    "Đã giảm được $_caloriesBurnedToday calories",
+                                    (Localizations.localeOf(context).languageCode == 'en')
+                                        ? 'Burned $_caloriesBurnedToday calories'
+                                        : 'Đã giảm được $_caloriesBurnedToday calories',
                                     style: TextStyle(
                                         color: TColor.white.withValues(alpha: 0.9),
                                         fontWeight: FontWeight.w700,
@@ -702,14 +737,17 @@ class _HomeViewState extends State<HomeView> {
                         ),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton(
-                            value: 'Tuần',
-                            items: const [
-                              DropdownMenuItem(value: 'Tuần', child: Text('Tuần')),
+                            value: AppLocalizations.of(context)?.weekly ?? 'Weekly',
+                            items: [
+                              DropdownMenuItem(
+                                value: AppLocalizations.of(context)?.weekly ?? 'Weekly',
+                                child: Text(AppLocalizations.of(context)?.weekly ?? 'Weekly'),
+                              ),
                             ],
                             onChanged: null,
                             icon: Icon(Icons.expand_more, color: TColor.white),
                             hint: Text(
-                              "Tuần",
+                              AppLocalizations.of(context)?.weekly ?? 'Weekly',
                               textAlign: TextAlign.center,
                               style: TextStyle(color: TColor.white, fontSize: 12),
                             ),
@@ -730,14 +768,24 @@ class _HomeViewState extends State<HomeView> {
                         shape: BoxShape.circle,
                       )),
                       const SizedBox(width: 6),
-                      const Text('Thực tế', style: TextStyle(fontSize: 12)),
+                      Text(
+                        Localizations.localeOf(context).languageCode == 'en'
+                            ? 'Actual'
+                            : 'Thực tế',
+                        style: const TextStyle(fontSize: 12),
+                      ),
                       const SizedBox(width: 16),
                       Container(width: 16, height: 10, alignment: Alignment.center,
                         child: Container(height: 2, width: 16, decoration: BoxDecoration(
                           color: TColor.secondaryColor1, borderRadius: BorderRadius.circular(2),
                         ))),
                       const SizedBox(width: 6),
-                      const Text('Kế hoạch', style: TextStyle(fontSize: 12)),
+                      Text(
+                        Localizations.localeOf(context).languageCode == 'en'
+                            ? 'Planned'
+                            : 'Kế hoạch',
+                        style: const TextStyle(fontSize: 12),
+                      ),
                     ],
                   ),
                 ),

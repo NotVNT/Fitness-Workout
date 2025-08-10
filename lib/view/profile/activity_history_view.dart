@@ -151,21 +151,21 @@ class _SummaryHeader extends StatelessWidget {
           Expanded(
             child: _SummaryItem(
               icon: Icons.event_available_rounded,
-              label: 'Hoạt động',
+              label: (Localizations.localeOf(context).languageCode == 'en') ? 'Activities' : 'Hoạt động',
               value: activities.length.toString(),
             ),
           ),
           Expanded(
             child: _SummaryItem(
               icon: Icons.photo_library_rounded,
-              label: 'Ảnh',
+              label: (Localizations.localeOf(context).languageCode == 'en') ? 'Photos' : 'Ảnh',
               value: photoCount.toString(),
             ),
           ),
           Expanded(
             child: _SummaryItem(
               icon: Icons.notifications_rounded,
-              label: 'Thông báo',
+              label: (Localizations.localeOf(context).languageCode == 'en') ? 'Notifications' : 'Thông báo',
               value: notiCount.toString(),
             ),
           ),
@@ -253,10 +253,10 @@ class _FilterChips extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            chip('Tất cả', 0),
-            chip('Thông báo', 1),
-            chip('Ảnh', 2),
-            chip('Cài đặt', 3),
+            chip(Localizations.localeOf(context).languageCode == 'en' ? 'All' : 'Tất cả', 0),
+            chip(Localizations.localeOf(context).languageCode == 'en' ? 'Notifications' : 'Thông báo', 1),
+            chip(Localizations.localeOf(context).languageCode == 'en' ? 'Photos' : 'Ảnh', 2),
+            chip(Localizations.localeOf(context).languageCode == 'en' ? 'Settings' : 'Cài đặt', 3),
           ],
         ),
       ),

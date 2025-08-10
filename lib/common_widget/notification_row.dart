@@ -58,7 +58,7 @@ class NotificationRow extends StatelessWidget {
                       children: [
                         ListTile(
                           leading: const Icon(Icons.delete_outline),
-                          title: const Text('Xóa thông báo này'),
+                          title: Text(Localizations.localeOf(context).languageCode == 'en' ? 'Delete this notification' : 'Xóa thông báo này'),
                           onTap: () {
                             Navigator.pop(ctx);
                             onDelete?.call();
@@ -66,7 +66,7 @@ class NotificationRow extends StatelessWidget {
                         ),
                         ListTile(
                           leading: const Icon(Icons.close),
-                          title: const Text('Đóng'),
+                          title: Text(Localizations.localeOf(context).languageCode == 'en' ? 'Close' : 'Đóng'),
                           onTap: () => Navigator.pop(ctx),
                         ),
                       ],
