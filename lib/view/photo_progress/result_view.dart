@@ -1,10 +1,14 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
 import 'package:percent_indicator/percent_indicator.dart';
 
 import '../../common/colo_extension.dart';
 import '../../common/common.dart';
 import '../../common_widget/round_button.dart';
+import '../../l10n/app_localizations.dart';
+
 
 class ResultView extends StatefulWidget {
   final DateTime date1;
@@ -13,29 +17,105 @@ class ResultView extends StatefulWidget {
 
   @override
   State<ResultView> createState() => _ResultViewState();
+
 }
 
 class _ResultViewState extends State<ResultView> {
   int selectButton = 0;
+  String _localizedTitle(String key) {
+    final l10n = AppLocalizations.of(context);
+    switch (key) {
+      case 'frontFacing':
+        return l10n?.frontFacing ?? 'Front Facing';
+      case 'backFacing':
+        return l10n?.backFacing ?? 'Back Facing';
+      case 'leftFacing':
+        return l10n?.leftFacing ?? 'Left Facing';
+      case 'rightFacing':
+        return l10n?.rightFacing ?? 'Right Facing';
+      default:
+        return key;
+    }
+  }
+
+  void _onShareTap() {
+    final l10n = AppLocalizations.of(context);
+    const progress = 62; // demo theo UI
+    final summary = '${l10n?.result ?? 'Result'} • '
+        '${l10n?.averageProgress ?? 'Average Progress'}: $progress%';
+
+    Clipboard.setData(ClipboardData(text: summary));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Đã sao chép nội dung để chia sẻ')),
+    );
+  }
+
+  void _onMoreTap() {
+    final l10n = AppLocalizations.of(context);
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.share),
+              title: Text(l10n?.gallery ?? 'Chia sẻ kết quả'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _onShareTap();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.close),
+              title: const Text('Đóng'),
+              onTap: () => Navigator.pop(ctx),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _localizedStatTitle(String key) {
+    final l10n = AppLocalizations.of(context);
+    switch (key) {
+      case 'loseWeight':
+        return l10n?.loseWeight ?? 'Lose Weight';
+      case 'heightIncrease':
+        return l10n?.heightIncrease ?? 'Height Increase';
+      case 'muscleMassIncrease':
+        return l10n?.muscleMassIncrease ?? 'Muscle Mass Increase';
+      case 'abs':
+        return l10n?.abs ?? 'Abs';
+      default:
+        return key;
+    }
+  }
+
+
 
   List imaArr = [
     {
-      "title": "Front Facing",
+      "title": "frontFacing",
       "month_1_image": "assets/img/pp_1.png",
       "month_2_image": "assets/img/pp_2.png",
     },
     {
-      "title": "Back Facing",
+      "title": "backFacing",
       "month_1_image": "assets/img/pp_3.png",
       "month_2_image": "assets/img/pp_4.png",
     },
     {
-      "title": "Left Facing",
+      "title": "leftFacing",
       "month_1_image": "assets/img/pp_5.png",
       "month_2_image": "assets/img/pp_6.png",
     },
     {
-      "title": "Right Facing",
+      "title": "rightFacing",
       "month_1_image": "assets/img/pp_7.png",
       "month_2_image": "assets/img/pp_8.png",
     },
@@ -43,25 +123,27 @@ class _ResultViewState extends State<ResultView> {
 
   List statArr = [
     {
-      "title": "Lose Weight",
+      "title": "loseWeight",
       "diff_per": "33",
       "month_1_per": "33%",
       "month_2_per": "67%",
     },
     {
-      "title": "Height Increase",
+
+
+      "title": "heightIncrease",
       "diff_per": "88",
       "month_1_per": "88%",
       "month_2_per": "12%",
     },
     {
-      "title": "Muscle Mass Increase",
+      "title": "muscleMassIncrease",
       "diff_per": "57",
       "month_1_per": "57%",
       "month_2_per": "43%",
     },
     {
-      "title": "Abs",
+      "title": "abs",
       "diff_per": "89",
       "month_1_per": "89%",
       "month_2_per": "11%",
@@ -98,13 +180,13 @@ class _ResultViewState extends State<ResultView> {
           ),
         ),
         title: Text(
-          "Result",
+          AppLocalizations.of(context)?.result ?? "Result",
           style: TextStyle(
               color: TColor.black, fontSize: 16, fontWeight: FontWeight.w700),
         ),
         actions: [
           InkWell(
-            onTap: () {},
+            onTap: _onShareTap,
             child: Container(
               margin: const EdgeInsets.all(8),
               height: 40,
@@ -122,7 +204,7 @@ class _ResultViewState extends State<ResultView> {
             ),
           ),
           InkWell(
-            onTap: () {},
+            onTap: _onMoreTap,
             child: Container(
               margin: const EdgeInsets.all(8),
               height: 40,
@@ -162,6 +244,8 @@ class _ResultViewState extends State<ResultView> {
                     child: Container(
                       width: (media.width * 0.5) - 40,
                       height: 40,
+
+
                       decoration: BoxDecoration(
                           gradient: LinearGradient(colors: TColor.primaryG),
                           borderRadius: BorderRadius.circular(30)),
@@ -183,7 +267,7 @@ class _ResultViewState extends State<ResultView> {
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(30)),
                               child: Text(
-                                "Photo",
+                                AppLocalizations.of(context)?.photo ?? "Photo",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     color: selectButton == 0
@@ -206,7 +290,7 @@ class _ResultViewState extends State<ResultView> {
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(30)),
                               child: Text(
-                                "Statistic",
+                                AppLocalizations.of(context)?.statistic ?? "Statistic",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     color: selectButton == 1
@@ -237,15 +321,15 @@ class _ResultViewState extends State<ResultView> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "Average Progress",
+                          AppLocalizations.of(context)?.averageProgress ?? "Average Progress",
                           style: TextStyle(
                               color: TColor.black,
                               fontSize: 16,
                               fontWeight: FontWeight.w700),
                         ),
-                        const Text(
-                          "Good",
-                          style: TextStyle(
+                        Text(
+                          AppLocalizations.of(context)?.good ?? "Good",
+                          style: const TextStyle(
                               color: Color(0xFF6DD570),
                               fontSize: 12,
                               fontWeight: FontWeight.w500),
@@ -318,7 +402,7 @@ class _ResultViewState extends State<ResultView> {
                                   height: 8,
                                 ),
                                 Text(
-                                  iObj["title"].toString(),
+                                  _localizedTitle(iObj["title"].toString()),
                                   style: TextStyle(
                                       color: TColor.gray,
                                       fontSize: 14,
@@ -381,7 +465,7 @@ class _ResultViewState extends State<ResultView> {
                               ]);
                         }),
                     RoundButton(
-                        title: "Back to Home",
+                        title: AppLocalizations.of(context)?.backToHome ?? "Back to Home",
                         onPressed: () {
                           Navigator.pop(context);
                         }),
@@ -538,7 +622,7 @@ class _ResultViewState extends State<ResultView> {
                                   height: 15,
                                 ),
                                 Text(
-                                  iObj["title"].toString(),
+                                  _localizedStatTitle(iObj["title"].toString()),
                                   style: TextStyle(
                                       color: TColor.gray,
                                       fontSize: 14,
@@ -591,7 +675,7 @@ class _ResultViewState extends State<ResultView> {
                               ]);
                         }),
                     RoundButton(
-                        title: "Back to Home",
+                        title: AppLocalizations.of(context)?.backToHome ?? "Back to Home",
                         onPressed: () {
                           Navigator.pop(context);
                         }),
@@ -641,8 +725,8 @@ class _ResultViewState extends State<ResultView> {
   LineChartBarData get lineChartBarData1_2 => LineChartBarData(
         isCurved: true,
         gradient: LinearGradient(colors: [
-          TColor.secondaryColor2.withOpacity(0.5),
-          TColor.secondaryColor1.withOpacity(0.5)
+          TColor.secondaryColor2.withValues(alpha: 0.5),
+          TColor.secondaryColor1.withValues(alpha: 0.5)
         ]),
         barWidth: 2,
         isStrokeCapRound: true,

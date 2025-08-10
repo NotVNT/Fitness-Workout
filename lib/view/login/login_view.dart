@@ -3,6 +3,9 @@ import 'package:fitness/common_widget/round_button.dart';
 import 'package:fitness/common_widget/round_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness/services/auth_service.dart';
+import 'package:provider/provider.dart';
+import 'package:fitness/providers/user_provider.dart';
+
 import '../bmi_edit/height_input_view.dart';
 import 'package:fitness/view/login/signup_view.dart';
 
@@ -42,9 +45,22 @@ class _LoginViewState extends State<LoginView> {
       );
 
       if (result != null) {
-        // Đăng nhập thành công -> đi vào flow BMI trước khi vào Home
-        if (mounted) {
-          Navigator.of(context).pushReplacement(
+
+        // Đăng nhập thành công: nếu user đã có đủ BMI (height, weight, targetWeight) thì vào thẳng Main.
+        // Nếu thiếu, dẫn qua flow nhập BMI.
+        final userProvider = Provider.of<UserProvider>(context, listen: false);
+        // Lấy context hiện tại vào biến cục bộ để tránh lỗi across async gaps
+        final navigator = Navigator.of(context);
+        await userProvider.loadUserData();
+        if (!mounted) return;
+
+        final u = userProvider.user;
+        final hasBMI = (u?.height ?? 0) > 0 && (u?.weight ?? 0) > 0 && (u?.targetWeight ?? 0) > 0;
+
+        if (hasBMI) {
+          navigator.pushReplacementNamed('/main');
+        } else {
+          navigator.pushReplacement(
             MaterialPageRoute(
               builder: (context) => const HeightInputView(
                 navigateToMainOnComplete: true,

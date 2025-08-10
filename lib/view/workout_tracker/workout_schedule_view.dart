@@ -385,7 +385,7 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
                                         alignment: Alignment.centerLeft,
                                         decoration: BoxDecoration(
                                           gradient: LinearGradient(
-                                              colors: TColor.secondaryG),
+                                              colors: TColor.primaryG),
                                           borderRadius:
                                               BorderRadius.circular(17.5),
                                         ),
@@ -431,7 +431,7 @@ class _WorkoutScheduleViewState extends State<WorkoutScheduleView> {
           width: 55,
           height: 55,
           decoration: BoxDecoration(
-              gradient: LinearGradient(colors: TColor.secondaryG),
+              gradient: LinearGradient(colors: TColor.primaryG),
               borderRadius: BorderRadius.circular(27.5),
               boxShadow: const [
                 BoxShadow(
