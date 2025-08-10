@@ -63,9 +63,9 @@ class WorkoutGeneratorService {
     return WorkoutModel(
       id: "${DateTime.now().millisecondsSinceEpoch}_day$dayNumber",
       userId: user.id,
-      name: "Ngày $dayNumber - ${_getDayName(dayNumber)}",
+      name: "Ngày $dayNumber",
       description:
-          "Workout ngày $dayNumber được tạo tự động dựa trên BMI ${user.bmi.toStringAsFixed(1)} và mục tiêu giảm cân ${user.targetWeight.toInt()}kg",
+          "Workout ngày $dayNumber được tạo tự động dựa trên BMI ${user.bmi.toStringAsFixed(1)} và mục tiêu ${_getGoalDescription(goal)}",
       exercises: workoutExercises,
       startTime: startDate,
       status: 'planned',
@@ -115,128 +115,142 @@ class WorkoutGeneratorService {
     }
   }
 
+  // Lấy mô tả mục tiêu
+  static String _getGoalDescription(String goal) {
+    switch (goal) {
+      case 'lose_weight':
+        return 'giảm cân';
+      case 'gain_muscle':
+        return 'tăng cơ bắp';
+      case 'maintain':
+        return 'duy trì sức khỏe';
+      default:
+        return 'cải thiện thể lực';
+    }
+  }
+
   static List<ExerciseModel> _selectDailyExercises(
       List<ExerciseModel> exercises,
       String goal,
       double intensity,
       int dayNumber) {
-    // 1) Xây pool theo mục tiêu
-    List<String> pool;
-    if (goal == 'lose_weight') {
-      pool = [
-        'Jumping Jack',
-        'Jump Rope',
-        'Mountain Climber',
-        'Jogging',
-        'Cycling',
-        'Squat',
-        'Push-up',
-        'Walking',
-        'Sit-up'
-      ];
-    } else if (goal == 'gain_muscle') {
-      pool = [
-        'Push-up',
-        'Squat',
-        'Plank',
-        'Sit-up',
-        'Mountain Climber',
-        'Jumping Jack',
-        'Jump Rope'
-      ];
-    } else {
-      pool = [
-        'Push-up',
-        'Squat',
-        'Plank',
-        'Jumping Jack',
-        'Walking',
-        'Sit-up',
-        'Mountain Climber',
-        'Jogging'
-      ];
+    if (exercises.isEmpty) return [];
+
+    // Lọc exercises phù hợp với mục tiêu
+    List<ExerciseModel> suitableExercises =
+        _filterExercisesByGoal(exercises, goal);
+
+    // Nếu không có exercises phù hợp, sử dụng tất cả
+    if (suitableExercises.isEmpty) {
+      suitableExercises = exercises;
     }
 
-    // 2) Lấy pattern theo ngày, sau đó chọn 3 bài đầu khác nhau
-    final pattern = _getDailyExercisePattern(pool, dayNumber);
+    // Tạo pattern đa dạng dựa trên ngày
+    List<ExerciseModel> selectedExercises =
+        _createDailyPattern(suitableExercises, dayNumber);
 
-    // 3) Map từ tên -> ExerciseModel, bỏ trùng lặp, lấy tối đa 3
-    final Set<String> seen = {};
-    final List<ExerciseModel> result = [];
-
-    for (final name in pattern) {
-      if (seen.contains(name)) continue; // loại trùng trong ngày
-      final ex = exercises.firstWhere(
-        (e) => e.name == name,
-        orElse: () => exercises.isNotEmpty
-            ? exercises.first
-            : ExerciseModel(
-                id: 'unknown',
-                name: 'Unknown',
-                vietnameseName: 'Không rõ',
-                description: '',
-                exerciseType: 'reps',
-                imageAsset: null,
-              ),
-      );
-      if (result.isEmpty || result.every((r) => r.id != ex.id)) {
-        result.add(ex);
-        seen.add(name);
-      }
-      if (result.length == 3) break;
-    }
-
-    // 4) Fallback: nếu chưa đủ 3, thêm ngẫu nhiên nhưng vẫn tránh trùng id trong ngày
-    int idx = 0;
-    while (result.length < 3 && exercises.isNotEmpty) {
-      final ex = exercises[idx % exercises.length];
-      if (result.every((r) => r.id != ex.id)) result.add(ex);
-      idx++;
-    }
-
-    return result.take(3).toList();
+    return selectedExercises.take(3).toList();
   }
 
-  // Tạo pattern bài tập khác nhau cho mỗi ngày
-  static List<String> _getDailyExercisePattern(
-      List<String> exercisePool, int dayNumber) {
-    // Shuffle exercises dựa trên ngày để tạo đa dạng
-    List<String> shuffled = List.from(exercisePool);
+  // Lọc exercises theo mục tiêu
+  static List<ExerciseModel> _filterExercisesByGoal(
+      List<ExerciseModel> exercises, String goal) {
+    // Ưu tiên exercises theo tên
+    List<String> preferredExercises;
 
-    // Tạo seed dựa trên ngày để có pattern cố định cho mỗi ngày
+    if (goal == 'lose_weight') {
+      // Ưu tiên cardio và full-body exercises
+      preferredExercises = [
+        'jumping jack',
+        'jump rope',
+        'mountain climber',
+        'jogging',
+        'cycling',
+        'burpee',
+        'high knees',
+        'running',
+        'walking'
+      ];
+    } else if (goal == 'gain_muscle') {
+      // Ưu tiên strength exercises
+      preferredExercises = [
+        'push-up',
+        'squat',
+        'plank',
+        'sit-up',
+        'pull-up',
+        'deadlift',
+        'bench press',
+        'dumbbell'
+      ];
+    } else {
+      // Maintain: cân bằng tất cả
+      preferredExercises = [
+        'push-up',
+        'squat',
+        'plank',
+        'jumping jack',
+        'walking',
+        'sit-up',
+        'mountain climber',
+        'jogging'
+      ];
+    }
+
+    // Lọc theo tên exercise (case-insensitive)
+    List<ExerciseModel> filtered = exercises.where((exercise) {
+      String exerciseName = exercise.name.toLowerCase();
+      String vietnameseName = exercise.vietnameseName.toLowerCase();
+
+      return preferredExercises.any((preferred) =>
+          exerciseName.contains(preferred.toLowerCase()) ||
+          vietnameseName.contains(preferred.toLowerCase()) ||
+          preferred.toLowerCase().contains(exerciseName) ||
+          preferred.toLowerCase().contains(vietnameseName));
+    }).toList();
+
+    // Nếu không tìm thấy exercises phù hợp, trả về tất cả
+    return filtered.isNotEmpty ? filtered : exercises;
+  }
+
+  // Tạo pattern đa dạng cho mỗi ngày
+  static List<ExerciseModel> _createDailyPattern(
+      List<ExerciseModel> exercises, int dayNumber) {
+    List<ExerciseModel> result = [];
+    List<ExerciseModel> shuffled = List.from(exercises);
+
+    // Tạo seed dựa trên ngày để có pattern cố định
     int seed = dayNumber * 7;
 
-    // Simple shuffle algorithm với seed
+    // Shuffle exercises với seed
     for (int i = 0; i < shuffled.length; i++) {
       int j = (seed + i) % shuffled.length;
-      String temp = shuffled[i];
+      ExerciseModel temp = shuffled[i];
       shuffled[i] = shuffled[j];
       shuffled[j] = temp;
     }
 
-    return shuffled.take(5).toList();
-  }
-
-  // Lấy tên ngày
-  static String _getDayName(int dayNumber) {
-    switch (dayNumber) {
-      case 1:
-        return "Thứ Hai";
-      case 2:
-        return "Thứ Ba";
-      case 3:
-        return "Thứ Tư";
-      case 4:
-        return "Thứ Năm";
-      case 5:
-        return "Thứ Sáu";
-      case 6:
-        return "Thứ Bảy";
-      case 7:
-        return "Chủ Nhật";
-      default:
-        return "Ngày $dayNumber";
+    // Chọn exercises đa dạng (tránh trùng lặp)
+    Set<String> usedIds = {};
+    for (ExerciseModel exercise in shuffled) {
+      if (!usedIds.contains(exercise.id)) {
+        result.add(exercise);
+        usedIds.add(exercise.id);
+        if (result.length >= 3) break;
+      }
     }
+
+    // Fallback nếu không đủ 3 exercises
+    if (result.length < 3 && exercises.isNotEmpty) {
+      for (int i = 0; i < exercises.length && result.length < 3; i++) {
+        if (!usedIds.contains(exercises[i].id)) {
+          result.add(exercises[i]);
+          usedIds.add(exercises[i].id);
+        }
+      }
+    }
+
+    return result;
   }
 
   // Tạo sets cho từng bài tập
