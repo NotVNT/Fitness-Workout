@@ -25,7 +25,6 @@ class WorkoutGeneratorService {
     return weeklyWorkouts;
   }
 
-
   static WorkoutModel generateDailyWorkout({
     required UserModel user,
     required List<ExerciseModel> availableExercises,
@@ -35,7 +34,6 @@ class WorkoutGeneratorService {
     // Tính toán cường độ dựa trên BMI và mục tiêu
     final intensity = _calculateIntensity(user);
     final goal = _determineGoal(user);
-
 
     final selectedExercises =
         _selectDailyExercises(availableExercises, goal, intensity, dayNumber);
@@ -68,7 +66,7 @@ class WorkoutGeneratorService {
       userId: user.id,
       name: "Ngày $dayNumber - ${_getDayName(dayNumber)}",
       description:
-          "Workout ngày $dayNumber được tạo tự động dựa trên BMI ${user.bmi.toStringAsFixed(1)} và mục tiêu ${user.goal}",
+          "Workout ngày $dayNumber được tạo tự động dựa trên BMI ${user.bmi.toStringAsFixed(1)} và mục tiêu giảm cân ${user.targetWeight.toInt()}kg",
       exercises: workoutExercises,
       startTime: startDate,
       status: 'planned',
@@ -108,10 +106,6 @@ class WorkoutGeneratorService {
 
   // Xác định mục tiêu tập luyện
   static String _determineGoal(UserModel user) {
-    if (user.goal.isNotEmpty) {
-      return user.goal; // Sử dụng mục tiêu đã chọn
-    }
-
     // Tự động xác định dựa trên BMI và cân nặng mong muốn
     if (user.weight > user.targetWeight) {
       return 'lose_weight'; // Giảm cân
@@ -122,19 +116,15 @@ class WorkoutGeneratorService {
     }
   }
 
-
-
   static List<ExerciseModel> _selectDailyExercises(
       List<ExerciseModel> exercises,
       String goal,
       double intensity,
       int dayNumber) {
-
     // 1) Xây pool theo mục tiêu
     List<String> pool;
     if (goal == 'lose_weight') {
       pool = [
-
         'Jumping Jack',
         'Jump Rope',
         'Mountain Climber',
@@ -146,9 +136,7 @@ class WorkoutGeneratorService {
         'Sit-up'
       ];
     } else if (goal == 'gain_muscle') {
-
       pool = [
-
         'Push-up',
         'Squat',
         'Plank',
@@ -158,9 +146,7 @@ class WorkoutGeneratorService {
         'Jump Rope'
       ];
     } else {
-
       pool = [
-
         'Push-up',
         'Squat',
         'Plank',
@@ -254,16 +240,13 @@ class WorkoutGeneratorService {
     }
   }
 
-
   // Tạo sets cho từng bài tập
   static List<SetModel> _generateSetsForExercise(
       ExerciseModel exercise, UserModel user, double intensity) {
     List<SetModel> sets = [];
 
-
     // Set mặc định = 1 cho mỗi bài tập
     const int numSets = 1;
-
 
     for (int i = 1; i <= numSets; i++) {
       if (exercise.exerciseType == 'reps') {

@@ -7,10 +7,10 @@ class UserModel {
   final String lastName;
   final String dateOfBirth;
   final String gender;
+  final String phone;
   final double weight;
   final double height;
   final double targetWeight;
-  final String goal;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -21,10 +21,10 @@ class UserModel {
     this.lastName = '',
     this.dateOfBirth = '',
     this.gender = '',
+    this.phone = '',
     this.weight = 0.0,
     this.height = 0.0,
     this.targetWeight = 0.0,
-    this.goal = '',
     this.createdAt,
     this.updatedAt,
   });
@@ -40,10 +40,10 @@ class UserModel {
       lastName: data['lastName'] ?? '',
       dateOfBirth: data['dateOfBirth'] ?? '',
       gender: data['gender'] ?? '',
+      phone: data['phone'] ?? '',
       weight: (data['weight'] ?? 0.0).toDouble(),
       height: (data['height'] ?? 0.0).toDouble(),
       targetWeight: (data['targetWeight'] ?? 0.0).toDouble(),
-      goal: data['goal'] ?? '',
       createdAt: data['createdAt'] != null
           ? (data['createdAt'] as Timestamp).toDate()
           : null,
@@ -61,10 +61,10 @@ class UserModel {
       'lastName': lastName,
       'dateOfBirth': dateOfBirth,
       'gender': gender,
+      'phone': phone,
       'weight': weight,
       'height': height,
       'targetWeight': targetWeight,
-      'goal': goal,
       'updatedAt': FieldValue.serverTimestamp(),
     };
   }
@@ -116,10 +116,10 @@ class UserModel {
     String? lastName,
     String? dateOfBirth,
     String? gender,
+    String? phone,
     double? weight,
     double? height,
     double? targetWeight,
-    String? goal,
     DateTime? updatedAt,
   }) {
     return UserModel(
@@ -129,10 +129,10 @@ class UserModel {
       lastName: lastName ?? this.lastName,
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
       gender: gender ?? this.gender,
+      phone: phone ?? this.phone,
       weight: weight ?? this.weight,
       height: height ?? this.height,
       targetWeight: targetWeight ?? this.targetWeight,
-      goal: goal ?? this.goal,
       createdAt: createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

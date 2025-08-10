@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 
-
 import '../../common/colo_extension.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/user_model.dart';
 import '../../services/auth_service.dart';
 
-
 import 'widgets/editable_info_tile.dart';
-
+import 'widgets/gender_dropdown_tile.dart';
+import 'widgets/date_picker_tile.dart';
 
 class PersonalDataView extends StatefulWidget {
   const PersonalDataView({super.key});
@@ -52,10 +51,10 @@ class _PersonalDataViewState extends State<PersonalDataView> {
               lastName: userData['lastName'] ?? '',
               dateOfBirth: userData['dateOfBirth'] ?? '',
               gender: userData['gender'] ?? '',
+              phone: userData['phone'] ?? '',
               weight: (userData['weight'] ?? 0.0).toDouble(),
               height: (userData['height'] ?? 0.0).toDouble(),
               targetWeight: (userData['targetWeight'] ?? 0.0).toDouble(),
-              goal: userData['goal'] ?? '',
             );
           }
 
@@ -64,10 +63,11 @@ class _PersonalDataViewState extends State<PersonalDataView> {
           String dob =
               user?.dateOfBirth.isNotEmpty == true ? user!.dateOfBirth : '--';
           String gender = user?.gender.isNotEmpty == true ? user!.gender : '--';
-
-          String goal = user?.goal.isNotEmpty == true ? user!.goal : '--';
-
-
+          String phone = user?.phone.isNotEmpty == true ? user!.phone : '--';
+          String targetWeight =
+              user?.targetWeight != null && user!.targetWeight > 0
+                  ? '${user.targetWeight.toInt()}kg'
+                  : '--';
 
           return Stack(
             children: [
@@ -118,75 +118,35 @@ class _PersonalDataViewState extends State<PersonalDataView> {
                               value: email,
                             ),
                             const Divider(height: 1),
-
-                            _InfoTile(
-                              icon: Icons.cake_outlined,
-                              label: 'Date of birth',
-                              value: dob,
-                            ),
-                            const Divider(height: 1),
-                            _InfoTile(
-                              icon: Icons.wc_outlined,
-                              label: 'Gender',
-                              value: gender,
-                            ),
-                            const Divider(height: 1),
                             _InfoTile(
                               icon: Icons.flag_outlined,
-                              label: 'Goal',
-                              value: goal,
+                              label: 'Mục tiêu giảm cân',
+                              value: targetWeight,
                             ),
                             const Divider(height: 1),
-                            // Ngày sinh (Việt hóa)
-                            EditableInfoTile(
+                            // Ngày sinh với date picker
+                            DatePickerTile(
                               icon: Icons.cake_outlined,
                               label: 'Ngày sinh',
                               value: dob,
                               fieldKey: 'dateOfBirth',
-                              keyboardType: TextInputType.datetime,
                             ),
                             const Divider(height: 1),
-                            // Giới tính: chỉ được phép thay đổi
-                            EditableInfoTile(
+                            // Giới tính với dropdown
+                            GenderDropdownTile(
                               icon: Icons.wc_outlined,
                               label: 'Giới tính',
                               value: gender,
                               fieldKey: 'gender',
                             ),
                             const Divider(height: 1),
-                            // Số điện thoại mới
+                            // Số điện thoại
                             EditableInfoTile(
                               icon: Icons.phone_outlined,
                               label: 'Số điện thoại',
-                              value: userData?['phone'] ?? '--',
+                              value: phone,
                               fieldKey: 'phone',
                               keyboardType: TextInputType.phone,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      // Small tip card to make it "cooler"
-                      Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(colors: TColor.secondaryG),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.verified_rounded,
-                                color: Colors.white),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                AppLocalizations.of(context)?.realTimeUpdates ??
-                                    'Real time updates',
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600),
-                              ),
                             ),
                           ],
                         ),
