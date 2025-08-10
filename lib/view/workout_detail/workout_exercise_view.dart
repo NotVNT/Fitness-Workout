@@ -4,6 +4,7 @@ import '../../common/colo_extension.dart';
 import '../../models/workout_model.dart';
 import '../../models/exercise_model.dart';
 import '../../services/exercise_service.dart';
+import '../../services/workout_service.dart';
 
 class WorkoutExerciseView extends StatefulWidget {
   final WorkoutModel workout;
@@ -28,7 +29,9 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
 
   Timer? _timer;
   int _currentTime = 0;
-  int _restTime = 10; // 10 seconds rest
+  int _restTime = 10; // 10 seconds rest between exercises
+  bool _restForNextSet =
+      false; // true = đang nghỉ để sang set tiếp theo (5 phút)
 
   ExerciseModel? currentExercise;
   WorkoutExercise? currentWorkoutExercise;
@@ -52,7 +55,10 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
 
       if (currentExercise!.exerciseType == 'duration') {
         final sets = currentWorkoutExercise!.sets;
-        _currentTime = sets.isNotEmpty ? (sets.first.duration ?? 30) : 30;
+        final idx = (currentSetIndex >= 0 && currentSetIndex < sets.length)
+            ? currentSetIndex
+            : 0;
+        _currentTime = sets.isNotEmpty ? (sets[idx].duration ?? 30) : 30;
         // Tự động bắt đầu đếm khi là bài tập theo thời gian
         isPaused = false;
         _startTimer();
@@ -70,43 +76,58 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
   }
 
   ExerciseModel _getExerciseById(String exerciseId) {
+    // Ưu tiên danh sách truyền từ parent (đã load Firestore với imageAsset)
     try {
-      // First try to find in provided exercises
       return widget.allExercises.firstWhere((ex) => ex.id == exerciseId);
-    } catch (e) {
-      // If not found, try ExerciseService
-      final exerciseService = ExerciseService();
-      final exercise = exerciseService.getExerciseById(exerciseId);
-      if (exercise != null) {
-        return exercise;
-      }
+    } catch (_) {}
 
-      // Fallback to unknown exercise
-      return ExerciseModel(
-        id: exerciseId,
-        name: "Unknown Exercise",
-        vietnameseName: "Bài tập không xác định",
-        description: "Bài tập không xác định",
-        exerciseType: "reps",
-      );
-    }
+    // Fallback: ExerciseService default list
+    final exercise = ExerciseService().getExerciseById(exerciseId);
+    if (exercise != null) return exercise;
+
+    // Cuối cùng: placeholder
+    return ExerciseModel(
+      id: exerciseId,
+      name: "Unknown Exercise",
+      vietnameseName: "Bài tập không xác định",
+      description: "Bài tập không xác định",
+      exerciseType: "reps",
+    );
   }
 
   void _startTimer() {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_restTime < 0) _restTime = 0;
       if (!isPaused) {
         setState(() {
           if (isResting) {
             _restTime--;
             if (_restTime <= 0) {
-              _nextExercise();
+              if (_restForNextSet) {
+                // Hết nghỉ giữa các set: sang set tiếp theo của cùng bài
+                _restForNextSet = false;
+                isResting = false;
+                currentSetIndex++;
+                // Nếu bài theo thời gian thì set lại thời gian từ set kế tiếp, nếu reps thì không cần
+                if (currentExercise!.exerciseType == 'duration') {
+                  final sets = currentWorkoutExercise!.sets;
+                  final nextDur = (sets[currentSetIndex].duration ?? 30);
+                  _currentTime = nextDur;
+                  _timer?.cancel();
+                  _startTimer();
+                }
+              } else {
+                // Hết nghỉ giữa các bài: sang bài tiếp theo
+                _nextExercise();
+              }
             }
           } else {
             if (currentExercise!.exerciseType == 'duration') {
               _currentTime--;
               if (_currentTime <= 0) {
                 _completeCurrentSet();
+                return; // dừng xử lý tick này để tránh đếm chồng
               }
             }
             // Với bài reps không đếm, không thay đổi _currentTime ở đây
@@ -122,17 +143,37 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
     });
   }
 
-  void _completeCurrentSet() {
-    // Mỗi bài tập chỉ tập 1 lần: bỏ qua logic đổi set, chuyển sang nghỉ/tiếp theo
-    _startRestPeriod();
+  Future<void> _completeCurrentSet() async {
+    // Đánh dấu set hiện tại hoàn thành trong Firestore
+    await _markCurrentSetCompletedInDb();
+
+    // Nếu bài này còn set tiếp theo thì nghỉ 5 phút, còn không thì nghỉ 10s sang bài mới
+    final sets = currentWorkoutExercise?.sets ?? [];
+    final hasNextSet = currentSetIndex + 1 < sets.length;
+    if (hasNextSet) {
+      // Nghỉ 5 phút giữa các set
+      setState(() {
+        isResting = true;
+        _restForNextSet = true;
+        _restTime = 300; // 5 phút
+      });
+      _startTimer();
+    } else {
+      // Sang bài tiếp theo (nghỉ 10s)
+      _startRestPeriod();
+    }
   }
 
   void _startRestPeriod() {
+    // Nghỉ giữa bài hiện tại và bài tiếp theo (10s)
     if (currentExerciseIndex < widget.workout.exercises.length - 1) {
       setState(() {
         isResting = true;
+        isPaused = false;
+        _restForNextSet = false;
         _restTime = 10;
       });
+      _startTimer(); // đảm bảo bắt đầu đếm nghỉ ngay
     } else {
       _completeWorkout();
     }
@@ -233,7 +274,7 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Exercise image placeholder
+                          // Exercise image (asset nếu có, nếu không thì icon)
                           Container(
                             width: imageSize,
                             height: imageSize,
@@ -241,13 +282,35 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
                               color: TColor.lightGray,
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: Icon(
-                              currentExercise!.exerciseType == 'duration'
-                                  ? Icons.timer_outlined
-                                  : Icons.repeat,
-                              color: TColor.gray,
-                              size: 100,
-                            ),
+                            child: () {
+                              String raw =
+                                  (currentExercise!.imageAsset ?? '').trim();
+                              if (raw.length >= 2) {
+                                final hasDouble =
+                                    raw.startsWith('"') && raw.endsWith('"');
+                                final hasSingle =
+                                    raw.startsWith("'") && raw.endsWith("'");
+                                if (hasDouble || hasSingle) {
+                                  raw = raw.substring(1, raw.length - 1).trim();
+                                }
+                              }
+                              if (raw.isNotEmpty) {
+                                return ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Image.asset(
+                                    raw,
+                                    fit: BoxFit.contain,
+                                  ),
+                                );
+                              }
+                              return Icon(
+                                currentExercise!.exerciseType == 'duration'
+                                    ? Icons.timer_outlined
+                                    : Icons.repeat,
+                                color: TColor.gray,
+                                size: 100,
+                              );
+                            }(),
                           ),
 
                           const SizedBox(height: 24),
@@ -279,7 +342,7 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
 
                           const SizedBox(height: 16),
 
-                          // Set info (ẩn vì mỗi bài tập chỉ tập 1 lần)
+                          // Set info: ẩn vì set mặc định = 1
                           const SizedBox.shrink(),
                         ],
                       ),
@@ -521,6 +584,42 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
         ),
       ),
     );
+  }
+
+  Future<void> _markCurrentSetCompletedInDb() async {
+    try {
+      final sets = currentWorkoutExercise?.sets ?? [];
+      if (currentExerciseIndex >= widget.workout.exercises.length ||
+          currentSetIndex >= sets.length) {
+        return;
+      }
+
+      // Cập nhật local model trước để UI cảm nhận nhanh
+      sets[currentSetIndex] = sets[currentSetIndex].copyWith(isCompleted: true);
+
+      // Ghi lên Firestore: update workout.exercises array toàn bộ
+      final updatedExercises =
+          widget.workout.exercises.asMap().entries.map((e) {
+        final idx = e.key;
+        final we = e.value;
+        if (idx == currentExerciseIndex) {
+          return WorkoutExercise(
+            exerciseId: we.exerciseId,
+            exercise: we.exercise,
+            sets: sets,
+            notes: we.notes,
+            order: we.order,
+          );
+        }
+        return we;
+      }).toList();
+
+      final updatedWorkout =
+          widget.workout.copyWith(exercises: updatedExercises);
+      await WorkoutService.updateWorkout(updatedWorkout);
+    } catch (e) {
+      debugPrint('Không thể cập nhật set hoàn thành: $e');
+    }
   }
 
   String _formatTime(int seconds) {

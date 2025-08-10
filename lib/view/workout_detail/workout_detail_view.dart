@@ -31,7 +31,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
 
   Future<void> _loadExerciseCatalog() async {
     setState(() => _loadingCatalog = true);
-    final catalog = await ExerciseService().getAllExercises();
+    final catalog = await ExerciseService().getAllExercises(forceReload: true);
     setState(() {
       _catalog = catalog;
       _loadingCatalog = false;
@@ -311,14 +311,14 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
 
   // Get exercise by ID
   ExerciseModel _getExerciseById(String exerciseId) {
-    // 1) Provided list (from parent)
-    try {
-      return widget.allExercises.firstWhere((ex) => ex.id == exerciseId);
-    } catch (_) {}
-
-    // 2) Local catalog we loaded (from Firestore)
+    // Ưu tiên catalog đã tải từ Firestore (có imageAsset)
     try {
       return _catalog.firstWhere((ex) => ex.id == exerciseId);
+    } catch (_) {}
+
+    // Sau đó mới tới danh sách truyền từ parent
+    try {
+      return widget.allExercises.firstWhere((ex) => ex.id == exerciseId);
     } catch (_) {}
 
     // 3) Service fallback (default list)
@@ -361,10 +361,16 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
     return (totalSeconds / 60).round(); // Convert to minutes
   }
 
-  // Calculate estimated calories
+  // Calculate estimated calories (match generator formula approx)
   int _calculateTotalCalories() {
-    // Simple estimation: 5 calories per minute
-    return _calculateTotalTime() * 5;
+    // Dùng công thức gần đúng: 4 kcal/phút * hệ số mục tiêu
+    // Giữa các bài có 10s nghỉ, không tính vào đốt calo
+    final minutes = _calculateTotalTime();
+    final goal = widget.workout.workoutType ?? 'maintain';
+    final goalFactor =
+        goal == 'lose_weight' ? 1.1 : 1.0; // giảm cân đốt nhiều hơn chút
+    final kcal = (minutes * 4 * goalFactor).round();
+    return kcal.clamp(20, 3000);
   }
 
   // Build exercise row
@@ -379,22 +385,8 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
       ),
       child: Row(
         children: [
-          // Exercise image placeholder
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: TColor.gray.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: Icon(
-              exercise.exerciseType == 'duration'
-                  ? Icons.timer_outlined
-                  : Icons.repeat,
-              color: TColor.gray,
-              size: 30,
-            ),
-          ),
+          // Ẩn hình ở danh sách ngoài theo yêu cầu
+          const SizedBox(width: 0, height: 0),
           const SizedBox(width: 15),
 
           // Exercise info

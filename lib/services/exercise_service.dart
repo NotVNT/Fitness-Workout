@@ -121,9 +121,10 @@ class ExerciseService {
     ),
   ];
 
-  // Get all exercises (load once, cache)
-  Future<List<ExerciseModel>> getAllExercises() async {
-    if (_cache.isNotEmpty) return _cache;
+  // Get all exercises (cacheable; set forceReload=true để luôn lấy mới từ Firestore)
+  Future<List<ExerciseModel>> getAllExercises(
+      {bool forceReload = false}) async {
+    if (!forceReload && _cache.isNotEmpty) return _cache;
 
     try {
       final snapshot =
