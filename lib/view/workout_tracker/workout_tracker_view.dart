@@ -23,6 +23,7 @@ class WorkoutTrackerView extends StatefulWidget {
 
 class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
   List<WorkoutModel> userWorkouts = [];
+
   List<ExerciseModel> allExercises = [];
   bool isLoadingWorkouts = true;
 
@@ -38,6 +39,7 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
       "time": "June 05, 02:00pm"
     },
   ];
+
 
   List whatArr = [
     {
@@ -78,6 +80,7 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
         final allWorkouts =
             await WorkoutService.getUserWorkouts(userProvider.user!.id);
 
+
         // Lọc chỉ workouts hôm nay
         final today = DateTime.now();
         final todayWorkouts = allWorkouts.where((workout) {
@@ -100,6 +103,7 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
           print(
               '🏋️ - ${workout.name}: ${workout.exercises.length} exercises (${workout.status})');
         }
+
       } else {
         setState(() {
           isLoadingWorkouts = false;
@@ -390,10 +394,16 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                       padding: EdgeInsets.zero,
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount: latestArr.length,
+                      itemCount: upcomingWorkouts.length,
                       itemBuilder: (context, index) {
-                        var wObj = latestArr[index] as Map? ?? {};
-                        return UpcomingWorkoutRow(wObj: wObj);
+                        final w = upcomingWorkouts[index];
+                        // Map cho widget cũ
+                        final map = {
+                          "image": _getWorkoutIcon(w.workoutType ?? ''),
+                          "title": w.name,
+                          "time": _formatWorkoutTime(w.startTime),
+                        };
+                        return UpcomingWorkoutRow(wObj: map);
                       }),
                   SizedBox(
                     height: media.width * 0.05,
@@ -486,12 +496,14 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: TColor.white,
+
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 5,
             offset: const Offset(0, 2),
+
           ),
         ],
       ),
@@ -522,6 +534,7 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                 _getWorkoutIconData(workout.workoutType ?? 'mixed'),
                 color: TColor.white,
                 size: 24,
+
               ),
             ),
             const SizedBox(width: 15),
@@ -533,6 +546,7 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
                 children: [
                   Text(
                     workout.name,
+
                     style: TextStyle(
                       color: TColor.black,
                       fontSize: 16,
@@ -689,6 +703,7 @@ class _WorkoutTrackerViewState extends State<WorkoutTrackerView> {
       return "${dateTime.day}/${dateTime.month}, ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
     }
   }
+
 
   LineTouchData get lineTouchData1 => LineTouchData(
         handleBuiltInTouches: true,

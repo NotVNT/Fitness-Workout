@@ -746,11 +746,119 @@ abstract class AppLocalizations {
   /// **'Gallery'**
   String get gallery;
 
+  /// No description provided for @photo.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get photo;
+
+  /// No description provided for @statistic.
+  ///
+  /// In en, this message translates to:
+  /// **'Statistic'**
+  String get statistic;
+
+  /// No description provided for @averageProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Average Progress'**
+  String get averageProgress;
+
+  /// No description provided for @good.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get good;
+
+  /// No description provided for @frontFacing.
+  ///
+  /// In en, this message translates to:
+  /// **'Front Facing'**
+  String get frontFacing;
+
+  /// No description provided for @backFacing.
+  ///
+  /// In en, this message translates to:
+  /// **'Back Facing'**
+  String get backFacing;
+
+  /// No description provided for @leftFacing.
+  ///
+  /// In en, this message translates to:
+  /// **'Left Facing'**
+  String get leftFacing;
+
+  /// No description provided for @rightFacing.
+  ///
+  /// In en, this message translates to:
+  /// **'Right Facing'**
+  String get rightFacing;
+
+  /// No description provided for @loseWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Lose Weight'**
+  String get loseWeight;
+
+  /// No description provided for @heightIncrease.
+  ///
+  /// In en, this message translates to:
+  /// **'Height Increase'**
+  String get heightIncrease;
+
+  /// No description provided for @muscleMassIncrease.
+  ///
+  /// In en, this message translates to:
+  /// **'Muscle Mass Increase'**
+  String get muscleMassIncrease;
+
+  /// No description provided for @abs.
+  ///
+  /// In en, this message translates to:
+  /// **'Abs'**
+  String get abs;
+
+  /// No description provided for @result.
+  ///
+  /// In en, this message translates to:
+  /// **'Result'**
+  String get result;
+
   /// No description provided for @comparison.
   ///
   /// In en, this message translates to:
   /// **'Comparison'**
   String get comparison;
+
+  /// No description provided for @selectMonth1.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Month 1'**
+  String get selectMonth1;
+
+  /// No description provided for @selectMonth2.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Month 2'**
+  String get selectMonth2;
+
+  /// No description provided for @selectMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Month'**
+  String get selectMonth;
+
+  /// No description provided for @selectMonthHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Select month'**
+  String get selectMonthHelp;
+
+  /// No description provided for @pleaseSelectTwoMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select two months to compare.'**
+  String get pleaseSelectTwoMonths;
 
   /// No description provided for @reminderReset.
   ///

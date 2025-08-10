@@ -4,7 +4,9 @@ import '../../common/colo_extension.dart';
 import '../../models/workout_model.dart';
 import '../../models/exercise_model.dart';
 import '../../services/exercise_service.dart';
+
 import '../../services/workout_service.dart';
+
 
 class WorkoutExerciseView extends StatefulWidget {
   final WorkoutModel workout;
@@ -33,6 +35,7 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
   bool _restForNextSet =
       false; // true = đang nghỉ để sang set tiếp theo (5 phút)
 
+
   ExerciseModel? currentExercise;
   WorkoutExercise? currentWorkoutExercise;
 
@@ -55,10 +58,12 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
 
       if (currentExercise!.exerciseType == 'duration') {
         final sets = currentWorkoutExercise!.sets;
+
         final idx = (currentSetIndex >= 0 && currentSetIndex < sets.length)
             ? currentSetIndex
             : 0;
         _currentTime = sets.isNotEmpty ? (sets[idx].duration ?? 30) : 30;
+
         // Tự động bắt đầu đếm khi là bài tập theo thời gian
         isPaused = false;
         _startTimer();
@@ -76,6 +81,7 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
   }
 
   ExerciseModel _getExerciseById(String exerciseId) {
+
     // Ưu tiên danh sách truyền từ parent (đã load Firestore với imageAsset)
     try {
       return widget.allExercises.firstWhere((ex) => ex.id == exerciseId);
@@ -93,6 +99,7 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
       description: "Bài tập không xác định",
       exerciseType: "reps",
     );
+
   }
 
   void _startTimer() {
@@ -104,6 +111,7 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
           if (isResting) {
             _restTime--;
             if (_restTime <= 0) {
+
               if (_restForNextSet) {
                 // Hết nghỉ giữa các set: sang set tiếp theo của cùng bài
                 _restForNextSet = false;
@@ -121,13 +129,16 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
                 // Hết nghỉ giữa các bài: sang bài tiếp theo
                 _nextExercise();
               }
+
             }
           } else {
             if (currentExercise!.exerciseType == 'duration') {
               _currentTime--;
               if (_currentTime <= 0) {
                 _completeCurrentSet();
+
                 return; // dừng xử lý tick này để tránh đếm chồng
+
               }
             }
             // Với bài reps không đếm, không thay đổi _currentTime ở đây
@@ -142,6 +153,7 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
       isPaused = !isPaused;
     });
   }
+
 
   Future<void> _completeCurrentSet() async {
     // Đánh dấu set hiện tại hoàn thành trong Firestore
@@ -174,6 +186,7 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
         _restTime = 10;
       });
       _startTimer(); // đảm bảo bắt đầu đếm nghỉ ngay
+
     } else {
       _completeWorkout();
     }
@@ -274,7 +287,7 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Exercise image (asset nếu có, nếu không thì icon)
+
                           Container(
                             width: imageSize,
                             height: imageSize,
@@ -282,6 +295,7 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
                               color: TColor.lightGray,
                               borderRadius: BorderRadius.circular(20),
                             ),
+
                             child: () {
                               String raw =
                                   (currentExercise!.imageAsset ?? '').trim();
@@ -311,6 +325,7 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
                                 size: 100,
                               );
                             }(),
+
                           ),
 
                           const SizedBox(height: 24),
@@ -342,7 +357,7 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
 
                           const SizedBox(height: 16),
 
-                          // Set info: ẩn vì set mặc định = 1
+
                           const SizedBox.shrink(),
                         ],
                       ),
@@ -586,6 +601,7 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
     );
   }
 
+
   Future<void> _markCurrentSetCompletedInDb() async {
     try {
       final sets = currentWorkoutExercise?.sets ?? [];
@@ -621,6 +637,7 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
       debugPrint('Không thể cập nhật set hoàn thành: $e');
     }
   }
+
 
   String _formatTime(int seconds) {
     int minutes = seconds ~/ 60;

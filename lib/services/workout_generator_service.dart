@@ -25,7 +25,7 @@ class WorkoutGeneratorService {
     return weeklyWorkouts;
   }
 
-  // Tạo workout cho 1 ngày (3 bài tập)
+
   static WorkoutModel generateDailyWorkout({
     required UserModel user,
     required List<ExerciseModel> availableExercises,
@@ -36,7 +36,7 @@ class WorkoutGeneratorService {
     final intensity = _calculateIntensity(user);
     final goal = _determineGoal(user);
 
-    // Chọn 3 bài tập không trùng lặp cho ngày này
+
     final selectedExercises =
         _selectDailyExercises(availableExercises, goal, intensity, dayNumber);
 
@@ -159,16 +159,18 @@ class WorkoutGeneratorService {
     return selected.take(maxExercises).toList();
   }
 
-  // Chọn 3 bài tập cho mỗi ngày, không trùng lặp trong ngày
+
   static List<ExerciseModel> _selectDailyExercises(
       List<ExerciseModel> exercises,
       String goal,
       double intensity,
       int dayNumber) {
+
     // 1) Xây pool theo mục tiêu
     List<String> pool;
     if (goal == 'lose_weight') {
       pool = [
+
         'Jumping Jack',
         'Jump Rope',
         'Mountain Climber',
@@ -180,7 +182,9 @@ class WorkoutGeneratorService {
         'Sit-up'
       ];
     } else if (goal == 'gain_muscle') {
+
       pool = [
+
         'Push-up',
         'Squat',
         'Plank',
@@ -190,7 +194,9 @@ class WorkoutGeneratorService {
         'Jump Rope'
       ];
     } else {
+
       pool = [
+
         'Push-up',
         'Squat',
         'Plank',
@@ -300,8 +306,10 @@ class WorkoutGeneratorService {
       ExerciseModel exercise, UserModel user, double intensity) {
     List<SetModel> sets = [];
 
+
     // Set mặc định = 1 cho mỗi bài tập
     const int numSets = 1;
+
 
     for (int i = 1; i <= numSets; i++) {
       if (exercise.exerciseType == 'reps') {

@@ -10,6 +10,7 @@ class ExerciseModel {
   final String?
       imageAsset;
 
+
   ExerciseModel({
     required this.id,
     required this.name,
@@ -17,12 +18,15 @@ class ExerciseModel {
     required this.description,
     required this.exerciseType,
     this.imageUrl,
+
     this.imageAsset,
+
   });
 
   // Factory constructor from Firestore
   factory ExerciseModel.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
 
     String? sanitizeAsset(dynamic v) {
       if (v is! String) return null;
@@ -40,12 +44,14 @@ class ExerciseModel {
     return ExerciseModel(
       // Ưu tiên field 'id' trong doc để khớp với workoutExercise.exerciseId; fallback = doc.id
       id: (data['id'] ?? doc.id) as String,
+
       name: data['name'] ?? '',
       vietnameseName: data['vietnameseName'] ?? '',
       description: data['description'] ?? '',
       exerciseType: data['exerciseType'] ?? 'reps',
       imageUrl: data['imageUrl'],
       imageAsset: sanitizeAsset(data['imageAsset']),
+
     );
   }
 
@@ -58,6 +64,7 @@ class ExerciseModel {
       'exerciseType': exerciseType,
       'imageUrl': imageUrl,
       'imageAsset': imageAsset,
+
     };
   }
 
@@ -70,6 +77,7 @@ class ExerciseModel {
     String? exerciseType,
     String? imageUrl,
     String? imageAsset,
+
   }) {
     return ExerciseModel(
       id: id ?? this.id,
@@ -79,6 +87,7 @@ class ExerciseModel {
       exerciseType: exerciseType ?? this.exerciseType,
       imageUrl: imageUrl ?? this.imageUrl,
       imageAsset: imageAsset ?? this.imageAsset,
+
     );
   }
 

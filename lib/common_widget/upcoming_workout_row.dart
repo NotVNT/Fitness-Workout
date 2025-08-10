@@ -1,4 +1,3 @@
-import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:fitness/common/colo_extension.dart';
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
@@ -12,8 +11,6 @@ class UpcomingWorkoutRow extends StatefulWidget {
 }
 
 class _UpcomingWorkoutRowState extends State<UpcomingWorkoutRow> {
-  bool positive = false;
-
   String _getLocalizedWorkoutName(BuildContext context, String workoutKey) {
     final localizations = AppLocalizations.of(context);
     switch (workoutKey) {
@@ -42,6 +39,11 @@ class _UpcomingWorkoutRowState extends State<UpcomingWorkoutRow> {
     return timeText;
   }
 
+  String _cleanTitle(String title) {
+    // Loại bỏ "Thứ" trong tên kiểu "Ngày 2 - Thứ Ba"
+    return title.replaceAll(RegExp(r"\s*-?\s*Thứ\s*[A-Za-zÀ-ỹ]+", caseSensitive: false), '').trim();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -50,7 +52,13 @@ class _UpcomingWorkoutRowState extends State<UpcomingWorkoutRow> {
         decoration: BoxDecoration(
             color: TColor.white,
             borderRadius: BorderRadius.circular(15),
-            boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 2)]),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              )
+            ]),
         child: Row(
           children: [
             ClipRRect(
@@ -70,12 +78,12 @@ class _UpcomingWorkoutRowState extends State<UpcomingWorkoutRow> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _getLocalizedWorkoutName(
-                      context, widget.wObj["title"].toString()),
+                  _cleanTitle(_getLocalizedWorkoutName(
+                      context, widget.wObj["title"].toString())),
                   style: TextStyle(
                       color: TColor.black,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600),
                 ),
                 Text(
                   _getLocalizedTime(context, widget.wObj["time"].toString()),
@@ -86,61 +94,8 @@ class _UpcomingWorkoutRowState extends State<UpcomingWorkoutRow> {
                 ),
               ],
             )),
-            Flexible(
-              child: CustomAnimatedToggleSwitch<bool>(
-                current: positive,
-                values: [false, true],
-                indicatorSize: const Size.square(28.0),
-                animationDuration: const Duration(milliseconds: 200),
-                animationCurve: Curves.linear,
-                onChanged: (b) => setState(() => positive = b),
-                iconBuilder: (context, local, global) {
-                  return const SizedBox();
-                },
-                onTap: (tapProperties) => setState(
-                    () => positive = tapProperties.tapped?.value ?? !positive),
-                iconsTappable: false,
-                wrapperBuilder: (context, global, child) {
-                  return Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Positioned(
-                          left: 10.0,
-                          right: 10.0,
-                          height: 30.0,
-                          child: DecoratedBox(
-                            decoration: BoxDecoration(
-                              gradient:
-                                  LinearGradient(colors: TColor.secondaryG),
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(50.0)),
-                            ),
-                          )),
-                      child,
-                    ],
-                  );
-                },
-                foregroundIndicatorBuilder: (context, global) {
-                  return SizedBox.fromSize(
-                    size: const Size(10, 10),
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: TColor.white,
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(50.0)),
-                        boxShadow: const [
-                          BoxShadow(
-                              color: Colors.black38,
-                              spreadRadius: 0.05,
-                              blurRadius: 1.1,
-                              offset: Offset(0.0, 0.8))
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
+            // Toggle bị loại bỏ theo yêu cầu để giao diện gọn hơn
+            const SizedBox.shrink(),
           ],
         ));
   }

@@ -31,7 +31,9 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
 
   Future<void> _loadExerciseCatalog() async {
     setState(() => _loadingCatalog = true);
+
     final catalog = await ExerciseService().getAllExercises(forceReload: true);
+
     setState(() {
       _catalog = catalog;
       _loadingCatalog = false;
@@ -70,7 +72,9 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
           ),
         ),
         title: Text(
+
           widget.workout.name,
+
           style: TextStyle(
             color: TColor.black,
             fontSize: 16,
@@ -112,14 +116,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
               padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
               child: Column(
                 children: [
-                  Text(
-                    widget.workout.name.toUpperCase(),
-                    style: TextStyle(
-                      color: TColor.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+
                   const SizedBox(height: 15),
                   Text(
                     widget.workout.description ?? "Workout được tạo tự động",
@@ -311,6 +308,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
 
   // Get exercise by ID
   ExerciseModel _getExerciseById(String exerciseId) {
+
     // Ưu tiên catalog đã tải từ Firestore (có imageAsset)
     try {
       return _catalog.firstWhere((ex) => ex.id == exerciseId);
@@ -319,6 +317,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
     // Sau đó mới tới danh sách truyền từ parent
     try {
       return widget.allExercises.firstWhere((ex) => ex.id == exerciseId);
+
     } catch (_) {}
 
     // 3) Service fallback (default list)
@@ -335,6 +334,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
     );
   }
 
+
   // Calculate total workout time
   int _calculateTotalTime() {
     int totalSeconds = 0;
@@ -350,7 +350,9 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
       } else {
         // Reps exercises: estimate 2 seconds per rep
         for (var set in workoutExercise.sets) {
+
           totalSeconds += (set.reps ?? 10) * 2; // 2 seconds per rep
+
         }
       }
 
@@ -360,6 +362,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
 
     return (totalSeconds / 60).round(); // Convert to minutes
   }
+
 
   // Calculate estimated calories (match generator formula approx)
   int _calculateTotalCalories() {
@@ -371,6 +374,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
         goal == 'lose_weight' ? 1.1 : 1.0; // giảm cân đốt nhiều hơn chút
     final kcal = (minutes * 4 * goalFactor).round();
     return kcal.clamp(20, 3000);
+
   }
 
   // Build exercise row
@@ -385,8 +389,24 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
       ),
       child: Row(
         children: [
-          // Ẩn hình ở danh sách ngoài theo yêu cầu
-          const SizedBox(width: 0, height: 0),
+
+          // Exercise image placeholder
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: TColor.gray.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: Icon(
+              exercise.exerciseType == 'duration'
+                  ? Icons.timer_outlined
+                  : Icons.repeat,
+              color: TColor.gray,
+              size: 30,
+            ),
+          ),
+
           const SizedBox(width: 15),
 
           // Exercise info

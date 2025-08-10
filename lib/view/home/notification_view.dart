@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../common/colo_extension.dart';
 import '../../common_widget/notification_row.dart';
+import '../../l10n/app_localizations.dart';
+import '../../services/workout_reminder_service.dart';
 
 class NotificationView extends StatefulWidget {
   const NotificationView({super.key});
@@ -11,14 +13,29 @@ class NotificationView extends StatefulWidget {
 }
 
 class _NotificationViewState extends State<NotificationView> {
-  List notificationArr = [
-    {"image": "assets/img/Workout1.png", "title": "Hey, it’s time for lunch", "time": "About 1 minutes ago"},
-    {"image": "assets/img/Workout2.png", "title": "Don’t miss your lowerbody workout", "time": "About 3 hours ago"},
-    {"image": "assets/img/Workout3.png", "title": "Hey, let’s add some meals for your b", "time": "About 3 hours ago"},
-    {"image": "assets/img/Workout1.png", "title": "Congratulations, You have finished A..", "time": "29 May"},
-    {"image": "assets/img/Workout2.png", "title": "Hey, it’s time for lunch", "time": "8 April"},
-    {"image": "assets/img/Workout3.png", "title": "Ups, You have missed your Lowerbo...", "time": "8 April"},
-  ];
+  List notificationArr = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    // Đọc giờ nhắc tập luyện đã lưu và thêm 1 thông báo mô phỏng
+    final reminder = await WorkoutReminderService.load();
+    if (!mounted) return;
+    setState(() {
+      notificationArr = [
+        if (reminder != null)
+          {
+            "image": "assets/img/Workout1.png",
+            "title": "Đến giờ tập luyện!",
+            "time": "${reminder.h.toString().padLeft(2, '0')}:${reminder.m.toString().padLeft(2, '0')}",
+          },
+      ];
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +65,7 @@ class _NotificationViewState extends State<NotificationView> {
           ),
         ),
         title: Text(
-          "Notification",
+          AppLocalizations.of(context)?.notification ?? 'Thông báo',
           style: TextStyle(
               color: TColor.black, fontSize: 16, fontWeight: FontWeight.w700),
         ),
@@ -80,7 +97,7 @@ class _NotificationViewState extends State<NotificationView> {
           var nObj = notificationArr[index] as Map? ?? {};
           return NotificationRow(nObj: nObj);
       }), separatorBuilder: (context, index){
-        return Divider(color: TColor.gray.withOpacity(0.5), height: 1, );
+        return Divider(color: TColor.gray.withValues(alpha: 0.5), height: 1, );
       }, itemCount: notificationArr.length),
     );
   }
