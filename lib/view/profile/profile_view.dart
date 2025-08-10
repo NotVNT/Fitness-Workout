@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-
-import 'package:animated_toggle_switch/animated_toggle_switch.dart';
-
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../common/colo_extension.dart';
