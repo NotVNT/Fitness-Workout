@@ -205,8 +205,8 @@ void main() {
       );
 
       // Assert
-      // Note: The service creates fallback exercises when list is empty
-      expect(workout.exercises.isNotEmpty, isTrue);
+      // When no exercises available, should return empty workout
+      expect(workout.exercises.isEmpty, isTrue);
       expect(workout.caloriesBurned, isNotNull);
       expect(workout.caloriesBurned! >= 0, isTrue);
     });
