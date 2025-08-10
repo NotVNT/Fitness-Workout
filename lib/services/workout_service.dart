@@ -124,9 +124,9 @@ class WorkoutService {
 
   // Lấy các workout đã hoàn thành gần đây của user
   static Future<List<WorkoutModel>> getRecentCompletedWorkouts(
-      String userId, {
-      int limit = 3,
-    }) async {
+    String userId, {
+    int limit = 3,
+  }) async {
     try {
       final snapshot = await _firestore
           .collection(usersCollection)
@@ -163,6 +163,7 @@ class WorkoutService {
             .map((doc) => WorkoutModel.fromFirestore(doc))
             .toList());
   }
+
 
 
   // Lấy workout theo ngày hiện tại (dựa trên dayNumber)
@@ -282,34 +283,6 @@ class WorkoutService {
     } catch (e) {
       print('Lỗi khi xóa workout: $e');
       return false;
-    }
-  }
-
-  // Tạo workout mẫu cho demo
-  static Future<void> createSampleWorkout(UserModel user) async {
-    try {
-      // Tạo workout đơn giản cho demo
-      final sampleWorkout = WorkoutModel(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        userId: user.id,
-        name: "Workout mẫu",
-        description: "Workout cơ bản để bắt đầu",
-        exercises: [], // Sẽ được thêm sau
-        startTime: DateTime.now(),
-        status: 'planned',
-        workoutType: 'mixed',
-      );
-
-      await _firestore
-          .collection(usersCollection)
-          .doc(user.id)
-          .collection(workoutsSubcollection)
-          .doc(sampleWorkout.id)
-          .set(sampleWorkout.toMap());
-
-      print('Đã tạo workout mẫu');
-    } catch (e) {
-      print('Lỗi khi tạo workout mẫu: $e');
     }
   }
 }

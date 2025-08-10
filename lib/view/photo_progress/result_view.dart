@@ -9,7 +9,6 @@ import '../../common/common.dart';
 import '../../common_widget/round_button.dart';
 import '../../l10n/app_localizations.dart';
 
-
 class ResultView extends StatefulWidget {
   final DateTime date1;
   final DateTime date2;
@@ -17,7 +16,6 @@ class ResultView extends StatefulWidget {
 
   @override
   State<ResultView> createState() => _ResultViewState();
-
 }
 
 class _ResultViewState extends State<ResultView> {
@@ -40,7 +38,7 @@ class _ResultViewState extends State<ResultView> {
 
   void _onShareTap() {
     final l10n = AppLocalizations.of(context);
-    const progress = 62; // demo theo UI
+    const progress = 62; // Giá trị tiến độ mặc định
     final summary = '${l10n?.result ?? 'Result'} • '
         '${l10n?.averageProgress ?? 'Average Progress'}: $progress%';
 
@@ -96,8 +94,6 @@ class _ResultViewState extends State<ResultView> {
     }
   }
 
-
-
   List imaArr = [
     {
       "title": "frontFacing",
@@ -129,8 +125,6 @@ class _ResultViewState extends State<ResultView> {
       "month_2_per": "67%",
     },
     {
-
-
       "title": "heightIncrease",
       "diff_per": "88",
       "month_1_per": "88%",
@@ -244,8 +238,6 @@ class _ResultViewState extends State<ResultView> {
                     child: Container(
                       width: (media.width * 0.5) - 40,
                       height: 40,
-
-
                       decoration: BoxDecoration(
                           gradient: LinearGradient(colors: TColor.primaryG),
                           borderRadius: BorderRadius.circular(30)),
@@ -290,7 +282,8 @@ class _ResultViewState extends State<ResultView> {
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(30)),
                               child: Text(
-                                AppLocalizations.of(context)?.statistic ?? "Statistic",
+                                AppLocalizations.of(context)?.statistic ??
+                                    "Statistic",
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     color: selectButton == 1
@@ -321,7 +314,8 @@ class _ResultViewState extends State<ResultView> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          AppLocalizations.of(context)?.averageProgress ?? "Average Progress",
+                          AppLocalizations.of(context)?.averageProgress ??
+                              "Average Progress",
                           style: TextStyle(
                               color: TColor.black,
                               fontSize: 16,
@@ -465,7 +459,8 @@ class _ResultViewState extends State<ResultView> {
                               ]);
                         }),
                     RoundButton(
-                        title: AppLocalizations.of(context)?.backToHome ?? "Back to Home",
+                        title: AppLocalizations.of(context)?.backToHome ??
+                            "Back to Home",
                         onPressed: () {
                           Navigator.pop(context);
                         }),
@@ -675,7 +670,8 @@ class _ResultViewState extends State<ResultView> {
                               ]);
                         }),
                     RoundButton(
-                        title: AppLocalizations.of(context)?.backToHome ?? "Back to Home",
+                        title: AppLocalizations.of(context)?.backToHome ??
+                            "Back to Home",
                         onPressed: () {
                           Navigator.pop(context);
                         }),

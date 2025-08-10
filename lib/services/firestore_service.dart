@@ -23,7 +23,6 @@ class FirestoreService {
     double? weight,
     double? height,
     double? targetWeight,
-    String? goal,
   }) async {
     try {
       print(
@@ -38,7 +37,6 @@ class FirestoreService {
         'weight': weight ?? 0.0,
         'height': height ?? 0.0,
         'targetWeight': targetWeight ?? 0.0,
-        'goal': goal ?? '',
         'createdAt': FieldValue.serverTimestamp(),
         'updatedAt': FieldValue.serverTimestamp(),
       };
@@ -76,7 +74,6 @@ class FirestoreService {
     double? weight,
     double? height,
     double? targetWeight,
-    String? goal,
   }) async {
     try {
       Map<String, dynamic> updateData = {
@@ -91,7 +88,6 @@ class FirestoreService {
       if (weight != null) updateData['weight'] = weight;
       if (height != null) updateData['height'] = height;
       if (targetWeight != null) updateData['targetWeight'] = targetWeight;
-      if (goal != null) updateData['goal'] = goal;
 
       await _users.doc(userId).update(updateData);
     } catch (e) {

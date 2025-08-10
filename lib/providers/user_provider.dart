@@ -37,10 +37,10 @@ class UserProvider with ChangeNotifier {
           lastName: userData['lastName'] ?? '',
           dateOfBirth: userData['dateOfBirth'] ?? '',
           gender: userData['gender'] ?? '',
+          phone: userData['phone'] ?? '',
           weight: (userData['weight'] ?? 0.0).toDouble(),
           height: (userData['height'] ?? 0.0).toDouble(),
           targetWeight: (userData['targetWeight'] ?? 0.0).toDouble(),
-          goal: userData['goal'] ?? '',
         );
       } else {
         // Create default user if no data exists
@@ -144,7 +144,6 @@ class UserProvider with ChangeNotifier {
     String? gender,
     double? weight,
     double? height,
-    String? goal,
   }) async {
     if (_user == null) return false;
 
@@ -158,7 +157,6 @@ class UserProvider with ChangeNotifier {
         gender: gender,
         weight: weight,
         height: height,
-        goal: goal,
         updatedAt: DateTime.now(),
       );
 
@@ -171,7 +169,6 @@ class UserProvider with ChangeNotifier {
         gender: gender,
         weight: weight,
         height: height,
-        goal: goal,
       );
 
       _error = null;
@@ -277,39 +274,5 @@ class UserProvider with ChangeNotifier {
     } else {
       print('UserProvider: User chưa có đủ thông tin để tạo workout');
     }
-  }
-
-  // Set demo user for testing
-  void setDemoUser() {
-    _user = UserModel(
-      id: 'demo_user',
-      email: 'demo@example.com',
-      firstName: 'Demo',
-      lastName: 'User',
-      dateOfBirth: '1990-01-01',
-      gender: 'Nam',
-      weight: 70.0,
-      height: 170.0,
-      targetWeight: 65.0,
-      goal: 'Giảm cân',
-    );
-    notifyListeners();
-  }
-
-  // Method for testing without Firebase
-  void initializeTestData() {
-    _user = UserModel(
-      id: 'test_user',
-      email: 'test@example.com',
-      firstName: 'Test',
-      lastName: 'User',
-      dateOfBirth: '1990-01-01',
-      gender: 'Nam',
-      weight: 75.0,
-      height: 170.0,
-      targetWeight: 70.0,
-      goal: 'Giảm cân',
-    );
-    notifyListeners();
   }
 }
