@@ -368,35 +368,63 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                                         ],
                                       ),
                                     ),
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: _getStatusColor(todayWorkout!.status),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          if (todayWorkout!.status == 'completed') ...[
+                                            Icon(Icons.check, size: 12, color: TColor.white),
+                                            const SizedBox(width: 4),
+                                          ],
+                                          Text(
+                                            _getStatusText(todayWorkout!.status),
+                                            style: TextStyle(
+                                              color: TColor.white,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
-                              // Danh sách exercises của workout hôm nay
-                              ...todayWorkout!.exercises
-                                  .take(3)
-                                  .map((workoutExercise) {
-                                if (workoutExercise.exercise != null) {
-                                  return _buildCompactExerciseCard(
-                                      workoutExercise.exercise!);
-                                } else {
-                                  // Nếu exercise null, tìm trong danh sách exercises đã load
-                                  final exercise = exercises.firstWhere(
-                                    (ex) => ex.id == workoutExercise.exerciseId,
-                                    orElse: () => exercises.isNotEmpty
-                                        ? exercises.first
-                                        : ExerciseModel(
-                                            id: workoutExercise.exerciseId,
-                                            name: "Unknown Exercise",
-                                            vietnameseName:
-                                                "Bài tập không xác định",
-                                            description:
-                                                "Bài tập không xác định",
-                                            exerciseType: "reps",
-                                          ),
-                                  );
-                                  return _buildCompactExerciseCard(exercise);
-                                }
-                              }),
+                              // Danh sách exercises của workout hôm nay (chọn 3 bài không trùng)
+                              ...(() {
+                                final seen = <String>{};
+                                final selected = todayWorkout!.exercises.where((we) {
+                                  if (seen.contains(we.exerciseId)) return false;
+                                  seen.add(we.exerciseId);
+                                  return true;
+                                }).take(3).toList();
+                                return selected.map((workoutExercise) {
+                                  if (workoutExercise.exercise != null) {
+                                    return _buildCompactExerciseCard(workoutExercise.exercise!);
+                                  } else {
+                                    // Nếu exercise null, tìm trong danh sách exercises đã load
+                                    final exercise = exercises.firstWhere(
+                                      (ex) => ex.id == workoutExercise.exerciseId,
+                                      orElse: () => exercises.isNotEmpty
+                                          ? exercises.first
+                                          : ExerciseModel(
+                                              id: workoutExercise.exerciseId,
+                                              name: "Unknown Exercise",
+                                              vietnameseName: "Bài tập không xác định",
+                                              description: "Bài tập không xác định",
+                                              exerciseType: "reps",
+                                            ),
+                                    );
+                                    return _buildCompactExerciseCard(exercise);
+                                  }
+                                }).toList();
+                              }()),
                             ],
                           ),
               ),
@@ -694,6 +722,37 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
         return Icons.fitness_center;
     }
   }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'planned':
+        return TColor.primaryColor1;
+      case 'in_progress':
+        return Colors.orange;
+      case 'completed':
+        return Colors.green;
+      case 'cancelled':
+        return Colors.red;
+      default:
+        return TColor.gray;
+    }
+  }
+
+  String _getStatusText(String status) {
+    switch (status) {
+      case 'planned':
+        return 'Đã lên kế hoạch';
+      case 'in_progress':
+        return 'Đang thực hiện';
+      case 'completed':
+        return 'Đã hoàn thành';
+      case 'cancelled':
+        return 'Đã hủy';
+      default:
+        return 'Không xác định';
+    }
+  }
+
 
   // Build compact exercise card cho Today Target section
   Widget _buildCompactExerciseCard(ExerciseModel exercise) {

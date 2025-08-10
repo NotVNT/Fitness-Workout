@@ -36,12 +36,35 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
       false; // true = đang nghỉ để sang set tiếp theo (5 phút)
 
 
+  // Display list limited to 3 unique exercises by exerciseId
+  List<WorkoutExercise> _displayExercises = [];
+  // Mapping from display index -> original index in workout.exercises
+  List<int> _originalIndices = [];
+
+
+
+  // Build display list once from the workout: 3 unique by exerciseId
+  void _buildDisplayExercises() {
+    final seen = <String>{};
+    _displayExercises = [];
+    _originalIndices = [];
+    for (var i = 0; i < widget.workout.exercises.length; i++) {
+      final we = widget.workout.exercises[i];
+      if (seen.add(we.exerciseId)) {
+        _displayExercises.add(we);
+        _originalIndices.add(i);
+        if (_displayExercises.length >= 3) break;
+      }
+    }
+  }
+
   ExerciseModel? currentExercise;
   WorkoutExercise? currentWorkoutExercise;
 
   @override
   void initState() {
     super.initState();
+    _buildDisplayExercises();
     _initializeCurrentExercise();
   }
 
@@ -52,8 +75,8 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
   }
 
   void _initializeCurrentExercise() {
-    if (currentExerciseIndex < widget.workout.exercises.length) {
-      currentWorkoutExercise = widget.workout.exercises[currentExerciseIndex];
+    if (currentExerciseIndex < _displayExercises.length) {
+      currentWorkoutExercise = _displayExercises[currentExerciseIndex];
       currentExercise = _getExerciseById(currentWorkoutExercise!.exerciseId);
 
       if (currentExercise!.exerciseType == 'duration') {
@@ -163,11 +186,11 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
     final sets = currentWorkoutExercise?.sets ?? [];
     final hasNextSet = currentSetIndex + 1 < sets.length;
     if (hasNextSet) {
-      // Nghỉ 5 phút giữa các set
+      // Nghỉ 1 phút giữa các set
       setState(() {
         isResting = true;
         _restForNextSet = true;
-        _restTime = 300; // 5 phút
+        _restTime = 60; // 1 phút
       });
       _startTimer();
     } else {
@@ -177,13 +200,13 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
   }
 
   void _startRestPeriod() {
-    // Nghỉ giữa bài hiện tại và bài tiếp theo (10s)
-    if (currentExerciseIndex < widget.workout.exercises.length - 1) {
+    // Nghỉ giữa bài hiện tại và bài tiếp theo (1 phút)
+    if (currentExerciseIndex < _displayExercises.length - 1) {
       setState(() {
         isResting = true;
         isPaused = false;
         _restForNextSet = false;
-        _restTime = 10;
+        _restTime = 60;
       });
       _startTimer(); // đảm bảo bắt đầu đếm nghỉ ngay
 
@@ -196,10 +219,10 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
     currentExerciseIndex++;
     currentSetIndex = 0;
 
-    if (currentExerciseIndex < widget.workout.exercises.length) {
+    if (currentExerciseIndex < _displayExercises.length) {
       setState(() {
         isResting = false;
-        _restTime = 10;
+        _restTime = 60;
       });
       _initializeCurrentExercise();
     } else {
@@ -207,15 +230,21 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
     }
   }
 
-  void _completeWorkout() {
+  void _completeWorkout() async {
     _timer?.cancel();
+    try {
+      // Đánh dấu workout hoàn thành trên Firestore
+      await WorkoutService.completeWorkout(widget.workout.userId, widget.workout.id);
+    } catch (e) {
+      debugPrint('Không thể đánh dấu workout hoàn thành: $e');
+    }
     setState(() {
       isCompleted = true;
     });
   }
 
   void _skipExercise() {
-    if (currentExerciseIndex < widget.workout.exercises.length - 1) {
+    if (currentExerciseIndex < _displayExercises.length - 1) {
       _startRestPeriod();
     } else {
       _completeWorkout();
@@ -252,7 +281,7 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
                   Expanded(
                     child: LinearProgressIndicator(
                       value: (currentExerciseIndex + 1) /
-                          widget.workout.exercises.length,
+                          _displayExercises.length,
                       backgroundColor: TColor.lightGray,
                       valueColor:
                           AlwaysStoppedAnimation<Color>(TColor.primaryColor1),
@@ -260,7 +289,7 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
                   ),
                   const SizedBox(width: 15),
                   Text(
-                    "${currentExerciseIndex + 1}/${widget.workout.exercises.length}",
+                    "${currentExerciseIndex + 1}/${_displayExercises.length}",
                     style: TextStyle(
                       color: TColor.gray,
                       fontSize: 12,
@@ -493,11 +522,11 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
                 ),
               ),
               const SizedBox(height: 30),
-              if (currentExerciseIndex + 1 < widget.workout.exercises.length)
+              if (currentExerciseIndex + 1 < _displayExercises.length)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text(
-                    "Tiếp theo: ${_getExerciseById(widget.workout.exercises[currentExerciseIndex + 1].exerciseId).vietnameseName}",
+                    "Tiếp theo: ${_getExerciseById(_displayExercises[currentExerciseIndex + 1].exerciseId).vietnameseName}",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: TColor.white,
@@ -605,7 +634,7 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
   Future<void> _markCurrentSetCompletedInDb() async {
     try {
       final sets = currentWorkoutExercise?.sets ?? [];
-      if (currentExerciseIndex >= widget.workout.exercises.length ||
+      if (currentExerciseIndex >= _displayExercises.length ||
           currentSetIndex >= sets.length) {
         return;
       }
@@ -614,11 +643,14 @@ class _WorkoutExerciseViewState extends State<WorkoutExerciseView> {
       sets[currentSetIndex] = sets[currentSetIndex].copyWith(isCompleted: true);
 
       // Ghi lên Firestore: update workout.exercises array toàn bộ
-      final updatedExercises =
-          widget.workout.exercises.asMap().entries.map((e) {
+      // Cần ánh xạ chỉ số hiển thị (đã lọc unique) sang chỉ số gốc trong workout
+      final originalIdx = (currentExerciseIndex < _originalIndices.length)
+          ? _originalIndices[currentExerciseIndex]
+          : currentExerciseIndex;
+      final updatedExercises = widget.workout.exercises.asMap().entries.map((e) {
         final idx = e.key;
         final we = e.value;
-        if (idx == currentExerciseIndex) {
+        if (idx == originalIdx) {
           return WorkoutExercise(
             exerciseId: we.exerciseId,
             exercise: we.exercise,

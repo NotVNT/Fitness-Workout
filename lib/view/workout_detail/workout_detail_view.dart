@@ -8,11 +8,13 @@ import 'workout_exercise_view.dart';
 class WorkoutDetailView extends StatefulWidget {
   final WorkoutModel workout;
   final List<ExerciseModel> allExercises;
+  final bool isPreviewOnly;
 
   const WorkoutDetailView({
     Key? key,
     required this.workout,
     required this.allExercises,
+    this.isPreviewOnly = false,
   }) : super(key: key);
 
   @override
@@ -20,6 +22,8 @@ class WorkoutDetailView extends StatefulWidget {
 }
 
 class _WorkoutDetailViewState extends State<WorkoutDetailView> {
+  bool get _isPreviewOnly => widget.isPreviewOnly;
+
   List<ExerciseModel> _catalog = [];
 
 
@@ -69,9 +73,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
           ),
         ),
         title: Text(
-
-          widget.workout.name,
-
+          _cleanTitle(widget.workout.name),
           style: TextStyle(
             color: TColor.black,
             fontSize: 16,
@@ -134,7 +136,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                           child: Column(
                             children: [
                               Text(
-                                "${widget.workout.exercises.length}",
+                                "${_uniqueExerciseCount()}",
                                 style: TextStyle(
                                   color: TColor.white,
                                   fontSize: 24,
@@ -232,7 +234,7 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                         ),
                         const Spacer(),
                         Text(
-                          "${widget.workout.exercises.length} bài tập",
+                          "${_uniqueExerciseCount()} bài tập",
                           style: TextStyle(
                             color: TColor.gray,
                             fontSize: 12,
@@ -254,45 +256,53 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
                     ),
                     const SizedBox(height: 10),
 
-                    // Exercise list
+                    // Exercise list (show 3 unique exercises by ID)
                     Expanded(
-                      child: ListView.builder(
-                        padding: EdgeInsets.zero,
-                        itemCount: widget.workout.exercises.length,
-                        itemBuilder: (context, index) {
-                          final workoutExercise =
-                              widget.workout.exercises[index];
-                          final exercise =
-                              _getExerciseById(workoutExercise.exerciseId);
+                      child: Builder(builder: (context) {
+                        final uniqueThree = (() {
+                          final seen = <String>{};
+                          return widget.workout.exercises.where((we) {
+                            if (seen.contains(we.exerciseId)) return false;
+                            seen.add(we.exerciseId);
+                            return true;
+                          }).take(3).toList();
+                        })();
 
-                          return _buildExerciseRow(
-                              exercise, workoutExercise);
-                        },
-                      ),
+                        return ListView.builder(
+                          padding: EdgeInsets.zero,
+                          itemCount: uniqueThree.length,
+                          itemBuilder: (context, index) {
+                            final workoutExercise = uniqueThree[index];
+                            final exercise = _getExerciseById(workoutExercise.exerciseId);
+                            return _buildExerciseRow(exercise, workoutExercise);
+                          },
+                        );
+                      }),
                     ),
 
-                    // Start button
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 20),
-                      child: MaterialButton(
-                        onPressed: () {
-                          _startWorkout();
-                        },
-                        height: 50,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
-                        ),
-                        color: TColor.primaryColor1,
-                        child: Text(
-                          "Khởi đầu",
-                          style: TextStyle(
-                            color: TColor.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
+                    // Start button ẩn trong chế độ xem trước "Bài tập sắp tới"
+                    if (!_isPreviewOnly)
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        child: MaterialButton(
+                          onPressed: () {
+                            _startWorkout();
+                          },
+                          height: 50,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          color: TColor.primaryColor1,
+                          child: Text(
+                            "Khởi đầu",
+                            style: TextStyle(
+                              color: TColor.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ),
@@ -331,6 +341,17 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
     );
   }
 
+  // Count unique exercises by exerciseId, capped at 3 for display
+  int _uniqueExerciseCount() {
+    final ids = <String>{};
+    for (final we in widget.workout.exercises) {
+      ids.add(we.exerciseId);
+      if (ids.length >= 3) break;
+    }
+    return ids.length;
+  }
+
+
 
   // Calculate total workout time
   int _calculateTotalTime() {
@@ -352,8 +373,8 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
         }
       }
 
-      // Add rest time between exercises (10s)
-      totalSeconds += 10;
+      // Add rest time between exercises (1 minute)
+      totalSeconds += 60;
     }
 
     return (totalSeconds / 60).round(); // Convert to minutes
@@ -461,4 +482,12 @@ class _WorkoutDetailViewState extends State<WorkoutDetailView> {
       ),
     );
   }
+
+  // Remove the Vietnamese weekday word "Thứ ..." from titles for cleaner display
+  String _cleanTitle(String title) {
+    return title
+        .replaceAll(RegExp(r"\s*-?\s*Thứ\s*[A-Za-zÀ-ỹ]+", caseSensitive: false), '')
+        .trim();
+  }
+
 }

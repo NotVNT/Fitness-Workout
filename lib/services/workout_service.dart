@@ -146,6 +146,24 @@ class WorkoutService {
     }
   }
 
+  // Stream realtime các workout đã hoàn thành gần đây của user
+  static Stream<List<WorkoutModel>> recentCompletedWorkoutsStream(
+      String userId, {
+      int limit = 3,
+    }) {
+    return _firestore
+        .collection(usersCollection)
+        .doc(userId)
+        .collection(workoutsSubcollection)
+        .where('status', isEqualTo: 'completed')
+        .orderBy('endTime', descending: true)
+        .limit(limit)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => WorkoutModel.fromFirestore(doc))
+            .toList());
+  }
+
 
   // Lấy workout theo ngày hiện tại (dựa trên dayNumber)
   static Future<WorkoutModel?> getTodayWorkout(String userId) async {
