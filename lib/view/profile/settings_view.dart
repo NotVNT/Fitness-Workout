@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../../common/colo_extension.dart';
 import '../../common_widget/language_selector.dart';
 import '../../l10n/app_localizations.dart';
+
 import '../../services/workout_reminder_service.dart';
+
 
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
@@ -14,6 +16,7 @@ class SettingsView extends StatefulWidget {
 
 class _SettingsViewState extends State<SettingsView> {
   bool _pushEnabled = true;
+
   TimeOfDay? _workoutReminder;
 
   @override
@@ -29,6 +32,7 @@ class _SettingsViewState extends State<SettingsView> {
       _workoutReminder = res == null ? null : TimeOfDay(hour: res.h, minute: res.m);
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -88,6 +92,7 @@ class _SettingsViewState extends State<SettingsView> {
                         ),
                         const SizedBox(width: 15),
                         Expanded(
+
                           child: InkWell(
                             onTap: () async {
                               final picked = await showTimePicker(

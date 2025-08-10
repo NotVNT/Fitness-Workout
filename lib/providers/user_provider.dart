@@ -236,7 +236,6 @@ class UserProvider with ChangeNotifier {
     }
   }
 
-
   // Tự động tạo workout nếu user có đủ thông tin
   Future<void> _autoCreateWorkoutIfNeeded() async {
     print('🔥 UserProvider: _autoCreateWorkoutIfNeeded() được gọi');
@@ -279,7 +278,6 @@ class UserProvider with ChangeNotifier {
       print('UserProvider: User chưa có đủ thông tin để tạo workout');
     }
   }
-
 
   // Set demo user for testing
   void setDemoUser() {
