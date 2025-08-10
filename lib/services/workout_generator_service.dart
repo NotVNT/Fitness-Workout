@@ -122,42 +122,7 @@ class WorkoutGeneratorService {
     }
   }
 
-  // Chọn bài tập phù hợp với mục tiêu
-  static List<ExerciseModel> _selectExercises(
-      List<ExerciseModel> exercises, String goal, double intensity) {
-    List<ExerciseModel> selected = [];
 
-    if (goal == 'lose_weight') {
-      // Ưu tiên cardio và bài tập đốt cháy calories
-      selected.addAll(_getExercisesByName(exercises, [
-        'Jumping Jack',
-        'Jump Rope',
-        'Mountain Climber',
-        'Jogging',
-        'Cycling',
-        'Squat',
-        'Push-up'
-      ]));
-    } else if (goal == 'gain_muscle') {
-      // Ưu tiên strength training
-      selected.addAll(_getExercisesByName(exercises, [
-        'Push-up',
-        'Squat',
-        'Plank',
-        'Sit-up',
-        'Mountain Climber',
-        'Jumping Jack'
-      ]));
-    } else {
-      // Maintain - mix cả cardio và strength
-      selected.addAll(_getExercisesByName(exercises,
-          ['Push-up', 'Squat', 'Plank', 'Jumping Jack', 'Walking', 'Sit-up']));
-    }
-
-    // Giới hạn số lượng bài tập dựa trên cường độ
-    int maxExercises = (intensity * 2).round().clamp(3, 6);
-    return selected.take(maxExercises).toList();
-  }
 
 
   static List<ExerciseModel> _selectDailyExercises(
@@ -290,16 +255,6 @@ class WorkoutGeneratorService {
     }
   }
 
-  // Lấy bài tập theo tên
-  static List<ExerciseModel> _getExercisesByName(
-      List<ExerciseModel> exercises, List<String> names) {
-    return names
-        .map((name) => exercises.firstWhere(
-              (ex) => ex.name == name,
-              orElse: () => exercises.first,
-            ))
-        .toList();
-  }
 
   // Tạo sets cho từng bài tập
   static List<SetModel> _generateSetsForExercise(

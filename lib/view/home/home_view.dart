@@ -8,6 +8,8 @@ import 'package:provider/provider.dart';
 import '../../common/colo_extension.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/user_provider.dart';
+import '../../services/workout_service.dart';
+import '../../models/workout_model.dart';
 import 'activity_tracker_view.dart';
 import 'finished_workout_view.dart';
 import 'notification_view.dart';
@@ -21,38 +23,18 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  List lastWorkoutArr = [
-    {
-      "name": "fullBodyWorkout",
-      "image": "assets/img/Workout1.png",
-      "kcal": "180",
-      "time": "20",
-      "progress": 0.3
-    },
-    {
-      "name": "lowerBodyWorkout",
-      "image": "assets/img/Workout2.png",
-      "kcal": "200",
-      "time": "30",
-      "progress": 0.4
-    },
-    {
-      "name": "abWorkout",
-      "image": "assets/img/Workout3.png",
-      "kcal": "300",
-      "time": "40",
-      "progress": 0.7
-    },
-  ];
+  // Dữ liệu 'Bài tập gần đây' sẽ được lấy từ Workout Tracker (đã hoàn thành)
+  List lastWorkoutArr = [];
   List<int> showingTooltipOnSpots = [21];
 
   @override
   void initState() {
     super.initState();
     // Load user data when the home view initializes
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final userProvider = Provider.of<UserProvider>(context, listen: false);
-      userProvider.loadUserData();
+      await userProvider.loadUserData();
+      await _loadRecentCompletedWorkouts();
     });
   }
 
@@ -104,6 +86,62 @@ class _HomeViewState extends State<HomeView> {
         FlSpot(29, 60),
         FlSpot(30, 40)
       ];
+  Future<void> _loadRecentCompletedWorkouts() async {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    if (userProvider.user == null) return;
+
+    final recents = await WorkoutService.getRecentCompletedWorkouts(
+      userProvider.user!.id,
+      limit: 3,
+    );
+
+    if (!mounted) return;
+    setState(() {
+      lastWorkoutArr = recents.map((w) {
+        return {
+          "name": _cleanTitle(w.name),
+          "image": _iconFromType(w.workoutType),
+          "kcal": (w.caloriesBurned ?? 0).toString(),
+          "time": (w.duration ?? _estimateDurationFromExercises(w)).toString(),
+          "progress": 1.0,
+        };
+      }).toList();
+    });
+  }
+
+  String _iconFromType(String? workoutType) {
+    switch (workoutType) {
+      case 'lose_weight':
+        return 'assets/img/Workout1.png';
+      case 'gain_muscle':
+        return 'assets/img/Workout2.png';
+      case 'maintain':
+        return 'assets/img/Workout3.png';
+      default:
+        return 'assets/img/Workout1.png';
+    }
+  }
+
+  int _estimateDurationFromExercises(WorkoutModel w) {
+    int totalSeconds = 0;
+    for (final ex in w.exercises) {
+      for (final set in ex.sets) {
+        if (set.duration != null && set.duration! > 0) {
+          totalSeconds += set.duration!;
+        } else {
+          totalSeconds += (set.reps * 3);
+        }
+        totalSeconds += (set.restTime ?? 60);
+      }
+    }
+    return (totalSeconds / 60).ceil();
+  }
+
+  String _cleanTitle(String title) {
+    return title.replaceAll(RegExp(r"\s*-?\s*Thứ\s*[A-Za-zÀ-ỹ]+", caseSensitive: false), '').trim();
+  }
+
+
 
   List waterArr = [
     {"title": "6am - 8am", "subtitle": "600ml"},

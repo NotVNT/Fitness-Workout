@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 
 import '../../common/colo_extension.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/user_model.dart';
 import '../../services/auth_service.dart';
 
+
 import '../../services/firestore_service.dart';
+
 import 'widgets/editable_info_tile.dart';
 
 
@@ -64,11 +66,13 @@ class _PersonalDataViewState extends State<PersonalDataView> {
           String dob =
               user?.dateOfBirth.isNotEmpty == true ? user!.dateOfBirth : '--';
           String gender = user?.gender.isNotEmpty == true ? user!.gender : '--';
+
           String goal = user?.goal.isNotEmpty == true ? user!.goal : '--';
           String phone = (userData != null &&
                   (userData['phone']?.toString().isNotEmpty == true))
               ? userData['phone']
               : '--';
+
 
 
           return Stack(

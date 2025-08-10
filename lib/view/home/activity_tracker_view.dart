@@ -1,18 +1,20 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../common/colo_extension.dart';
+
 import '../../common_widget/today_target_cell.dart';
 import '../../common_widget/icon_text_button.dart';
 import '../../l10n/app_localizations.dart';
 
+
 import '../../providers/user_provider.dart';
+
 import '../../models/exercise_model.dart';
 import '../../models/workout_model.dart';
 import '../../services/workout_service.dart';
-import '../../providers/step_counter_provider.dart';
 
 
 class ActivityTrackerView extends StatefulWidget {
@@ -25,22 +27,11 @@ class ActivityTrackerView extends StatefulWidget {
 class _ActivityTrackerViewState extends State<ActivityTrackerView> {
   int touchedIndex = -1;
   List<ExerciseModel> exercises = [];
-  bool isLoadingExercises = true;
+
   WorkoutModel? todayWorkout;
   bool isLoadingTodayWorkout = true;
 
-  List latestArr = [
-    {
-      "image": "assets/img/pic_4.png",
-      "title": "Drinking 300ml Water",
-      "time": "About 1 minutes ago"
-    },
-    {
-      "image": "assets/img/pic_5.png",
-      "title": "Eat Snack (Fitbar)",
-      "time": "About 3 hours ago"
-    },
-  ];
+
 
   @override
   void initState() {
@@ -69,7 +60,6 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
 
       setState(() {
         exercises = loadedExercises;
-        isLoadingExercises = false;
       });
 
       print('🏃 ActivityTracker: Đã load ${exercises.length} exercises');
@@ -77,9 +67,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
         print('🏃 - ${ex.name} (${ex.vietnameseName}) - ${ex.exerciseType}');
       }
     } catch (e) {
-      setState(() {
-        isLoadingExercises = false;
-      });
+
       print('🏃 ActivityTracker: Lỗi load exercises: $e');
     }
   }
@@ -229,7 +217,7 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                     const SizedBox(
                       height: 15,
                     ),
-                    Row(
+                    const Row(
                       children: [
                         Expanded(
                           child: TodayTargetCell(
@@ -242,15 +230,11 @@ class _ActivityTrackerViewState extends State<ActivityTrackerView> {
                           width: 15,
                         ),
                         Expanded(
-                          child: Builder(builder: (context) {
-                            final steps =
-                                context.watch<StepCounterProvider>().stepsToday;
-                            return TodayTargetCell(
-                              icon: "assets/img/foot.png",
-                              value: steps.toString(),
-                              title: "Foot Steps",
-                            );
-                          }),
+                          child: TodayTargetCell(
+                            icon: "assets/img/foot.png",
+                            value: "2400",
+                            title: "Foot Steps",
+                          ),
                         ),
                       ],
                     )
